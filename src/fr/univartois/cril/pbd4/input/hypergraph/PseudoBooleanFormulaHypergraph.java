@@ -20,11 +20,13 @@
 
 package fr.univartois.cril.pbd4.input.hypergraph;
 
+import org.sat4j.specs.IConstr;
+import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
 
 /**
- * The PseudoBooleanFormulaHypergraph defines the contract for a hypergraph representation
- * of a pseudo-Boolean formula.
+ * The PseudoBooleanFormulaHypergraph defines the interface for a hypergraph
+ * representation of a pseudo-Boolean formula.
  *
  * @author Romain WALLON
  *
@@ -33,10 +35,19 @@ import org.sat4j.specs.IVecInt;
 public interface PseudoBooleanFormulaHypergraph {
 
     /**
-     * Gives the cutset of this hypergraph, i.e. the identifier of the hyperedges to
-     * remove in order to get a hypergraph made of (at least) two separate sub-hypergraph.
-     * 
-     * @return The cutset of this hypergraph.
+     * Gives the connected components in the associated pseudo-Boolean formula.
+     * A connected component is a vector of constraints that share variables.
+     *
+     * @return The vector of connected components.
+     */
+    IVec<IVec<IConstr>> connectedComponents();
+
+    /**
+     * Gives the cutset of the associated pseudo-Boolean formula.
+     * A cutset is represented by a vector of variables to assign to get (at least) two
+     * sub-formulae that do not share any variable.
+     *
+     * @return The cutset of the formula.
      */
     IVecInt cutset();
 

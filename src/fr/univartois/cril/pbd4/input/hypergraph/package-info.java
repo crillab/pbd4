@@ -1,8 +1,10 @@
 /**
- * The {@code fr.univartois.cril.pbd4.hypergraph} allows to handle the hypergraph
- * associated to the PB formulae to compile and their partitioning with JKaHyPar.
- * 
+ * The {@code fr.univartois.cril.pbd4.input.hypergraph} package provides the
+ * representation of the hypergraphs associated to a pseudo-Boolean formula to compile and
+ * their partitioning with JKaHyPar.
+ *
  * @author Romain WALLON
+ *
  * @version 0.1.0
  */
 

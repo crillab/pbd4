@@ -7,7 +7,7 @@ import org.sat4j.specs.IVecInt;
 import fr.univartois.cril.pbd4.ddnnf.ConjunctionNode;
 import fr.univartois.cril.pbd4.ddnnf.DecisionDnnf;
 import fr.univartois.cril.pbd4.ddnnf.LeafNode;
-import fr.univartois.cril.pbd4.input.graph.PseudoBooleanFormulaGraph;
+import fr.univartois.cril.pbd4.input.hypergraph.PseudoBooleanFormulaHypergraph;
 import fr.univartois.cril.pbd4.solver.PseudoBooleanSolver;
 import fr.univartois.cril.pbd4.solver.SolverStatus;
 
@@ -15,7 +15,7 @@ public class D4 {
 	
     private final PseudoBooleanSolver solver;
     
-    private PseudoBooleanFormulaGraph graph;
+    private PseudoBooleanFormulaHypergraph graph;
 
     public D4(PseudoBooleanSolver solver) {
         super();
@@ -47,11 +47,7 @@ public class D4 {
         var lnd = new Vec<DecisionDnnf>();
         for (var it = components.iterator(); it.hasNext();) {
             var component = it.next();
-            var lvc = restrict(vecInt, component);
-            var v = lvc.last();
-            
             // TODO Compute HGP and recursively compile.
-            lvc.pop();
         }
         
         var node = new ConjunctionNode(s, lnd);

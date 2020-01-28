@@ -20,22 +20,76 @@
 
 package fr.univartois.cril.pbd4.input.hypergraph;
 
+import org.sat4j.specs.IConstr;
+import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
 
 import fr.univartois.cril.jkahypar.hypergraph.Hypergraph;
 
+/**
+ * The DualHypergraph represents the dual hypergraph of a pseudo-Boolean formula, i.e. the
+ * hypergraph in which the vertices are the constraints of the formula and a hyperedge
+ * represents a variable shared between the constraints joined by this hyperedge.
+ *
+ * @author Romain WALLON
+ *
+ * @version 0.1.0
+ */
 public final class DualHypergraph implements PseudoBooleanFormulaHypergraph {
-    
+
+    /**
+     * The constraints of the formula.
+     */
+    private final IConstr[] constraints;
+
+    /**
+     * The JKaHyPar representation of the hypergraph.
+     */
     private final Hypergraph hypergraph;
 
-    public DualHypergraph(Hypergraph hypergraph) {
+    /**
+     * The array storing, for each constraint, the identifiers of the hyperedges in which
+     * it appears.
+     */
+    private final IVecInt[] hyperedgesContainingConstraint;
+
+    /**
+     * Creates a new DualHypergraph.
+     * 
+     * @param constraints The constraints of the formula.
+     * @param hypergraph The JKaHyPar representation of the hypergraph.
+     * @param hyperedgesContainingConstraint The array storing, for each constraint, the
+     *        identifiers of the hyperedges in which it appears.
+     */
+    public DualHypergraph(IConstr[] constraints, Hypergraph hypergraph,
+            IVecInt[] hyperedgesContainingConstraint) {
+        this.constraints = constraints;
         this.hypergraph = hypergraph;
+        this.hyperedgesContainingConstraint = hyperedgesContainingConstraint;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * fr.univartois.cril.pbd4.input.graph.PseudoBooleanFormulaGraph#connectedComponents()
+     */
+    @Override
+    public IVec<IVec<IConstr>> connectedComponents() {
+        var finder = new DualHypergraphConnectedComponentFinder(
+                constraints, hyperedgesContainingConstraint);
+        return finder.connectedComponents();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * fr.univartois.cril.pbd4.input.hypergraph.PseudoBooleanFormulaHypergraph#cutset()
+     */
     @Override
     public IVecInt cutset() {
-        // TODO Auto-generated method stub
-        return null;
+        return DualHypergraphPartitionFinder.instance().cutsetOf(hypergraph);
     }
 
 }

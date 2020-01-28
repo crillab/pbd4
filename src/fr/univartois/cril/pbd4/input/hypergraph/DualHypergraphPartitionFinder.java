@@ -27,34 +27,68 @@ import fr.univartois.cril.jkahypar.KahyparContext;
 import fr.univartois.cril.jkahypar.hypergraph.Hypergraph;
 
 /**
- * The DualHypergraphPartitioner
+ * The DualHypergraphPartitionFinder allows to compute a partition of a hypergraph.
+ * 
+ * The system property {@code kahypar.config} must have been set to a INI file containing
+ * the configuration for JKaHyPar to be able to compute partitions.
+ * 
+ * This class is a singleton that is NOT thread-safe.
  *
  * @author Romain WALLON
  *
  * @version 1.0
  */
-public class DualHypergraphPartitioner {
+final class DualHypergraphPartitionFinder {
 
-    private static final DualHypergraphPartitioner INSTANCE = new DualHypergraphPartitioner();
+    /**
+     * The single instance of this class.
+     */
+    private static DualHypergraphPartitionFinder instance = new DualHypergraphPartitionFinder();
 
+    /**
+     * The JKaHyPar context used to compute partitions.
+     */
     private final KahyparContext context;
 
-    private DualHypergraphPartitioner() {
+    /**
+     * Creates a new DualHypergraphPartitionFinder.
+     * It initializes the context to be used.
+     */
+    private DualHypergraphPartitionFinder() {
         this.context = new KahyparContext();
         this.context.configureFrom(System.getProperty("kahypar.config"));
     }
 
+    /**
+     * Gives the single instance of this class.
+     * 
+     * @return The single instance of this class.
+     */
+    public static DualHypergraphPartitionFinder instance() {
+        if (instance == null) {
+            instance = new DualHypergraphPartitionFinder();
+        }
+        return instance;
+    }
+
+    /**
+     * Computes the cutset of the given hypergraph.
+     *
+     * @param hypergraph The hypergraph to compute the cutset of.
+     *
+     * @return The computed cutset.
+     */
     public IVecInt cutsetOf(Hypergraph hypergraph) {
         var partitioner = context.createPartitionerFor(hypergraph);
         var partition = partitioner.computePartition();
         int[] vertices = hypergraph.getHyperedgeVertices();
         var cutset = new VecInt();
-        
+
         for (int i = 0; i < hypergraph.getNumberOfHyperedges(); i++) {
             long[] hyperedgeIndices = hypergraph.getHyperedgeIndices();
             int begin = (int) hyperedgeIndices[i];
             int end = (int) hyperedgeIndices[i + 1];
-            
+
             // Copying the vertices, considering that vertices are currently shifted.
             int first = partition.blockOf(vertices[begin]);
             for (int j = begin + 1; j < end; j++) {
@@ -63,10 +97,18 @@ public class DualHypergraphPartitioner {
                     break;
                 }
             }
-
-            
         }
+
         return cutset;
+    }
+
+    /**
+     * Disposes the underlying JKaHyPar context to delete the memory it uses.
+     * Do not forget to invoke this method to avoid memory leaks.
+     */
+    public static void clearInstance() {
+        instance.context.close();
+        instance = null;
     }
 
 }

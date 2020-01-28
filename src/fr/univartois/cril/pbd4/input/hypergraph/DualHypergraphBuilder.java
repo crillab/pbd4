@@ -20,65 +20,161 @@
 
 package fr.univartois.cril.pbd4.input.hypergraph;
 
-import static fr.univartois.cril.jkahypar.hypergraph.UnweightedHyperedge.joining;
-
 import org.sat4j.core.LiteralsUtils;
 import org.sat4j.core.VecInt;
+import org.sat4j.specs.IConstr;
 import org.sat4j.specs.IVecInt;
 
 import fr.univartois.cril.jkahypar.hypergraph.HypergraphBuilder;
 
-public final class DualHypergraphBuilder {
+import static fr.univartois.cril.jkahypar.hypergraph.HypergraphBuilder.createHypergraph;
+import static fr.univartois.cril.jkahypar.hypergraph.UnweightedHyperedge.joining;
 
-    private final int nbVariables;
+/**
+ * The DualHypergraphBuilder allows to build the dual hypergraph of a pseudo-Boolean
+ * formula.
+ *
+ * @author Romain WALLON
+ *
+ * @version 0.1.0
+ */
+public final class DualHypergraphBuilder implements PseudoBooleanFormulaHypergraphBuilder {
 
-    private final int nbConstraints;
+    /**
+     * The constraints of the formula.
+     */
+    private IConstr[] constraints;
 
-    private final IVecInt[] constraintsContainingVariable;
+    /**
+     * The identifier of the next constraint.
+     */
+    private int nextIdentifier;
 
-    private int constraintIdentifier = 0;
+    /**
+     * The array storing, for each variable, the identifiers of the constraints in which
+     * it appears.
+     */
+    private IVecInt[] constraintsContainingVariable;
 
-    private DualHypergraphBuilder(int nbVariables, int nbConstraints) {
-        this.nbVariables = nbVariables;
-        this.nbConstraints = nbConstraints;
-        this.constraintsContainingVariable = new IVecInt[nbVariables + 1];
+    /**
+     * The array storing, for each constraint, the identifiers of the hyperedges in which
+     * it appears.
+     */
+    private IVecInt[] hyperedgesContainingConstraint;
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * fr.univartois.cril.pbd4.input.hypergraph.PseudoBooleanFormulaHypergraphBuilder#
+     * setNumberOfVariables(int)
+     */
+    @Override
+    public void setNumberOfVariables(int numberOfVariables) {
+        this.constraintsContainingVariable = new IVecInt[numberOfVariables + 1];
     }
 
-    public static DualHypergraphBuilder newInstance(int nbVariables, int nbConstraints) {
-        return new DualHypergraphBuilder(nbVariables, nbConstraints);
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * fr.univartois.cril.pbd4.input.hypergraph.PseudoBooleanFormulaHypergraphBuilder#
+     * setNumberOfConstraints(int)
+     */
+    @Override
+    public void setNumberOfConstraints(int numberOfConstraints) {
+        this.constraints = new IConstr[numberOfConstraints];
+        this.hyperedgesContainingConstraint = new IVecInt[numberOfConstraints];
     }
 
-    public DualHypergraphBuilder addConstraint(IVecInt literals) {
-        constraintIdentifier++;
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * fr.univartois.cril.pbd4.input.hypergraph.PseudoBooleanFormulaHypergraphBuilder#
+     * addConstraint(org.sat4j.specs.IConstr, org.sat4j.specs.IVecInt)
+     */
+    @Override
+    public void addConstraint(IConstr constraint, IVecInt literals) {
+        // Storing the constraint.
+        constraints[nextIdentifier] = constraint;
 
+        // Updating the pre-hypergraph.
         for (var it = literals.iterator(); it.hasNext();) {
             int variable = LiteralsUtils.var(it.next());
+            var vec = constraintsContainingVariable[variable];
 
-            if (constraintsContainingVariable[variable] == null) {
-                constraintsContainingVariable[variable] = new VecInt();
+            if (vec == null) {
+                vec = new VecInt();
+                constraintsContainingVariable[variable] = vec;
             }
 
-            constraintsContainingVariable[variable].push(constraintIdentifier);
+            vec.push(nextIdentifier);
         }
-        return this;
+
+        // Moving to the next identifier.
+        nextIdentifier++;
     }
 
-    public DualHypergraph build() {
-        var builder = HypergraphBuilder.createHypergraph(nbConstraints, nbVariables);
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * fr.univartois.cril.pbd4.input.hypergraph.PseudoBooleanFormulaHypergraphBuilder#
+     * build()
+     */
+    @Override
+    public PseudoBooleanFormulaHypergraph build() {
+        var builder = createHypergraph(constraints.length, constraintsContainingVariable.length - 1);
 
-        for (int i = 1; i < constraintsContainingVariable.length; i++) {
-            var constraints = constraintsContainingVariable[i];
-            if (constraints == null) {
-                builder.withHyperedge(joining());
+        // Adding the hyperedges.
+        for (int v = 1; v < constraintsContainingVariable.length; v++) {
+            var constraintsWithV = constraintsContainingVariable[v];
+            addHyperedge(builder, constraintsWithV);
+            associate(v - 1, constraintsWithV);
+        }
 
-            } else {
-                int[] vertices = new int[constraints.size()];
-                constraints.sort();
-                constraints.copyTo(vertices);
-                builder.withHyperedge(joining(vertices));
+        return new DualHypergraph(constraints,
+                builder.build(), hyperedgesContainingConstraint);
+    }
+
+    /**
+     * Adds a hyperedge joining the given vertices to the hypergraph built by the given
+     * builder.
+     * 
+     * @param builder The builder used to build the hypergraph.
+     * @param vertices The vertices joined by the hyperedge to add.
+     */
+    private void addHyperedge(HypergraphBuilder builder, IVecInt vertices) {
+        if (vertices == null) {
+            builder.withHyperedge(joining());
+            return;
+        }
+
+        int[] asArray = new int[vertices.size()];
+        vertices.copyTo(asArray);
+        builder.withHyperedge(joining(asArray));
+    }
+
+    /**
+     * Associates the given constraints to a hyperedge joining them in
+     * {@link #hyperedgesContainingConstraint}.
+     *
+     * @param hyperedgeId The identifier of the hyperedge joining the constraints.
+     * @param joinedConstraints The constraints joined by the hyperedge.
+     */
+    private void associate(int hyperedgeId, IVecInt joinedConstraints) {
+        for (var it = joinedConstraints.iterator(); it.hasNext();) {
+            int constraintId = it.next();
+            var vec = hyperedgesContainingConstraint[constraintId];
+
+            if (vec == null) {
+                vec = new VecInt();
+                hyperedgesContainingConstraint[constraintId] = vec;
             }
-        }
 
-        return new DualHypergraph(builder.build());
+            vec.push(hyperedgeId);
+        }
     }
+
 }
