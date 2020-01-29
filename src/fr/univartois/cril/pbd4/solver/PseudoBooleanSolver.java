@@ -23,9 +23,9 @@ package fr.univartois.cril.pbd4.solver;
 import org.sat4j.specs.IVecInt;
 
 /**
- * The PseudoBooleanSolver interface defines the contract for a pseudo-Boolean solver
- * used during the compilation process.
- * 
+ * The PseudoBooleanSolver provides an interface for interacting with a pseudo-Boolean
+ * solver to be used during the compilation process.
+ *
  * This interface is designed to allow any solver to be plugged into the compiler by
  * implementing adapters.
  *
@@ -36,29 +36,34 @@ import org.sat4j.specs.IVecInt;
 public interface PseudoBooleanSolver {
 
     /**
-     * Applies Boolean Constraint Propagation (BCP) to the underlying formula.
+     * Applies Boolean Constraint Propagation (BCP) to the underlying pseudo-Boolean
+     * formula.
      *
-     * @return The status of the BCP.
+     * @param assumptions The assumptions to make on the variables of the formula.
+     *
+     * @return The status of the solver after it has applied BCP.
      */
-    SolverStatus propagate();
+    SolverStatus propagate(int... assumptions);
 
     /**
      * Gives the vector of the literals that have been propagated.
-     * The content of the vector may be inconsistent if {@link #propagate()} returned
-     * {@code false} on the last call.
-     * 
+     * The content of the vector may be inconsistent if the previous call to
+     * {@link #propagate()} returned {@link SolverStatus#UNSATISFIABLE}.
+     *
      * @return The propagated literals.
-     * 
+     *
      * @see #propagate()
      */
     IVecInt getPropagatedLiterals();
-    
 
-    
-    default int compare(int var1, int var2) {
-        return Double.compare(scoreOf(var2), scoreOf(var1));
-    }
-
+    /**
+     * Gives the score of the given variable, as used by the solver to decide which
+     * variable to assign next.
+     *
+     * @param variable The variable to get the score of.
+     *
+     * @return The score of the variable.
+     */
     double scoreOf(int variable);
 
 }

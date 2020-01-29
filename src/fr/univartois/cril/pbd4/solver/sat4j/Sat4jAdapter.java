@@ -20,6 +20,7 @@
 
 package fr.univartois.cril.pbd4.solver.sat4j;
 
+import org.sat4j.core.VecInt;
 import org.sat4j.minisat.core.Solver;
 import org.sat4j.minisat.orders.SubsetVarOrder;
 import org.sat4j.specs.IVecInt;
@@ -29,48 +30,75 @@ import fr.univartois.cril.pbd4.solver.PseudoBooleanSolver;
 import fr.univartois.cril.pbd4.solver.SolverStatus;
 
 /**
- * The Sat4jAdapter
+ * The Sat4jAdapter adapts a {@link Solver} from Sat4j to use it as a
+ * {@link PseudoBooleanSolver}.
  *
  * @author Romain WALLON
  *
  * @version 0.1.0
  */
-public class Sat4jAdapter implements PseudoBooleanSolver {
+public final class Sat4jAdapter implements PseudoBooleanSolver {
 
+    /**
+     * The solver being adapted.
+     */
     private final Solver<?> adaptee;
 
+    /**
+     * The unit-propagation listener used to record the propagations performed during the
+     * execution of {@link #adaptee}.
+     */
     private final UnitPropagationListener listener;
-    
+
+    /**
+     * The scores of the VSIDS heuristic used by the solver.
+     */
     private final double[] vsidsScores;
-    
+
+    /**
+     * The scores of the DLCS heuristic (i.e., the number of occurrences of each variable
+     * in the formula).
+     */
     private final int[] dlcsScores;
 
-    public Sat4jAdapter(Solver<?> adaptee) {
+    /**
+     * Creates a new Sat4jAdapter.
+     *
+     * @param adaptee The solver to adapt.
+     * @param dlcsScores The scores of the DLCS heuristic
+     */
+    public Sat4jAdapter(Solver<?> adaptee, int[] dlcsScores) {
         this.adaptee = adaptee;
         this.adaptee.setKeepSolverHot(true);
         this.listener = new UnitPropagationListener();
         this.vsidsScores = adaptee.getVariableHeuristics();
-        this.dlcsScores = new int[adaptee.nVars() + 1];
+        this.dlcsScores = dlcsScores;
     }
 
     /*
      * (non-Javadoc)
      * 
-     * @see fr.univartois.cril.pbd4.solver.PseudoBooleanSolver#propagate()
+     * @see fr.univartois.cril.pbd4.solver.PseudoBooleanSolver#propagate(int[])
      */
     @Override
-    public SolverStatus propagate() {
+    public SolverStatus propagate(int... assumptions) {
         try {
-            adaptee.setOrder(new SubsetVarOrder(new int[0]));
+            // Setting up the solver.
             listener.reset();
             adaptee.setSearchListener(listener);
-            if (adaptee.isSatisfiable()) {
+            adaptee.setOrder(new SubsetVarOrder(new int[0]));
+
+            if (adaptee.isSatisfiable(VecInt.of(assumptions))) {
+                // The solver has found a solution.
                 return SolverStatus.SATISFIABLE;
             }
-            
+
+            // The formula is necessarily unsatisfiable.
+            // Otherwise, an exception would have been thrown.
             return SolverStatus.UNSATISFIABLE;
 
         } catch (TimeoutException e) {
+            // The solver could not determine whether the formula was satisfiable.
             return SolverStatus.UNKNOWN;
         }
     }
@@ -84,7 +112,12 @@ public class Sat4jAdapter implements PseudoBooleanSolver {
     public IVecInt getPropagatedLiterals() {
         return listener.getPropagatedLiterals();
     }
-    
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see fr.univartois.cril.pbd4.solver.PseudoBooleanSolver#scoreOf(int)
+     */
     @Override
     public double scoreOf(int variable) {
         return vsidsScores[variable] + .5 * dlcsScores[variable];

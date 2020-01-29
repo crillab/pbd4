@@ -20,9 +20,9 @@
 
 package fr.univartois.cril.pbd4.solver;
 
-
 /**
- * The SolverStatus
+ * The SolverStatus represents the different status that a pseudo-Boolean solver may
+ * return.
  *
  * @author Romain WALLON
  *
@@ -30,6 +30,22 @@ package fr.univartois.cril.pbd4.solver;
  */
 public enum SolverStatus {
 
-    UNSATISFIABLE, SATISFIABLE, UNKNOWN;
-}
+    /**
+     * The UNSATISFIABLE status, meaning that the considered pseudo-Boolean formula does
+     * not have any model.
+     */
+    UNSATISFIABLE,
 
+    /**
+     * The SATISFIABLE status, meaning that the considered pseudo-Boolean formula has at
+     * least one model, that the solver has found.
+     */
+    SATISFIABLE,
+
+    /**
+     * The UNKNOWN status, meaning that the solver does not know yet whether the
+     * considered pseudo-Boolean formula is SATISFIABLE or UNSATISFIABLE.
+     */
+    UNKNOWN;
+
+}
