@@ -20,6 +20,58 @@
 
 package fr.univartois.cril.pbd4.ddnnf;
 
+/**
+ * The LeafNode represents a leaf node of a d-DNNF, i.e., a Boolean constant.
+ *
+ * @author Romain WALLON
+ *
+ * @version 0.1.0
+ */
 public enum LeafNode implements DecisionDnnf {
-	TRUE, FALSE;
+
+    /**
+     * The FALSE Boolean constant.
+     */
+    FALSE("O 0 0"),
+
+    /**
+     * The TRUE Boolean constant.
+     */
+    TRUE("A 0");
+
+    /**
+     * The NNF representation of this leaf.
+     */
+    private final String nnf;
+
+    /**
+     * Creates a new LeafNode.
+     * 
+     * @param nnf The NNF representation of the leaf.
+     */
+    private LeafNode(String nnf) {
+        this.nnf = nnf;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnf#accept(fr.univartois.cril.pbd4.ddnnf.
+     * DecisionDnnfVisitor)
+     */
+    @Override
+    public void accept(DecisionDnnfVisitor visitor) {
+        visitor.visit(this);
+    }
+
+    /**
+     * Gives The NNF representation of this leaf.
+     *
+     * @return The NNF representation of this leaf.
+     */
+    public String toNNF() {
+        return nnf;
+    }
+
 }

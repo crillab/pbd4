@@ -20,42 +20,28 @@
 
 package fr.univartois.cril.pbd4.ddnnf;
 
-import java.io.OutputStream;
+import java.io.ByteArrayOutputStream;
 
 /**
- * The DecisionDnnf provides an interface for manipulating d-DNNFs.
+ * The InternalNode is the parent class for the internal nodes in a d-DNNF.
  *
  * @author Romain WALLON
  *
  * @version 0.1.0
  */
-public interface DecisionDnnf {
+public abstract class InternalNode implements DecisionDnnf {
 
-    /**
-     * Accepts a {@link DecisionDnnfVisitor} in a depth first manner.
+    /*
+     * (non-Javadoc)
      *
-     * @param visitor The visitor to accept.
+     * @see java.lang.Object#toString()
      */
-    void accept(DecisionDnnfVisitor visitor);
-
-    /**
-     * Writes this d-DNNF to the given output stream, using the NNF format.
-     *
-     * @param outputStream The output stream in which to write this d-DNNF.
-     */
-    default void writeTo(OutputStream outputStream) {
-        try (var visitor = new DecisionDnnfWriter(outputStream)) {
-            visitor.enter(this);
-            accept(visitor);
-            visitor.exit(this);
-        }
+    @Override
+    public String toString() {
+        var output = new ByteArrayOutputStream();
+        writeTo(output);
+        return output.toString();
     }
 
-    /**
-     * Computes a String representation of this d-DNNF, using the NNF format.
-     *
-     * @return A String representation of this d-DNNF.
-     */
-    String toString();
-
 }
+

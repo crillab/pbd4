@@ -20,29 +20,84 @@
 
 package fr.univartois.cril.pbd4.ddnnf;
 
-
 /**
- * The DecisionNode
+ * The DecisionNode is a node in a d-DNNF representing a decision on a variable.
+ * Such a node is also known as an {@code if-then-else} node.
  *
  * @author Romain WALLON
  *
  * @version 0.1.0
  */
-public class DecisionNode implements DecisionDnnf {
+public final class DecisionNode extends InternalNode {
 
+    /**
+     * The variable for which this node represents a decision on.
+     */
     private final int variable;
-    
+
+    /**
+     * The d-DNNF representing the case in which the variable is satisfied.
+     */
     private final DecisionDnnf positiveDecision;
-    
+
+    /**
+     * The d-DNNF representing the case in which the variable is falsified.
+     */
     private final DecisionDnnf negativeDecision;
 
-    public DecisionNode(int variable, DecisionDnnf positiveDecision,
+    /**
+     * Creates a new DecisionNode.
+     *
+     * @param variable The variable for which the node represents a decision on.
+     * @param positiveDecision The d-DNNF representing the case in which the variable is
+     *        satisfied.
+     * @param negativeDecision The d-DNNF representing the case in which the variable is
+     *        falsified.
+     */
+    private DecisionNode(int variable, DecisionDnnf positiveDecision,
             DecisionDnnf negativeDecision) {
-        super();
         this.variable = variable;
         this.positiveDecision = positiveDecision;
         this.negativeDecision = negativeDecision;
     }
-    
-}
 
+    /**
+     * Creates a new DecisionNode.
+     *
+     * @param variable The variable for which the node represents a decision on.
+     * @param positiveDecision The d-DNNF representing the case in which the variable is
+     *        satisfied.
+     * @param negativeDecision The d-DNNF representing the case in which the variable is
+     *        falsified.
+     *
+     * @return The created node. 
+     */
+    public static DecisionDnnf ifThenElse(int variable, DecisionDnnf positiveDecision,
+            DecisionDnnf negativeDecision) {
+        return new DecisionNode(variable, positiveDecision, negativeDecision);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnf#accept(fr.univartois.cril.pbd4.ddnnf.
+     * DecisionDnnfVisitor)
+     */
+    @Override
+    public void accept(DecisionDnnfVisitor visitor) {
+        positiveDecision.accept(visitor);
+        negativeDecision.accept(visitor);
+        visitor.visit(this);
+    }
+
+    /**
+     * Gives the variable for which this node represents a decision on.
+     *
+     * @return The variable on which a decision has been taken.
+     */
+    public int getVariable() {
+        return variable;
+    }
+
+}

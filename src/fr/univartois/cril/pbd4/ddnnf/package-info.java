@@ -3,7 +3,7 @@
  * decision-DNNFs that are produced by the compiler.
  *
  * @author Romain WALLON
- * 
+ *
  * @version 0.1.0
  */
 

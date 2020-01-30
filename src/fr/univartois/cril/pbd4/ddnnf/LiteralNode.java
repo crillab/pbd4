@@ -20,53 +20,38 @@
 
 package fr.univartois.cril.pbd4.ddnnf;
 
-import java.util.Collection;
-import java.util.List;
-
 /**
- * The ConjunctionNode represents the conjunction of several d-DNNFs (there may be
- * arbitrary many conjuncts).
+ * The LiteralNode is a node representing a single literal.
  *
  * @author Romain WALLON
  *
  * @version 0.1.0
  */
-public final class ConjunctionNode extends InternalNode {
+public final class LiteralNode extends InternalNode {
 
     /**
-     * The d-DNNFs for which this node represents the conjunction of.
+     * The DIMACS identifier of the literal represented by this node.
      */
-    private final Collection<DecisionDnnf> conjuncts;
+    private final int literal;
 
     /**
-     * Creates a new ConjunctionNode.
+     * Creates a new LiteralNode.
      *
-     * @param conjuncts The d-DNNFs for which the node represents the conjunction of.
+     * @param literal The DIMACS identifier of the literal represented by the node.
      */
-    private ConjunctionNode(Collection<DecisionDnnf> conjuncts) {
-        this.conjuncts = conjuncts;
+    private LiteralNode(int literal) {
+        this.literal = literal;
     }
 
     /**
-     * Creates a new ConjunctionNode.
+     * Creates a new LiteralNode.
      *
-     * @param conjuncts The d-DNNFs for which the node represents the conjunction of.
-     *
-     * @return The created node.
-     */
-    public static final DecisionDnnf and(DecisionDnnf... conjuncts) {
-        return new ConjunctionNode(List.of(conjuncts));
-    }
-
-    /**
-     * Creates a new ConjunctionNode.
-     *
-     * @param conjuncts The d-DNNFs for which the node represents the conjunction of.
+     * @param literal The DIMACS identifier of the literal represented by the node.
      *
      * @return The created node.
      */
-    public static final DecisionDnnf and(Collection<DecisionDnnf> conjuncts) {
-        return new ConjunctionNode(conjuncts);
+    public static DecisionDnnf literal(int literal) {
+        return new LiteralNode(literal);
     }
 
     /*
@@ -78,8 +63,16 @@ public final class ConjunctionNode extends InternalNode {
      */
     @Override
     public void accept(DecisionDnnfVisitor visitor) {
-        conjuncts.forEach(c -> c.accept(visitor));
         visitor.visit(this);
+    }
+    
+    /**
+     * Gives the DIMACS identifier of the literal represented by the node.
+     *
+     * @return The literal represented by the node.
+     */
+    public int getLiteral() {
+        return literal;
     }
 
 }
