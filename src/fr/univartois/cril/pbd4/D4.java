@@ -38,7 +38,7 @@ public class D4 {
         var s = solver.getPropagatedLiterals();
         if (status == SolverStatus.SATISFIABLE) {
             // A solution has been found while propagating.
-            return new ConjunctionNode(s);
+            return null;//new ConjunctionNode(s);
         }
         
         // TODO: Manage the cache.
@@ -50,7 +50,7 @@ public class D4 {
             // TODO Compute HGP and recursively compile.
         }
         
-        var node = new ConjunctionNode(s, lnd);
+        ConjunctionNode node = null;//new ConjunctionNode(s, lnd);
         // TODO Add to cache.
         return node;
     }
