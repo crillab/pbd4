@@ -21,6 +21,7 @@
 package fr.univartois.cril.pbd4.input.hypergraph;
 
 import org.sat4j.core.ConstrGroup;
+import org.sat4j.specs.Constr;
 import org.sat4j.specs.IConstr;
 import org.sat4j.specs.IVecInt;
 
@@ -56,6 +57,13 @@ public interface PseudoBooleanFormulaHypergraphBuilder {
      *        a {@link ConstrGroup}, which does not support literal retrieval).
      */
     void addConstraint(IConstr constraint, IVecInt literals);
+
+    /**
+     * Adds a constraint to the hypergraph representation that is being built.
+     *
+     * @param constraint The constraint to add.
+     */
+    void addConstraint(Constr constraint);
 
     /**
      * Creates the hypergraph representation of a pseudo-Boolean formula that have been

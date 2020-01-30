@@ -22,6 +22,7 @@ package fr.univartois.cril.pbd4.input.hypergraph;
 
 import org.sat4j.core.LiteralsUtils;
 import org.sat4j.core.VecInt;
+import org.sat4j.specs.Constr;
 import org.sat4j.specs.IConstr;
 import org.sat4j.specs.IVecInt;
 
@@ -102,18 +103,49 @@ public final class DualHypergraphBuilder implements PseudoBooleanFormulaHypergra
         // Updating the pre-hypergraph.
         for (var it = literals.iterator(); it.hasNext();) {
             int variable = LiteralsUtils.var(it.next());
-            var vec = constraintsContainingVariable[variable];
-
-            if (vec == null) {
-                vec = new VecInt();
-                constraintsContainingVariable[variable] = vec;
-            }
-
-            vec.push(nextIdentifier);
+            addConstraintContainingVariable(variable);
         }
 
         // Moving to the next identifier.
         nextIdentifier++;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * fr.univartois.cril.pbd4.input.hypergraph.PseudoBooleanFormulaHypergraphBuilder#
+     * addConstraint(org.sat4j.specs.Constr)
+     */
+    @Override
+    public void addConstraint(Constr constraint) {
+        // Storing the constraint.
+        constraints[nextIdentifier] = constraint;
+
+        // Updating the pre-hypergraph.
+        for (int i = 0; i < constraint.size(); i++) {
+            int variable = LiteralsUtils.var(constraint.get(i));
+            addConstraintContainingVariable(variable);
+        }
+
+        // Moving to the next identifier.
+        nextIdentifier++;
+    }
+
+    /**
+     * Adds the current constraint as containing the given variable.
+     *
+     * @param variable The variable to add a constraint to.
+     */
+    private void addConstraintContainingVariable(int variable) {
+        var vec = constraintsContainingVariable[variable];
+
+        if (vec == null) {
+            vec = new VecInt();
+            constraintsContainingVariable[variable] = vec;
+        }
+
+        vec.push(nextIdentifier);
     }
 
     /*

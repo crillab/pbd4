@@ -20,14 +20,54 @@
 
 package fr.univartois.cril.pbd4.input;
 
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import org.sat4j.pb.SolverFactory;
+import org.sat4j.reader.DimacsReader;
+import org.sat4j.reader.ParseFormatException;
+import org.sat4j.specs.ContradictionException;
+
+import fr.univartois.cril.pbd4.solver.PseudoBooleanSolver;
+import fr.univartois.cril.pbd4.solver.sat4j.Sat4jAdapter;
+
 /**
- * The PseudoBooleanFormulaReader
+ * The PseudoBooleanFormulaReader allows to read a pseudo-Boolean formula from an input file and to 
  *
  * @author Romain WALLON
  *
  * @version 0.1.0
  */
-public class PseudoBooleanFormulaReader {
+public final class PseudoBooleanFormulaReader implements Closeable {
+    
+    private final InputStream input;
+    
+    public PseudoBooleanFormulaReader() {
+        this(System.in);
+    }
+    
+    public PseudoBooleanFormulaReader(String path) throws IOException {
+        this(Files.newInputStream(Path.of(path)));
+    }
 
+    public PseudoBooleanFormulaReader(InputStream inputStream) {
+        this.input = inputStream;
+    }
+
+    public PseudoBooleanSolver read() throws ParseFormatException, ContradictionException, IOException {
+        var solver = SolverFactory.newCuttingPlanes();
+        var reader = new DimacsReader(solver);
+        reader.parseInstance(input);
+        return new Sat4jAdapter(solver, null);
+    }
+
+    @Override
+    public void close() throws IOException {
+        input.close();
+    }
+    
 }
 

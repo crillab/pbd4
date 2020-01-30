@@ -64,14 +64,14 @@ public final class Sat4jAdapter implements PseudoBooleanSolver {
     /**
      * Creates a new Sat4jAdapter.
      *
-     * @param adaptee The solver to adapt.
+     * @param solver The solver to adapt.
      * @param dlcsScores The scores of the DLCS heuristic
      */
-    public Sat4jAdapter(Solver<?> adaptee, int[] dlcsScores) {
-        this.adaptee = adaptee;
+    public Sat4jAdapter(Solver<?> solver, int[] dlcsScores) {
+        this.adaptee = solver;
         this.adaptee.setKeepSolverHot(true);
         this.listener = new UnitPropagationListener();
-        this.vsidsScores = adaptee.getVariableHeuristics();
+        this.vsidsScores = solver.getVariableHeuristics();
         this.dlcsScores = dlcsScores;
     }
 

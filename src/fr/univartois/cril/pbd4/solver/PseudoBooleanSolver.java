@@ -26,9 +26,6 @@ import org.sat4j.specs.IVecInt;
  * The PseudoBooleanSolver provides an interface for interacting with a pseudo-Boolean
  * solver to be used during the compilation process.
  *
- * This interface is designed to allow any solver to be plugged into the compiler by
- * implementing adapters.
- *
  * @author Romain WALLON
  *
  * @version 0.1.0
