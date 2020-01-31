@@ -1,6 +1,6 @@
 /**
  * PBD4, a pseudo-Boolean based implementation of the D4 compiler.
- * Copyright (c) 2020 - Univ Artois & CNRS.
+ * Copyright (c) 2020 - Romain WALLON.
  * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -18,40 +18,38 @@
  * If not, see {@link http://www.gnu.org/licenses}.
  */
 
-package fr.univartois.cril.pbd4;
+package fr.univartois.cril.pbd4.input;
 
-import java.math.BigInteger;
+import java.util.Collection;
 
-import fr.univartois.cril.pbd4.ddnnf.DecisionDnnf;
+import org.sat4j.specs.IVecInt;
+
+import fr.univartois.cril.pbd4.input.hypergraph.PseudoBooleanFormulaHypergraph;
 
 /**
- * The D4 class makes easier the configuration and use of D4-based compilers or model
- * counters.
+ * The PseudoBooleanFormula stores all data
  *
  * @author Romain WALLON
  *
  * @version 0.1.0
  */
-public final class D4 {
+public interface PseudoBooleanFormula {
 
-    private D4() {
-        // Disables external instantiation.
-    }
-
-    public static D4 newInstance() {
-        return new D4();
-    }
+    int numberOfVariables();
     
-    public D4 forFormula(String path) {
-        return this;
-    }
+    int numberOfConstraints();
+    
+    IVecInt variables();
+    
+    PseudoBooleanFormula simplify(int... v);
 
-    public BigInteger countModels() {
-        return null;
-    }
-
-    public DecisionDnnf compile() {
-        return null;
-    }
-
+    PseudoBooleanFormula simplify(IVecInt assignment);
+    
+    IVecInt cutset();
+    
+    Collection<PseudoBooleanFormula> connectedComponents();
+    
+    IVecInt assumptions();
+    
 }
+

@@ -13,6 +13,8 @@ module fr.univartois.cril.pbd4 {
 
     exports fr.univartois.cril.pbd4;
 
+    exports fr.univartois.cril.pbd4.input;
+
     exports fr.univartois.cril.pbd4.ddnnf;
 
     exports fr.univartois.cril.pbd4.solver;

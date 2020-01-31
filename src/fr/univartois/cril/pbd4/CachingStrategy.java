@@ -20,38 +20,38 @@
 
 package fr.univartois.cril.pbd4;
 
-import java.math.BigInteger;
+import java.util.Optional;
 
-import fr.univartois.cril.pbd4.ddnnf.DecisionDnnf;
+import fr.univartois.cril.pbd4.input.PseudoBooleanFormula;
 
 /**
- * The D4 class makes easier the configuration and use of D4-based compilers or model
- * counters.
+ * The CachingStrategy defines a strategy for caching pseudo-Boolean formulae encountered
+ * during the compilation process.
+ *
+ * @param <T> The type of the values in the cache.
  *
  * @author Romain WALLON
  *
  * @version 0.1.0
  */
-public final class D4 {
+public interface CachingStrategy<T> {
 
-    private D4() {
-        // Disables external instantiation.
-    }
+    /**
+     * Gives the value that has been cached for the given formula.
+     *
+     * @param formula The formula to get the cached value of.
+     *
+     * @return The value cached for the given formula, or {@link Optional#empty()} if no
+     *         value is cached.
+     */
+    Optional<T> get(PseudoBooleanFormula formula);
 
-    public static D4 newInstance() {
-        return new D4();
-    }
-    
-    public D4 forFormula(String path) {
-        return this;
-    }
-
-    public BigInteger countModels() {
-        return null;
-    }
-
-    public DecisionDnnf compile() {
-        return null;
-    }
+    /**
+     * Puts a value computed for a pseudo-Boolean formula into the cache.
+     *
+     * @param formula The formula to put the value of.
+     * @param value The value to cache for the formula.
+     */
+    void put(PseudoBooleanFormula formula, T toCache);
 
 }

@@ -1,6 +1,6 @@
 /**
  * PBD4, a pseudo-Boolean based implementation of the D4 compiler.
- * Copyright (c) 2020 - Romain WALLON.
+ * Copyright (c) 2020 - Univ Artois & CNRS.
  * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -20,8 +20,14 @@
 
 package fr.univartois.cril.pbd4;
 
+import java.util.Collection;
+import java.util.Optional;
+
+import fr.univartois.cril.pbd4.ddnnf.ConjunctionNode;
 import fr.univartois.cril.pbd4.ddnnf.DecisionDnnf;
+import fr.univartois.cril.pbd4.ddnnf.DecisionNode;
 import fr.univartois.cril.pbd4.ddnnf.LiteralNode;
+import fr.univartois.cril.pbd4.input.PseudoBooleanFormula;
 
 /**
  * The DecisionDnnfFactory allows to create or reuse d-DNNF representations.
@@ -36,6 +42,8 @@ public final class DecisionDnnfFactory {
      * The d-DNNF representations of the literals.
      */
     private DecisionDnnf[] literals;
+    
+    private CachingStrategy<DecisionDnnf> cache;
 
     /**
      * Creates a new DecisionDnnfFactory.
@@ -61,4 +69,20 @@ public final class DecisionDnnfFactory {
         return literals[index];
     }
 
+    
+    public DecisionDnnf conjunctionOf(Collection<DecisionDnnf> conjuncts) {
+        return ConjunctionNode.and(conjuncts);
+    }
+    
+    public Optional<DecisionDnnf> getCached(PseudoBooleanFormula formula) {
+        return cache.get(formula);
+    }
+    
+    public void cache(PseudoBooleanFormula formula, DecisionDnnf dDnnf) {
+        cache.put(formula, dDnnf);
+    }
+
+    public DecisionDnnf ifThenElse(int variable, DecisionDnnf positiveDecision, DecisionDnnf negativeDecision) {
+        return DecisionNode.ifThenElse(variable, positiveDecision, negativeDecision);
+    }
 }

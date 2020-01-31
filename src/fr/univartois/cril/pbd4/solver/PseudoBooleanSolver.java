@@ -63,4 +63,6 @@ public interface PseudoBooleanSolver {
      */
     double scoreOf(int variable);
 
+    int numberOfVariables();
+
 }

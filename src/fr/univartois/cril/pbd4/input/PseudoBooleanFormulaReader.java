@@ -27,7 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.sat4j.pb.SolverFactory;
-import org.sat4j.reader.DimacsReader;
+import org.sat4j.reader.InstanceReader;
 import org.sat4j.reader.ParseFormatException;
 import org.sat4j.specs.ContradictionException;
 
@@ -41,32 +41,20 @@ import fr.univartois.cril.pbd4.solver.sat4j.Sat4jAdapter;
  *
  * @version 0.1.0
  */
-public final class PseudoBooleanFormulaReader implements Closeable {
+public final class PseudoBooleanFormulaReader {
     
-    private final InputStream input;
+    private final String input;
     
-    public PseudoBooleanFormulaReader() {
-        this(System.in);
-    }
-    
-    public PseudoBooleanFormulaReader(String path) throws IOException {
-        this(Files.newInputStream(Path.of(path)));
-    }
 
-    public PseudoBooleanFormulaReader(InputStream inputStream) {
+    public PseudoBooleanFormulaReader(String inputStream) {
         this.input = inputStream;
     }
 
     public PseudoBooleanSolver read() throws ParseFormatException, ContradictionException, IOException {
         var solver = SolverFactory.newCuttingPlanes();
-        var reader = new DimacsReader(solver);
+        var reader = new InstanceReader(solver);
         reader.parseInstance(input);
         return new Sat4jAdapter(solver, null);
-    }
-
-    @Override
-    public void close() throws IOException {
-        input.close();
     }
     
 }

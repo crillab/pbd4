@@ -123,4 +123,14 @@ public final class Sat4jAdapter implements PseudoBooleanSolver {
         return vsidsScores[variable] + .5 * dlcsScores[variable];
     }
 
+    /* 
+     * (non-Javadoc)
+     * 
+     * @see fr.univartois.cril.pbd4.solver.PseudoBooleanSolver#numberOfVariables()
+     */
+    @Override
+    public int numberOfVariables() {
+        return adaptee.nVars();
+    }
+
 }
