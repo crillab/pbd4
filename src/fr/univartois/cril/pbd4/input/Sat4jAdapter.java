@@ -18,16 +18,13 @@
  * If not, see {@link http://www.gnu.org/licenses}.
  */
 
-package fr.univartois.cril.pbd4.solver.sat4j;
+package fr.univartois.cril.pbd4.input;
 
 import org.sat4j.core.VecInt;
 import org.sat4j.minisat.core.Solver;
 import org.sat4j.minisat.orders.SubsetVarOrder;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
-
-import fr.univartois.cril.pbd4.solver.PseudoBooleanSolver;
-import fr.univartois.cril.pbd4.solver.SolverStatus;
 
 /**
  * The Sat4jAdapter adapts a {@link Solver} from Sat4j to use it as a

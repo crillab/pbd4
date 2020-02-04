@@ -38,43 +38,37 @@ public final class DecisionNode extends InternalNode {
     /**
      * The d-DNNF representing the case in which the variable is satisfied.
      */
-    private final DecisionDnnf positiveDecision;
+    private final DecisionDnnf ifTrue;
 
     /**
      * The d-DNNF representing the case in which the variable is falsified.
      */
-    private final DecisionDnnf negativeDecision;
+    private final DecisionDnnf ifFalse;
 
     /**
      * Creates a new DecisionNode.
      *
      * @param variable The variable for which the node represents a decision on.
-     * @param positiveDecision The d-DNNF representing the case in which the variable is
-     *        satisfied.
-     * @param negativeDecision The d-DNNF representing the case in which the variable is
-     *        falsified.
+     * @param ifTrue The d-DNNF representing the case in which the variable is satisfied.
+     * @param ifFalse The d-DNNF representing the case in which the variable is falsified.
      */
-    private DecisionNode(int variable, DecisionDnnf positiveDecision,
-            DecisionDnnf negativeDecision) {
+    private DecisionNode(int variable, DecisionDnnf ifTrue, DecisionDnnf ifFalse) {
         this.variable = variable;
-        this.positiveDecision = positiveDecision;
-        this.negativeDecision = negativeDecision;
+        this.ifTrue = ifTrue;
+        this.ifFalse = ifFalse;
     }
 
     /**
      * Creates a new DecisionNode.
      *
      * @param variable The variable for which the node represents a decision on.
-     * @param positiveDecision The d-DNNF representing the case in which the variable is
-     *        satisfied.
-     * @param negativeDecision The d-DNNF representing the case in which the variable is
-     *        falsified.
+     * @param ifTrue The d-DNNF representing the case in which the variable is satisfied.
+     * @param ifFalse The d-DNNF representing the case in which the variable is falsified.
      *
      * @return The created node. 
      */
-    public static DecisionDnnf ifThenElse(int variable, DecisionDnnf positiveDecision,
-            DecisionDnnf negativeDecision) {
-        return new DecisionNode(variable, positiveDecision, negativeDecision);
+    public static DecisionDnnf ifThenElse(int variable, DecisionDnnf ifTrue, DecisionDnnf ifFalse) {
+        return new DecisionNode(variable, ifTrue, ifFalse);
     }
 
     /*
@@ -86,8 +80,8 @@ public final class DecisionNode extends InternalNode {
      */
     @Override
     public void accept(DecisionDnnfVisitor visitor) {
-        positiveDecision.accept(visitor);
-        negativeDecision.accept(visitor);
+        ifTrue.accept(visitor);
+        ifFalse.accept(visitor);
         visitor.visit(this);
     }
 

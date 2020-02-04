@@ -1,6 +1,6 @@
 /**
- * The {@code fr.univartois.cril.pbd4.input} provides the classes for managing the input
- * pseudo-Boolean formula to compile.
+ * The {@code fr.univartois.cril.pbd4.input} package provides the classes for managing the
+ * pseudo-Boolean formulae used as input for the compiler or counter.
  *
  * @author Romain WALLON
  *

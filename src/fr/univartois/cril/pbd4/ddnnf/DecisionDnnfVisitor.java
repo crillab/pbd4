@@ -31,7 +31,8 @@ public interface DecisionDnnfVisitor {
 
     /***
      * Notifies this visitor that it is going to visit a d-DNNF.
-     * This method may be used to perform some initialization before actually visiting the d-DNNF.
+     * This method may be used to perform some initialization before actually visiting the
+     * d-DNNF.
      *
      * @param root The root node of the d-DNNF to visit.
      *
@@ -71,7 +72,8 @@ public interface DecisionDnnfVisitor {
 
     /**
      * Notifies this visitor that it has visited a whole d-DNNF.
-     * This method may be used to perform some last computations after having visited the d-DNNF.
+     * This method may be used to perform some last computations after having visited the
+     * d-DNNF.
      *
      * @param root The root node of the d-DNNF that has been visited.
      *

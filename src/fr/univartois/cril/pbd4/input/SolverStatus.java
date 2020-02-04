@@ -18,11 +18,11 @@
  * If not, see {@link http://www.gnu.org/licenses}.
  */
 
-package fr.univartois.cril.pbd4.solver;
+package fr.univartois.cril.pbd4.input;
 
 /**
- * The SolverStatus represents the different status that a pseudo-Boolean solver may
- * return.
+ * The SolverStatus enumeration represents the different statuses that a pseudo-Boolean
+ * solver may return.
  *
  * @author Romain WALLON
  *

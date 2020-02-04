@@ -29,7 +29,7 @@ import java.io.ByteArrayOutputStream;
  *
  * @version 0.1.0
  */
-public abstract class InternalNode implements DecisionDnnf {
+abstract class InternalNode implements DecisionDnnf {
 
     /*
      * (non-Javadoc)

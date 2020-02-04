@@ -26,6 +26,8 @@ import org.sat4j.specs.IConstr;
 import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
 
+import fr.univartois.cril.pbd4.input.PseudoBooleanFormula;
+
 /**
  * The DualHypergraphConnectedComponentFinder finds the connected components of a hypergraph.
  *
@@ -70,7 +72,7 @@ final class DualHypergraphConnectedComponentFinder {
      *
      * @return The vector of connected components.
      */
-    public IVec<IVec<IConstr>> connectedComponents() {
+    public IVec<PseudoBooleanFormula> connectedComponents() {
         var components = new Vec<IVec<IConstr>>();
 
         for (int constraint = 0; constraint < hyperedgesContainingConstraint.length; constraint++) {

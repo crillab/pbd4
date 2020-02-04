@@ -30,13 +30,13 @@ import fr.univartois.cril.pbd4.ddnnf.LeafNode;
 import fr.univartois.cril.pbd4.input.PseudoBooleanFormula;
 
 /**
- * The D4Counter specifies the D4 algorithm for compiling the input formula into a d-DNNF.
+ * The D4Compiler specifies the D4 algorithm for compiling the input formula into a d-DNNF.
  *
  * @author Romain WALLON
  *
  * @version 0.1.0
  */
-public final class D4Compiler extends AbstractD4<DecisionDnnf> {
+final class D4Compiler extends AbstractD4<DecisionDnnf> {
 
     /**
      * The factory used to create the different nodes of the d-DNNF being computed.
@@ -47,11 +47,10 @@ public final class D4Compiler extends AbstractD4<DecisionDnnf> {
      * Creates a new D4Compiler.
      *
      * @param configuration The configuration of the compiler.
-     * @param numberOfVariables The number of variables in the formula being compiled.
      */
-    D4Compiler(D4 configuration, int numberOfVariables) {
+    D4Compiler(D4 configuration) {
         super(configuration);
-        this.factory = new DecisionDnnfFactory(numberOfVariables);
+        this.factory = new DecisionDnnfFactory(configuration.getFormula().numberOfVariables());
     }
 
     /*

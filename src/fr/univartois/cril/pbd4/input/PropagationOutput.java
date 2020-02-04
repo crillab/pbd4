@@ -1,6 +1,6 @@
 /**
  * PBD4, a pseudo-Boolean based implementation of the D4 compiler.
- * Copyright (c) 2020 - Romain WALLON.
+ * Copyright (c) 2020 - Univ Artois & CNRS.
  * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -20,35 +20,46 @@
 
 package fr.univartois.cril.pbd4.input;
 
-import java.util.Collection;
-
 import org.sat4j.specs.IVecInt;
 
 /**
- * The PseudoBooleanFormula stores all data
+ * The PropagationOutput
  *
  * @author Romain WALLON
  *
  * @version 0.1.0
  */
-public interface PseudoBooleanFormula {
+public class PropagationOutput {
 
-    int numberOfVariables();
+    private final SolverStatus status;
     
-    int numberOfConstraints();
+    private final IVecInt propagatedLiterals;
     
-    IVecInt variables();
-    
-    PseudoBooleanFormula simplify(int... v);
+    private final PseudoBooleanFormula simplifiedFormula;
 
-    PseudoBooleanFormula simplify(IVecInt assignment);
+    public PropagationOutput(SolverStatus status, IVecInt propagatedLiterals,
+            PseudoBooleanFormula simplifiedFormula) {
+        super();
+        this.status = status;
+        this.propagatedLiterals = propagatedLiterals;
+        this.simplifiedFormula = simplifiedFormula;
+    }
     
-    IVecInt cutset();
+
     
-    Collection<PseudoBooleanFormula> connectedComponents();
+    public SolverStatus getStatus() {
+        return status;
+    }
+
     
-    IVecInt assumptions();
+    public IVecInt getPropagatedLiterals() {
+        return propagatedLiterals;
+    }
+
     
-    PropagationOutput propagate();
+    public PseudoBooleanFormula getSimplifiedFormula() {
+        return simplifiedFormula;
+    }
+    
 }
 

@@ -32,7 +32,8 @@ import java.io.OutputStream;
 public interface DecisionDnnf {
 
     /**
-     * Accepts a {@link DecisionDnnfVisitor} in a depth first manner.
+     * Accepts a {@link DecisionDnnfVisitor}.
+     * Visiting a d-DNNF is performed in a depth-first manner.
      *
      * @param visitor The visitor to accept.
      */

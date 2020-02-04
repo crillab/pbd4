@@ -18,18 +18,17 @@
  * If not, see {@link http://www.gnu.org/licenses}.
  */
 
-package fr.univartois.cril.pbd4.cache;
+package fr.univartois.cril.pbd4;
 
 import java.util.Optional;
 
-import fr.univartois.cril.pbd4.CachingStrategy;
 import fr.univartois.cril.pbd4.input.PseudoBooleanFormula;
 
 /**
  * The NoCache strategy is a caching strategy that does not cache any value.
- * It is a Null Object implementation of {@link CachingStrategy}.
+ * It is a Singleton for a Null Object implementation of {@link CachingStrategy}.
  *
- * @param <T> The type of the values in the cache.
+ * @param <T> The type of the values (expected to be) in the cache.
  *
  * @author Romain WALLON
  *
@@ -52,7 +51,7 @@ public final class NoCache<T> implements CachingStrategy<T> {
     /**
      * Gives the single instance of this class.
      *
-     * @param <T> The type of the elements in the cache.
+     * @param <T> The type of the values (expected to be) in the cache.
      *
      * @return The single instance of this class.
      */

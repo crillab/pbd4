@@ -18,7 +18,7 @@
  * If not, see {@link http://www.gnu.org/licenses}.
  */
 
-package fr.univartois.cril.pbd4.solver.sat4j;
+package fr.univartois.cril.pbd4.input;
 
 import java.io.Serializable;
 
@@ -30,7 +30,7 @@ import org.sat4j.specs.SearchListenerAdapter;
 
 /**
  * The UnitPropagationListener allows to record all propagations that were performed
- * during the execution of Sat4j.
+ * during an execution of Sat4j.
  *
  * @author Romain WALLON
  *
@@ -41,7 +41,7 @@ final class UnitPropagationListener extends SearchListenerAdapter<ISolverService
     /**
      * The {@code serialVersionUID} of this {@link Serializable} class.
      */
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -8556073018543337864L;
 
     /**
      * The vector in which to store propagated literals.

@@ -1,6 +1,6 @@
 /**
  * The {@code fr.univartois.cril.pbd4.ddnnf} package provides the representation for the
- * decision-DNNFs that are produced by the compiler.
+ * d-DNNFs that are produced by the compiler.
  *
  * @author Romain WALLON
  *

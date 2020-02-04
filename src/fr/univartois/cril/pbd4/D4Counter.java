@@ -35,7 +35,7 @@ import fr.univartois.cril.pbd4.input.PseudoBooleanFormula;
  *
  * @version 0.1.0
  */
-public final class D4Counter extends AbstractD4<BigInteger> {
+final class D4Counter extends AbstractD4<BigInteger> {
 
     /**
      * Creates a new D4Counter.

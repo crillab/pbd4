@@ -1,6 +1,7 @@
 /**
- * The {@code fr.univartois.cril.pbd4} module provides a pseudo-Boolean based
- * implementation of the D4 compiler.
+ * The {@code fr.univartois.cril.pbd4} module provides a pseudo-Boolean-based
+ * implementation of the D4 algorithm, to compile pseudo-Boolean formulae into
+ * decision-DNNF, or to count their models.
  *
  * @author Romain WALLON
  *
@@ -13,17 +14,17 @@ module fr.univartois.cril.pbd4 {
 
     exports fr.univartois.cril.pbd4;
 
-    exports fr.univartois.cril.pbd4.input;
-
     exports fr.univartois.cril.pbd4.ddnnf;
 
-    exports fr.univartois.cril.pbd4.solver;
+    exports fr.univartois.cril.pbd4.input;
 
-    // Modules required for solving PB formulae.
+    exports fr.univartois.cril.pbd4.input.hypergraph;
+
+    // Modules required for solving pseudo-Boolean formulae.
 
     requires transitive org.ow2.sat4j.core;
 
-    requires transitive org.ow2.sat4j.pb;
+    requires org.ow2.sat4j.pb;
 
     // Module required for hypergraph partitioning.
 

@@ -27,6 +27,9 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.sat4j.core.VecInt;
+import org.sat4j.specs.IVecInt;
+
 /**
  * The DecisionDnnfWriter allows to write a d-DNNF to an output stream, using the NNF format.
  *
@@ -40,6 +43,16 @@ public final class DecisionDnnfWriter implements DecisionDnnfVisitor, Closeable 
      * The writer to use to print the d-DNNF to an output stream.
      */
     private final PrintWriter writer;
+    
+    /**
+     * The children of the node being explored.
+     */
+    private final IVecInt children;
+    
+    /**
+     * The index of the current node in the output.
+     */
+    private int currentIndex;
 
     /**
      * Creates a new DecisionDnnfWriter.
@@ -68,6 +81,7 @@ public final class DecisionDnnfWriter implements DecisionDnnfVisitor, Closeable 
      */
     public DecisionDnnfWriter(PrintWriter writer) {
         this.writer = writer;
+        this.children = new VecInt();
     }
 
     /*
@@ -79,8 +93,10 @@ public final class DecisionDnnfWriter implements DecisionDnnfVisitor, Closeable 
      */
     @Override
     public void visit(ConjunctionNode node) {
-        // TODO Auto-generated method stub
-
+        writer.printf("A %d", children.size());
+        printCurrentChildren();
+        pushNode();
+        
     }
 
     /*
@@ -92,8 +108,9 @@ public final class DecisionDnnfWriter implements DecisionDnnfVisitor, Closeable 
      */
     @Override
     public void visit(DecisionNode node) {
-        // TODO Auto-generated method stub
-
+        writer.printf("O %d %d", node.getVariable(), children.size());
+        printCurrentChildren();
+        pushNode();
     }
 
     /*
@@ -106,6 +123,7 @@ public final class DecisionDnnfWriter implements DecisionDnnfVisitor, Closeable 
     @Override
     public void visit(LiteralNode node) {
         writer.printf("L %d%n", node.getLiteral());
+        pushNode();
     }
 
     /*
@@ -118,6 +136,22 @@ public final class DecisionDnnfWriter implements DecisionDnnfVisitor, Closeable 
     @Override
     public void visit(LeafNode node) {
         writer.println(node.toNNF());
+        pushNode();
+    }
+
+    /**
+     * Prints the children of the current node to the output stream, and removes them once finished.
+     */
+    private void printCurrentChildren() {
+        // TODO
+    }
+
+    /**
+     * Adds a child of the node currently visited.
+     */
+    private void pushNode() {
+        children.push(currentIndex);
+        currentIndex++;
     }
 
     /*

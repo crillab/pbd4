@@ -1,5 +1,5 @@
 /**
- * The {@code fr.univartois.cril.pbd4} package provides the classes for interacting with
+ * The {@code fr.univartois.cril.pbd4} package provides the main classes defining
  * the pseudo-Boolean implementation of the D4 compiler.
  *
  * @author Romain WALLON

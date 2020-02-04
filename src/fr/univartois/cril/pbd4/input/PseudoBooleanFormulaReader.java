@@ -31,9 +31,6 @@ import org.sat4j.reader.InstanceReader;
 import org.sat4j.reader.ParseFormatException;
 import org.sat4j.specs.ContradictionException;
 
-import fr.univartois.cril.pbd4.solver.PseudoBooleanSolver;
-import fr.univartois.cril.pbd4.solver.sat4j.Sat4jAdapter;
-
 /**
  * The PseudoBooleanFormulaReader allows to read a pseudo-Boolean formula from an input file and to 
  *
@@ -55,6 +52,11 @@ public final class PseudoBooleanFormulaReader {
         var reader = new InstanceReader(solver);
         reader.parseInstance(input);
         return new Sat4jAdapter(solver, null);
+    }
+
+    public static PseudoBooleanFormula read(String path) {
+        // TODO Auto-generated method stub
+        return null;
     }
     
 }

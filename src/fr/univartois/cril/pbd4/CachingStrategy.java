@@ -42,7 +42,12 @@ public interface CachingStrategy<T> {
      * @param formula The formula to get the cached value of.
      *
      * @return The value cached for the given formula, or {@link Optional#empty()} if no
-     *         value is cached.
+     *         corresponding value is cached.
+     *
+     * @implSpec The cached value is <b>not</b> guaranteed to be retrieved by this method:
+     *           a best-effort approach is expected (even though it is not required).
+     *
+     * @see #put(PseudoBooleanFormula, Object)
      */
     Optional<T> get(PseudoBooleanFormula formula);
 
@@ -51,6 +56,12 @@ public interface CachingStrategy<T> {
      *
      * @param formula The formula to put the value of.
      * @param value The value to cache for the formula.
+     *
+     * @implSpec This method does <b>not</b> guarantee that the cached value may be
+     *           retrieved later on: it expects a best-effort approach (even though it is
+     *           not required).
+     *
+     * @see #get(PseudoBooleanFormula)
      */
     void put(PseudoBooleanFormula formula, T toCache);
 

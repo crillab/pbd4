@@ -42,15 +42,15 @@ public enum LeafNode implements DecisionDnnf {
     /**
      * The NNF representation of this leaf.
      */
-    private final String nnf;
+    private final String nnfString;
 
     /**
      * Creates a new LeafNode.
-     * 
-     * @param nnf The NNF representation of the leaf.
+     *
+     * @param nnfString The NNF representation of the leaf.
      */
-    private LeafNode(String nnf) {
-        this.nnf = nnf;
+    private LeafNode(String nnfString) {
+        this.nnfString = nnfString;
     }
 
     /*
@@ -71,7 +71,7 @@ public enum LeafNode implements DecisionDnnf {
      * @return The NNF representation of this leaf.
      */
     public String toNNF() {
-        return nnf;
+        return nnfString;
     }
 
 }

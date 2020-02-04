@@ -34,14 +34,14 @@ import java.util.List;
 public final class ConjunctionNode extends InternalNode {
 
     /**
-     * The d-DNNFs for which this node represents the conjunction of.
+     * The d-DNNFs for which this node is a representation of the conjunction.
      */
     private final Collection<DecisionDnnf> conjuncts;
 
     /**
      * Creates a new ConjunctionNode.
      *
-     * @param conjuncts The d-DNNFs for which the node represents the conjunction of.
+     * @param conjuncts The d-DNNFs for which the node is a representation of the conjunction.
      */
     private ConjunctionNode(Collection<DecisionDnnf> conjuncts) {
         this.conjuncts = conjuncts;
@@ -50,7 +50,7 @@ public final class ConjunctionNode extends InternalNode {
     /**
      * Creates a new ConjunctionNode.
      *
-     * @param conjuncts The d-DNNFs for which the node represents the conjunction of.
+     * @param conjuncts The d-DNNFs for which the node is a representation of the conjunction.
      *
      * @return The created node.
      */
@@ -61,7 +61,7 @@ public final class ConjunctionNode extends InternalNode {
     /**
      * Creates a new ConjunctionNode.
      *
-     * @param conjuncts The d-DNNFs for which the node represents the conjunction of.
+     * @param conjuncts The d-DNNFs for which the node is a representation of the conjunction.
      *
      * @return The created node.
      */

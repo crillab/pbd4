@@ -21,29 +21,28 @@
 package fr.univartois.cril.pbd4;
 
 import java.util.Collection;
-import java.util.Optional;
+
+import org.sat4j.core.LiteralsUtils;
 
 import fr.univartois.cril.pbd4.ddnnf.ConjunctionNode;
 import fr.univartois.cril.pbd4.ddnnf.DecisionDnnf;
 import fr.univartois.cril.pbd4.ddnnf.DecisionNode;
 import fr.univartois.cril.pbd4.ddnnf.LiteralNode;
-import fr.univartois.cril.pbd4.input.PseudoBooleanFormula;
 
 /**
- * The DecisionDnnfFactory allows to create or reuse d-DNNF representations.
+ * The DecisionDnnfFactory allows to create the d-DNNF representations used in the
+ * compiled form of the input formula.
  *
  * @author Romain WALLON
  *
  * @version 0.1.0
  */
-public final class DecisionDnnfFactory {
+final class DecisionDnnfFactory {
 
     /**
      * The d-DNNF representations of the literals.
      */
     private DecisionDnnf[] literals;
-    
-    private CachingStrategy<DecisionDnnf> cache;
 
     /**
      * Creates a new DecisionDnnfFactory.
@@ -62,27 +61,35 @@ public final class DecisionDnnfFactory {
      * @return The d-DNNF representing {@code literal}.
      */
     public DecisionDnnf literal(int literal) {
-        int index = literal < 0 ? -literal << 1 ^ 1 : literal << 1;
+        int index = LiteralsUtils.toInternal(literal);
         if (literals[index] == null) {
             literals[index] = LiteralNode.literal(literal);
         }
         return literals[index];
     }
 
-    
+    /**
+     * Creates a d-DNNF representing the conjunction of the given d-DNNFs.
+     *
+     * @param conjuncts The d-DNNF representations to create the conjunction of.
+     *
+     * @return The d-DNNF representing the conjunctions of the given d-DNNF.
+     */
     public DecisionDnnf conjunctionOf(Collection<DecisionDnnf> conjuncts) {
         return ConjunctionNode.and(conjuncts);
     }
-    
-    public Optional<DecisionDnnf> getCached(PseudoBooleanFormula formula) {
-        return cache.get(formula);
-    }
-    
-    public void cache(PseudoBooleanFormula formula, DecisionDnnf dDnnf) {
-        cache.put(formula, dDnnf);
+
+    /**
+     * Creates a d-DNNF representing a decision taken on a given variable.
+     *
+     * @param variable The variable on which a decision is taken.
+     * @param ifTrue The d-DNNF representing the case in which the variable is satisfied.
+     * @param ifFalse The d-DNNF representing the case in which the variable is falsified.
+     *
+     * @return The created d-DNNF.
+     */
+    public DecisionDnnf ifThenElse(int variable, DecisionDnnf ifTrue, DecisionDnnf ifFalse) {
+        return DecisionNode.ifThenElse(variable, ifTrue, ifFalse);
     }
 
-    public DecisionDnnf ifThenElse(int variable, DecisionDnnf positiveDecision, DecisionDnnf negativeDecision) {
-        return DecisionNode.ifThenElse(variable, positiveDecision, negativeDecision);
-    }
 }

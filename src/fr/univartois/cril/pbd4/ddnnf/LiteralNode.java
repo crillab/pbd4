@@ -32,26 +32,26 @@ public final class LiteralNode extends InternalNode {
     /**
      * The DIMACS identifier of the literal represented by this node.
      */
-    private final int literal;
+    private final int dimacs;
 
     /**
      * Creates a new LiteralNode.
      *
-     * @param literal The DIMACS identifier of the literal represented by the node.
+     * @param dimacs The DIMACS identifier of the literal represented by the node.
      */
-    private LiteralNode(int literal) {
-        this.literal = literal;
+    private LiteralNode(int dimacs) {
+        this.dimacs = dimacs;
     }
 
     /**
      * Creates a new LiteralNode.
      *
-     * @param literal The DIMACS identifier of the literal represented by the node.
+     * @param dimacs The DIMACS identifier of the literal represented by the node.
      *
      * @return The created node.
      */
-    public static DecisionDnnf literal(int literal) {
-        return new LiteralNode(literal);
+    public static DecisionDnnf literal(int dimacs) {
+        return new LiteralNode(dimacs);
     }
 
     /*
@@ -65,14 +65,15 @@ public final class LiteralNode extends InternalNode {
     public void accept(DecisionDnnfVisitor visitor) {
         visitor.visit(this);
     }
-    
+
     /**
-     * Gives the DIMACS identifier of the literal represented by the node.
+     * Gives the literal represented by this node, as the DIMACS identifier of this
+     * literal.
      *
-     * @return The literal represented by the node.
+     * @return The literal represented by this node.
      */
     public int getLiteral() {
-        return literal;
+        return dimacs;
     }
 
 }
