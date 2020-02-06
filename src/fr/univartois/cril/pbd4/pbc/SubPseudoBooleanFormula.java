@@ -18,7 +18,7 @@
  * If not, see {@link http://www.gnu.org/licenses}.
  */
 
-package fr.univartois.cril.pbd4.input;
+package fr.univartois.cril.pbd4.pbc;
 
 import java.util.BitSet;
 import java.util.Collection;
@@ -91,7 +91,7 @@ public final class SubPseudoBooleanFormula implements PseudoBooleanFormula {
      * @see fr.univartois.cril.pbd4.input.PseudoBooleanFormula#simplify(int[])
      */
     @Override
-    public PseudoBooleanFormula simplify(int... v) {
+    public PseudoBooleanFormula satisfy(int... v) {
         // TODO Auto-generated method stub
         return null;
     }

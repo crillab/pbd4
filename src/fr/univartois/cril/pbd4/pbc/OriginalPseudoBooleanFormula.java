@@ -18,7 +18,7 @@
  * If not, see {@link http://www.gnu.org/licenses}.
  */
 
-package fr.univartois.cril.pbd4.input;
+package fr.univartois.cril.pbd4.pbc;
 
 import java.util.Collection;
 
@@ -44,90 +44,43 @@ public class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
         this.variables = variables;
     }
 
-    /* 
-     * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.input.PseudoBooleanFormula#numberOfVariables()
-     */
     @Override
     public int numberOfVariables() {
         return solver.nVars();
     }
 
-    /* 
-     * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.input.PseudoBooleanFormula#numberOfConstraints()
-     */
     @Override
     public int numberOfConstraints() {
         return solver.nConstraints();
     }
 
-    /* 
-     * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.input.PseudoBooleanFormula#variables()
-     */
     @Override
     public IVecInt variables() {
         return variables;
     }
 
-    /* 
-     * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.input.PseudoBooleanFormula#simplify(int[])
-     */
     @Override
-    public PseudoBooleanFormula simplify(int... v) {
+    public PseudoBooleanFormula satisfy(int literal) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    /* 
-     * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.input.PseudoBooleanFormula#simplify(org.sat4j.specs.IVecInt)
-     */
-    @Override
-    public PseudoBooleanFormula simplify(IVecInt assignment) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* 
-     * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.input.PseudoBooleanFormula#cutset()
-     */
     @Override
     public IVecInt cutset() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    /* 
-     * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.input.PseudoBooleanFormula#connectedComponents()
-     */
     @Override
     public Collection<PseudoBooleanFormula> connectedComponents() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    /* 
-     * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.input.PseudoBooleanFormula#assumptions()
-     */
     @Override
-    public IVecInt assumptions() {
+    public PropagationOutput propagate() {
         // TODO Auto-generated method stub
         return null;
     }
-
 }
 

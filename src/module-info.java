@@ -16,9 +16,9 @@ module fr.univartois.cril.pbd4 {
 
     exports fr.univartois.cril.pbd4.ddnnf;
 
-    exports fr.univartois.cril.pbd4.input;
+    exports fr.univartois.cril.pbd4.pbc;
 
-    exports fr.univartois.cril.pbd4.input.hypergraph;
+    exports fr.univartois.cril.pbd4.hypergraph;
 
     // Modules required for solving pseudo-Boolean formulae.
 

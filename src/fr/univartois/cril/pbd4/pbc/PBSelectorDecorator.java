@@ -18,10 +18,13 @@
  * If not, see {@link http://www.gnu.org/licenses}.
  */
 
-package fr.univartois.cril.pbd4.input;
+package fr.univartois.cril.pbd4.pbc;
 
 import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.sat4j.pb.GroupPBSelectorSolver;
 import org.sat4j.pb.IPBSolver;
 import org.sat4j.pb.PBSolverDecorator;
 import org.sat4j.specs.ContradictionException;
@@ -36,69 +39,89 @@ import org.sat4j.specs.IVecInt;
  *
  * @version 0.1.0
  */
-public final class PBSelectorDecorator extends PBSolverDecorator {
+final class PBSelectorDecorator extends PBSolverDecorator {
 
     private int realNVar;
 
-    private int selector;
+    private int groupId = 1;
+    
+    private Map<IConstr, Integer> constraints = new HashMap<>();
 
-    public PBSelectorDecorator(IPBSolver solver) {
-        super(solver);
+    PBSelectorDecorator(IPBSolver solver) {
+        super(new GroupPBSelectorSolver(solver));
     }
 
     @Override
     public void setExpectedNumberOfClauses(int nb) {
-        realNVar = nVars();
-        selector = realNVar + 1;
-        newVar(nb);
+        super.setExpectedNumberOfClauses(nb);
+    }
+
+    @Override
+    public GroupPBSelectorSolver decorated() {
+        return (GroupPBSelectorSolver) super.decorated();
     }
 
     @Override
     public IConstr addAtLeast(IVecInt literals, IVec<BigInteger> coeffs, BigInteger degree)
             throws ContradictionException {
-        literals.push(selector);
-        coeffs.push(degree);
-        selector++;
-        return super.addAtLeast(literals, coeffs, degree);
+        var constr = decorated().addAtLeast(literals, coeffs, degree, groupId);
+        constraints.put(constr, groupId);
+        groupId++;
+        return constr;
     }
 
     @Override
     public IConstr addAtLeast(IVecInt literals, IVecInt coeffs, int degree)
             throws ContradictionException {
-        literals.push(selector);
-        coeffs.push(degree);
-        selector++;
-        return super.addAtLeast(literals, coeffs, degree);
+        var constr = decorated().addAtLeast(literals, coeffs, degree, groupId++);
+        constraints.put(constr, groupId);
+        groupId++;
+        return constr;
     }
 
     @Override
     public IConstr addAtMost(IVecInt literals, IVec<BigInteger> coeffs, BigInteger degree)
             throws ContradictionException {
-        return super.addAtMost(literals, coeffs, degree);
+        var constr = decorated().addAtMost(literals, coeffs, degree, groupId++);
+        constraints.put(constr, groupId);
+        groupId++;
+        return constr;
     }
 
     @Override
     public IConstr addAtMost(IVecInt literals, IVecInt coeffs, int degree)
             throws ContradictionException {
-        return super.addAtMost(literals, coeffs, degree);
+        var constr = decorated().addAtMost(literals, coeffs, degree, groupId++);
+        constraints.put(constr, groupId);
+        groupId++;
+        return constr;
     }
 
     @Override
     public IConstr addExactly(IVecInt literals, IVec<BigInteger> coeffs, BigInteger weight)
             throws ContradictionException {
-        return super.addExactly(literals, coeffs, weight);
+        var constr = decorated().addExactly(literals, coeffs, weight, groupId++);
+        constraints.put(constr, groupId);
+        groupId++;
+        return constr;
     }
 
     @Override
     public IConstr addExactly(IVecInt literals, IVecInt coeffs, int weight)
             throws ContradictionException {
-        return super.addExactly(literals, coeffs, weight);
+        var constr = decorated().addExactly(literals, coeffs, weight, groupId++);
+        constraints.put(constr, groupId);
+        groupId++;
+        return constr;
     }
 
     @Override
     public IConstr addPseudoBoolean(IVecInt lits, IVec<BigInteger> coeffs, boolean moreThan,
             BigInteger d) throws ContradictionException {
-        return super.addPseudoBoolean(lits, coeffs, moreThan, d);
+        var constr = moreThan ?  addAtLeast(lits, coeffs, d) : addAtMost(lits, coeffs, d);
+        constraints.put(constr, groupId);
+        groupId++;
+        return constr;
     }
 
     @Override
@@ -110,31 +133,47 @@ public final class PBSelectorDecorator extends PBSolverDecorator {
 
     @Override
     public IConstr addAtLeast(IVecInt literals, int degree) throws ContradictionException {
-        return super.addAtLeast(literals, degree);
+        var constr = decorated().addAtLeast(literals, degree, groupId++);
+        constraints.put(constr, groupId);
+        groupId++;
+        return constr;
     }
 
     @Override
     public IConstr addAtMost(IVecInt literals, int degree) throws ContradictionException {
-        return super.addAtMost(literals, degree);
+        var constr = decorated().addAtMost(literals, degree, groupId++);
+        constraints.put(constr, groupId);
+        groupId++;
+        return constr;
     }
 
     @Override
     public IConstr addBlockingClause(IVecInt literals) throws ContradictionException {
-        literals.push(selector);
-        selector++;
-        return super.addBlockingClause(literals);
+        var constr = addClause(literals);
+        constraints.put(constr, groupId);
+        groupId++;
+        return constr;
     }
 
     @Override
     public IConstr addClause(IVecInt literals) throws ContradictionException {
-        literals.push(selector);
-        selector++;
-        return super.addClause(literals);
+        var constr = decorated().addClause(literals, groupId++);
+        constraints.put(constr, groupId);
+        groupId++;
+        return constr;
     }
 
     @Override
     public IConstr addExactly(IVecInt literals, int n) throws ContradictionException {
-        return super.addExactly(literals, n);
+        var constr = decorated().addExactly(literals, n, groupId++);
+        constraints.put(constr, groupId);
+        groupId++;
+        return constr;
+    }
+
+    @Override
+    public IConstr addParity(IVecInt literals, boolean even) {
+        throw new UnsupportedOperationException();
     }
 
 }

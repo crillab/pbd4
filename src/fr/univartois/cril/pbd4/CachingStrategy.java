@@ -22,7 +22,7 @@ package fr.univartois.cril.pbd4;
 
 import java.util.Optional;
 
-import fr.univartois.cril.pbd4.input.PseudoBooleanFormula;
+import fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula;
 
 /**
  * The CachingStrategy defines a strategy for caching pseudo-Boolean formulae encountered

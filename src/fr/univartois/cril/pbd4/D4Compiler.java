@@ -27,7 +27,7 @@ import org.sat4j.specs.IVecInt;
 
 import fr.univartois.cril.pbd4.ddnnf.DecisionDnnf;
 import fr.univartois.cril.pbd4.ddnnf.LeafNode;
-import fr.univartois.cril.pbd4.input.PseudoBooleanFormula;
+import fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula;
 
 /**
  * The D4Compiler specifies the D4 algorithm for compiling the input formula into a d-DNNF.

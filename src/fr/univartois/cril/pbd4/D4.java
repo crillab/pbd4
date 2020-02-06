@@ -23,8 +23,8 @@ package fr.univartois.cril.pbd4;
 import java.math.BigInteger;
 
 import fr.univartois.cril.pbd4.ddnnf.DecisionDnnf;
-import fr.univartois.cril.pbd4.input.PseudoBooleanFormula;
-import fr.univartois.cril.pbd4.input.PseudoBooleanFormulaReader;
+import fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula;
+import fr.univartois.cril.pbd4.pbc.PseudoBooleanFormulaReader;
 
 /**
  * The D4 class makes easier the configuration and use of D4-based compilers or model

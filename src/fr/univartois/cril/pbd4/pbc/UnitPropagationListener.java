@@ -18,7 +18,7 @@
  * If not, see {@link http://www.gnu.org/licenses}.
  */
 
-package fr.univartois.cril.pbd4.input;
+package fr.univartois.cril.pbd4.pbc;
 
 import java.io.Serializable;
 

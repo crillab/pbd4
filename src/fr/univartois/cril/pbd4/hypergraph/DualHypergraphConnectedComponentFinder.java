@@ -18,7 +18,7 @@
  * If not, see {@link http://www.gnu.org/licenses}.
  */
 
-package fr.univartois.cril.pbd4.input.hypergraph;
+package fr.univartois.cril.pbd4.hypergraph;
 
 import org.sat4j.core.Vec;
 import org.sat4j.core.VecInt;
@@ -26,7 +26,7 @@ import org.sat4j.specs.IConstr;
 import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
 
-import fr.univartois.cril.pbd4.input.PseudoBooleanFormula;
+import fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula;
 
 /**
  * The DualHypergraphConnectedComponentFinder finds the connected components of a hypergraph.

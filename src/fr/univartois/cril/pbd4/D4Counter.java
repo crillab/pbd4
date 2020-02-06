@@ -25,7 +25,7 @@ import java.util.Collection;
 
 import org.sat4j.specs.IVecInt;
 
-import fr.univartois.cril.pbd4.input.PseudoBooleanFormula;
+import fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula;
 
 /**
  * The D4Counter specifies the D4 algorithm for counting the number of models of the input

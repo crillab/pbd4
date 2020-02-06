@@ -44,4 +44,3 @@ abstract class InternalNode implements DecisionDnnf {
     }
 
 }
-

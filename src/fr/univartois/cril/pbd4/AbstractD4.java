@@ -29,8 +29,8 @@ import org.sat4j.core.VecInt;
 import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
 
-import fr.univartois.cril.pbd4.input.PseudoBooleanFormula;
-import fr.univartois.cril.pbd4.input.SolverStatus;
+import fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula;
+import fr.univartois.cril.pbd4.pbc.SolverStatus;
 
 /**
  * The AbstractD4 class implements the "skeleton" of the D4 algorithm [Lagniez and
@@ -119,8 +119,8 @@ public abstract class AbstractD4<T> {
 
             var v = lvc.last();
             lvc = lvc.pop();
-            lnd.add(ifThenElse(v, compile(simplifiedFormula.simplify(v), lvc),
-                    compile(simplifiedFormula.simplify(-v), lvc)));
+            lnd.add(ifThenElse(v, compile(simplifiedFormula.satisfy(v), lvc),
+                    compile(simplifiedFormula.satisfy(-v), lvc)));
         }
 
         // Caching the result.

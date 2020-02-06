@@ -18,34 +18,37 @@
  * If not, see {@link http://www.gnu.org/licenses}.
  */
 
-package fr.univartois.cril.pbd4.input;
+package fr.univartois.cril.pbd4.hypergraph;
+
+import org.sat4j.specs.IConstr;
+import org.sat4j.specs.IVec;
+import org.sat4j.specs.IVecInt;
 
 /**
- * The SolverStatus enumeration represents the different statuses that a pseudo-Boolean
- * solver may return.
+ * The PseudoBooleanFormulaHypergraph defines the interface for a hypergraph
+ * representation of a pseudo-Boolean formula.
  *
  * @author Romain WALLON
  *
  * @version 0.1.0
  */
-public enum SolverStatus {
+public interface PseudoBooleanFormulaHypergraph {
 
     /**
-     * The UNSATISFIABLE status, meaning that the considered pseudo-Boolean formula does
-     * not have any model.
+     * Gives the connected components in the associated pseudo-Boolean formula.
+     * A connected component is a vector of constraints that share variables.
+     *
+     * @return The vector of connected components.
      */
-    UNSATISFIABLE,
+    IVec<IVec<IConstr>> connectedComponents();
 
     /**
-     * The SATISFIABLE status, meaning that the considered pseudo-Boolean formula has at
-     * least one model, that the solver has found.
+     * Gives the cutset of the associated pseudo-Boolean formula.
+     * A cutset is represented by a vector of variables to assign to get (at least) two
+     * sub-formulae that do not share any variable.
+     *
+     * @return The cutset of the formula.
      */
-    SATISFIABLE,
-
-    /**
-     * The UNKNOWN status, meaning that the solver does not know yet whether the
-     * considered pseudo-Boolean formula is SATISFIABLE or UNSATISFIABLE.
-     */
-    UNKNOWN;
+    IVecInt cutset();
 
 }
