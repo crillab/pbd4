@@ -35,110 +35,60 @@ import org.sat4j.specs.IVecInt;
  */
 public final class SubPseudoBooleanFormula implements PseudoBooleanFormula {
 
+    private final IVecInt assumptions;
+    
     private final PseudoBooleanFormula decorated;
     
     private final BitSet activeConstraint;
     
-    public SubPseudoBooleanFormula(PseudoBooleanFormula decorated) {
+    public SubPseudoBooleanFormula(OriginalPseudoBooleanFormula decorated, IVecInt assumptions) {
         this.decorated = decorated;
         this.activeConstraint = new BitSet(decorated.numberOfConstraints());
-    }
-    
-    public void activate(int constrIndex) {
-        activeConstraint.set(constrIndex);
-    }
-    
-    public boolean isActive(int constrIndex) {
-        return activeConstraint.get(constrIndex);
+        this.assumptions = assumptions;
     }
 
-    /* 
-     * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.input.PseudoBooleanFormula#numberOfVariables()
-     */
     @Override
     public int numberOfVariables() {
         // TODO Auto-generated method stub
         return 0;
     }
 
-    /* 
-     * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.input.PseudoBooleanFormula#numberOfConstraints()
-     */
     @Override
     public int numberOfConstraints() {
         // TODO Auto-generated method stub
         return 0;
     }
 
-    /* 
-     * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.input.PseudoBooleanFormula#variables()
-     */
     @Override
     public IVecInt variables() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    /* 
-     * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.input.PseudoBooleanFormula#simplify(int[])
-     */
     @Override
-    public PseudoBooleanFormula satisfy(int... v) {
+    public PseudoBooleanFormula satisfy(int literal) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    /* 
-     * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.input.PseudoBooleanFormula#simplify(org.sat4j.specs.IVecInt)
-     */
-    @Override
-    public PseudoBooleanFormula simplify(IVecInt assignment) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* 
-     * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.input.PseudoBooleanFormula#cutset()
-     */
     @Override
     public IVecInt cutset() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    /* 
-     * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.input.PseudoBooleanFormula#connectedComponents()
-     */
     @Override
     public Collection<PseudoBooleanFormula> connectedComponents() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    /* 
-     * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.input.PseudoBooleanFormula#assumptions()
-     */
     @Override
-    public IVecInt assumptions() {
+    public PropagationOutput propagate() {
         // TODO Auto-generated method stub
         return null;
     }
+    
 
 }
 

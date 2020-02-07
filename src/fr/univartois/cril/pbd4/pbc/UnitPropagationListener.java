@@ -41,7 +41,7 @@ final class UnitPropagationListener extends SearchListenerAdapter<ISolverService
     /**
      * The {@code serialVersionUID} of this {@link Serializable} class.
      */
-    private static final long serialVersionUID = -8556073018543337864L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * The vector in which to store propagated literals.
@@ -69,9 +69,10 @@ final class UnitPropagationListener extends SearchListenerAdapter<ISolverService
     }
 
     /**
-     * Gives the literals that have been propagated while this listener was listening.
+     * Gives the literals that have been propagated while this listener was listening, in
+     * the DIMACS format.
      *
-     * @return The vector of propagated literals.
+     * @return The vector of propagated literals, which may be modified afterwards.
      */
     public IVecInt getPropagatedLiterals() {
         return propagatedLiterals;

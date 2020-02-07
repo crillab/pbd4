@@ -24,7 +24,6 @@ import java.math.BigInteger;
 
 import fr.univartois.cril.pbd4.ddnnf.DecisionDnnf;
 import fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula;
-import fr.univartois.cril.pbd4.pbc.PseudoBooleanFormulaReader;
 
 /**
  * The D4 class makes easier the configuration and use of D4-based compilers or model
@@ -70,7 +69,6 @@ public final class D4 {
      * @return This configurator.
      */
     public D4 whenCompiling(String path) {
-        this.formula = PseudoBooleanFormulaReader.read(path);
         return this;
     }
 

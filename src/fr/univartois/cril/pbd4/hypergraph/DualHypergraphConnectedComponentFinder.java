@@ -81,7 +81,7 @@ final class DualHypergraphConnectedComponentFinder {
             }
         }
 
-        return components;
+        return null;
     }
 
     /**

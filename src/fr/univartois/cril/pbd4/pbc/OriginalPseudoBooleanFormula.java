@@ -20,10 +20,16 @@
 
 package fr.univartois.cril.pbd4.pbc;
 
+import static fr.univartois.cril.pbd4.pbc.RangeVecInt.range;
 import java.util.Collection;
 
-import org.sat4j.pb.IPBSolver;
+import org.sat4j.core.VecInt;
+import org.sat4j.minisat.core.ICDCL;
+import org.sat4j.minisat.orders.SubsetVarOrder;
+import org.sat4j.pb.constraints.pb.PBConstr;
+import org.sat4j.specs.ISolverService;
 import org.sat4j.specs.IVecInt;
+import org.sat4j.specs.TimeoutException;
 
 
 /**
@@ -34,19 +40,50 @@ import org.sat4j.specs.IVecInt;
  * @version 0.1.0
  */
 public class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
+
+
+    private final PBSelectorDecorator solver;
+
+    private final ISolverService engine;
     
-    private final IPBSolver solver;
+    /**
+     * The unit-propagation listener used to record the propagations performed during the
+     * execution of {@link #adaptee}.
+     */
+    private final UnitPropagationListener listener;
+
+    /**
+     * The scores of the VSIDS heuristic used by the solver.
+     */
+    private final double[] vsidsScores;
+
+    /**
+     * The scores of the DLCS heuristic (i.e., the number of occurrences of each variable
+     * in the formula).
+     */
+    private final int[] dlcsScores;
     
     private final IVecInt variables;
-
-    OriginalPseudoBooleanFormula(IPBSolver solver, IVecInt variables) {
+    
+    /**
+     * Creates a new Sat4jAdapter.
+     *
+     * @param solver The solver to adapt.
+     * @param dlcsScores The scores of the DLCS heuristic
+     */
+    OriginalPseudoBooleanFormula(PBSelectorDecorator solver, int[] dlcsScores) {
         this.solver = solver;
-        this.variables = variables;
+        this.solver.setKeepSolverHot(true);
+        this.engine = (ISolverService) solver.getSolvingEngine();
+        this.listener = new UnitPropagationListener();
+        this.vsidsScores = engine.getVariableHeuristics();
+        this.dlcsScores = dlcsScores;
+        this.variables = range(1, numberOfVariables());
     }
 
     @Override
     public int numberOfVariables() {
-        return solver.nVars();
+        return solver.nVars() - solver.getVarToHighLevel().size();
     }
 
     @Override
@@ -61,8 +98,7 @@ public class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
 
     @Override
     public PseudoBooleanFormula satisfy(int literal) {
-        // TODO Auto-generated method stub
-        return null;
+        return new SubPseudoBooleanFormula(this, VecInt.of(literal));
     }
 
     @Override
@@ -79,8 +115,35 @@ public class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
 
     @Override
     public PropagationOutput propagate() {
-        // TODO Auto-generated method stub
-        return null;
+        return propagate(VecInt.EMPTY);
+    }
+    
+    public PropagationOutput propagate(IVecInt assumptions) {
+        try {
+            solver.externalState();
+            // Setting up the solver.
+            listener.reset();
+            solver.setSearchListener(listener);
+            ((ICDCL<?>) engine).setOrder(new SubsetVarOrder(new int[0]));
+
+            if (solver.isSatisfiable(assumptions)) {
+                // The solver has found a solution.
+                return null;
+            }
+
+            // The formula is necessarily unsatisfiable.
+            // Otherwise, an exception would have been thrown.
+            return null;
+
+        } catch (TimeoutException e) {
+            // The solver could not determine whether the formula was satisfiable.
+            var formula = new SubPseudoBooleanFormula(this, listener.getPropagatedLiterals());
+            return null;
+        }
+    }
+    
+    PBConstr getConstraint(int i) {
+        return solver.getConstraint(i);
     }
 }
 

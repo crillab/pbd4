@@ -20,6 +20,7 @@
 
 package fr.univartois.cril.pbd4.pbc;
 
+import org.sat4j.pb.constraints.pb.PBConstr;
 import org.sat4j.specs.IVecInt;
 
 /**
@@ -35,17 +36,15 @@ public class PropagationOutput {
     
     private final IVecInt propagatedLiterals;
     
-    private final PseudoBooleanFormula simplifiedFormula;
+    private final OriginalPseudoBooleanFormula original;
 
     public PropagationOutput(SolverStatus status, IVecInt propagatedLiterals,
-            PseudoBooleanFormula simplifiedFormula) {
+            OriginalPseudoBooleanFormula simplifiedFormula) {
         super();
         this.status = status;
         this.propagatedLiterals = propagatedLiterals;
-        this.simplifiedFormula = simplifiedFormula;
+        this.original = simplifiedFormula;
     }
-    
-
     
     public SolverStatus getStatus() {
         return status;
@@ -58,7 +57,15 @@ public class PropagationOutput {
 
     
     public PseudoBooleanFormula getSimplifiedFormula() {
-        return simplifiedFormula;
+        for (int i = 0; i < original.numberOfConstraints(); i++) {
+            var constr = original.getConstraint(i);
+            for (int l = 0; l < constr.size(); l++) {
+                // Ajouter les coef
+                // Ajouter les liens dans l'hypergraphe
+                
+            }
+        }
+        return null;
     }
     
 }

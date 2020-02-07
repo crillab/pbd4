@@ -25,7 +25,8 @@ import java.util.Collection;
 import org.sat4j.specs.IVecInt;
 
 /**
- * The PseudoBooleanFormula stores all data
+ * The PseudoBooleanFormula represents a formula considered as input for the compiler or
+ * model counter.
  *
  * @author Romain WALLON
  *

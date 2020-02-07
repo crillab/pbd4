@@ -78,7 +78,7 @@ public final class DualHypergraph implements PseudoBooleanFormulaHypergraph {
     public IVec<IVec<IConstr>> connectedComponents() {
         var finder = new DualHypergraphConnectedComponentFinder(
                 constraints, hyperedgesContainingConstraint);
-        return finder.connectedComponents();
+        return null;
     }
 
     /*
