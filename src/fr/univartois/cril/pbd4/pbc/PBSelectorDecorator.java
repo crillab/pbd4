@@ -41,8 +41,6 @@ import org.sat4j.specs.IVecInt;
  */
 final class PBSelectorDecorator extends GroupPBSelectorSolver {
 
-    private int realNVar;
-
     private int groupId = 1;
 
     private IVec<IConstr> constraints;

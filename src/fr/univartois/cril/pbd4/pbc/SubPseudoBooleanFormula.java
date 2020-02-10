@@ -23,8 +23,10 @@ package fr.univartois.cril.pbd4.pbc;
 import java.util.BitSet;
 import java.util.Collection;
 
+import org.sat4j.core.LiteralsUtils;
+import org.sat4j.core.Vec;
+import org.sat4j.core.VecInt;
 import org.sat4j.specs.IVecInt;
-
 
 /**
  * The SubPseudoBooleanFormula
@@ -36,39 +38,47 @@ import org.sat4j.specs.IVecInt;
 public final class SubPseudoBooleanFormula implements PseudoBooleanFormula {
 
     private final IVecInt assumptions;
-    
-    private final PseudoBooleanFormula decorated;
-    
-    private final BitSet activeConstraint;
-    
+
+    private final OriginalPseudoBooleanFormula decorated;
+
+    private final BitSet inactiveConstraint;
+
+    private IVecInt variables;
+
     public SubPseudoBooleanFormula(OriginalPseudoBooleanFormula decorated, IVecInt assumptions) {
         this.decorated = decorated;
-        this.activeConstraint = new BitSet(decorated.numberOfConstraints());
+        this.inactiveConstraint = new BitSet(decorated.numberOfConstraints());
+        this.assumptions = assumptions;
+        assumptions.sort();
+    }
+
+    public SubPseudoBooleanFormula(OriginalPseudoBooleanFormula decorated, IVecInt assumptions,
+            BitSet activeConstraints) {
+        this.decorated = decorated;
+        this.inactiveConstraint = activeConstraints;
         this.assumptions = assumptions;
     }
 
     @Override
     public int numberOfVariables() {
-        // TODO Auto-generated method stub
-        return 0;
+        return decorated.numberOfVariables() - assumptions.size();
     }
 
     @Override
     public int numberOfConstraints() {
-        // TODO Auto-generated method stub
-        return 0;
+        return inactiveConstraint.size() - inactiveConstraint.cardinality();
     }
 
     @Override
     public IVecInt variables() {
-        // TODO Auto-generated method stub
-        return null;
+
     }
 
     @Override
     public PseudoBooleanFormula satisfy(int literal) {
-        // TODO Auto-generated method stub
-        return null;
+        var newAssumptions = new VecInt(assumptions.size() + 1);
+        assumptions.copyTo(newAssumptions);
+        newAssumptions.push(literal);
     }
 
     @Override
@@ -85,10 +95,17 @@ public final class SubPseudoBooleanFormula implements PseudoBooleanFormula {
 
     @Override
     public PropagationOutput propagate() {
-        // TODO Auto-generated method stub
-        return null;
+        var effectiveAssumptions = new VecInt();
+        assumptions.copyTo(effectiveAssumptions);
+        for (int i = 0; i < inactiveConstraint.size(); i++) {
+            if (inactiveConstraint.get(i)) {
+                effectiveAssumptions.push(LiteralsUtils.posLit(numberOfVariables() + i + 1));
+            } else {
+                effectiveAssumptions.push(LiteralsUtils.negLit(numberOfVariables() + i + 1));
+            }
+        }
+
+        return decorated.propagate(effectiveAssumptions);
     }
-    
 
 }
-

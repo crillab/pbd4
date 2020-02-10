@@ -115,12 +115,17 @@ public class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
 
     @Override
     public PropagationOutput propagate() {
-        return propagate(VecInt.EMPTY);
+        solver.externalState();
+        return internalPropagate(VecInt.EMPTY);
     }
     
     public PropagationOutput propagate(IVecInt assumptions) {
+        solver.internalState();
+        return internalPropagate(assumptions);
+    }
+    
+    private PropagationOutput internalPropagate(IVecInt assumptions) {
         try {
-            solver.externalState();
             // Setting up the solver.
             listener.reset();
             solver.setSearchListener(listener);
