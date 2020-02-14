@@ -23,7 +23,7 @@ package fr.univartois.cril.pbd4.ddnnf;
 import java.io.OutputStream;
 
 /**
- * The DecisionDnnf provides an interface for manipulating d-DNNFs.
+ * The DecisionDnnf defines the interface for manipulating d-DNNFs.
  *
  * @author Romain WALLON
  *

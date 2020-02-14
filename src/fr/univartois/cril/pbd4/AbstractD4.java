@@ -24,9 +24,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Objects;
 
-import org.sat4j.core.Vec;
 import org.sat4j.core.VecInt;
-import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
 
 import fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula;
@@ -56,8 +54,6 @@ public abstract class AbstractD4<T> {
      * The cache in which formula that have already been treated are stored.
      */
     private final CachingStrategy<T> cache;
-    
-    private final IVec<PseudoBooleanFormula> stack;
 
     /**
      * Creates a new AbstractD4.
@@ -67,7 +63,6 @@ public abstract class AbstractD4<T> {
     protected AbstractD4(D4 configuration) {
         this.formula = Objects.requireNonNull(configuration.getFormula());
         this.cache = Objects.requireNonNull(configuration.getCache());
-        this.stack = new Vec<>();
     }
 
     /**
@@ -76,7 +71,6 @@ public abstract class AbstractD4<T> {
      * @return The output of the algorithm on the input formula.
      */
     public T compute() {
-        stack.push(formula);
         return compile(formula, new VecInt());
     }
 

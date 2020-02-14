@@ -1,5 +1,5 @@
 /**
- * The {@code fr.univartois.cril.pbd4.ddnnf} package provides the representation for the
+ * The {@code fr.univartois.cril.pbd4.ddnnf} package provides the representations for the
  * d-DNNFs that are produced by the compiler.
  *
  * @author Romain WALLON

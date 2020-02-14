@@ -73,7 +73,7 @@ final class DecisionDnnfFactory {
      *
      * @param conjuncts The d-DNNF representations to create the conjunction of.
      *
-     * @return The d-DNNF representing the conjunctions of the given d-DNNF.
+     * @return The d-DNNF representing the conjunctions of the given d-DNNFs.
      */
     public DecisionDnnf conjunctionOf(Collection<DecisionDnnf> conjuncts) {
         return ConjunctionNode.and(conjuncts);

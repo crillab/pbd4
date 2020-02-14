@@ -21,6 +21,7 @@
 package fr.univartois.cril.pbd4;
 
 import java.math.BigInteger;
+import java.util.function.Function;
 
 import fr.univartois.cril.pbd4.ddnnf.DecisionDnnf;
 import fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula;
@@ -111,7 +112,7 @@ public final class D4 {
      * @return The number of models.
      */
     public BigInteger countModels() {
-        var modelCounter = new D4Counter(this);
+        var modelCounter = create(D4Counter::new);
         return modelCounter.compute();
     }
 
@@ -121,8 +122,12 @@ public final class D4 {
      * @return A d-DNNF representing the associated formula.
      */
     public DecisionDnnf compile() {
-        var compiler = new D4Compiler(this);
+        var compiler = create(D4Compiler::new);
         return compiler.compute();
+    }
+    
+    public <T, U extends AbstractD4<T>> U create(Function<D4, U> factory) {
+        return factory.apply(this);
     }
 
 }

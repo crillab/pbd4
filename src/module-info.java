@@ -16,13 +16,9 @@ module fr.univartois.cril.pbd4 {
 
     exports fr.univartois.cril.pbd4.ddnnf;
 
-    exports fr.univartois.cril.pbd4.pbc;
+    // Modules required for dealing with pseudo-Boolean formulae.
 
-    exports fr.univartois.cril.pbd4.hypergraph;
-
-    // Modules required for solving pseudo-Boolean formulae.
-
-    requires transitive org.ow2.sat4j.core;
+    requires org.ow2.sat4j.core;
 
     requires org.ow2.sat4j.pb;
 

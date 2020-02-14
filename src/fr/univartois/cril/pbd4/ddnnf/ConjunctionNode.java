@@ -21,6 +21,7 @@
 package fr.univartois.cril.pbd4.ddnnf;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -66,7 +67,7 @@ public final class ConjunctionNode extends InternalNode {
      * @return The created node.
      */
     public static final DecisionDnnf and(Collection<DecisionDnnf> conjuncts) {
-        return new ConjunctionNode(conjuncts);
+        return new ConjunctionNode(Collections.unmodifiableCollection(conjuncts));
     }
 
     /*

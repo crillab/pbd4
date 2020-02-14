@@ -59,7 +59,8 @@ final class D4Counter extends AbstractD4<BigInteger> {
     /*
      * (non-Javadoc)
      * 
-     * @see fr.univartois.cril.pbd4.AbstractD4#model(org.sat4j.specs.IVecInt)
+     * @see fr.univartois.cril.pbd4.AbstractD4#model(fr.univartois.cril.pbd4.pbc.
+     * PseudoBooleanFormula, org.sat4j.specs.IVecInt)
      */
     @Override
     protected BigInteger model(PseudoBooleanFormula formula, IVecInt propagatedLiterals) {

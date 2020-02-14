@@ -111,7 +111,7 @@ final class D4Compiler extends AbstractD4<DecisionDnnf> {
     /**
      * Creates, for each literals in the vector, a d-DNNF representing this literal.
      *
-     * @param literals The literal to create d-DNNFs for.
+     * @param literals The literals to create d-DNNFs for.
      *
      * @return The d-DNNFs representing the literals.
      */

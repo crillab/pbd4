@@ -45,7 +45,7 @@ public final class NoCache<T> implements CachingStrategy<T> {
      * Disables external instantiation.
      */
     private NoCache() {
-        // Nothing to do.
+        // Nothing to do: Singleton Design Pattern.
     }
 
     /**
@@ -63,7 +63,7 @@ public final class NoCache<T> implements CachingStrategy<T> {
     /*
      * (non-Javadoc)
      * 
-     * @see fr.univartois.cril.pbd4.CachingStrategy#get(fr.univartois.cril.pbd4.input.
+     * @see fr.univartois.cril.pbd4.CachingStrategy#get(fr.univartois.cril.pbd4.pbc.
      * PseudoBooleanFormula)
      */
     @Override
@@ -74,12 +74,12 @@ public final class NoCache<T> implements CachingStrategy<T> {
     /*
      * (non-Javadoc)
      * 
-     * @see fr.univartois.cril.pbd4.CachingStrategy#put(fr.univartois.cril.pbd4.input.
+     * @see fr.univartois.cril.pbd4.CachingStrategy#put(fr.univartois.cril.pbd4.pbc.
      * PseudoBooleanFormula, java.lang.Object)
      */
     @Override
     public void put(PseudoBooleanFormula formula, T toCache) {
-        // Nothing to do: Null Object.
+        // Nothing to do: Null Object Design Pattern.
     }
 
 }

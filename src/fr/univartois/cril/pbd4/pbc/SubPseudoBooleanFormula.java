@@ -71,7 +71,7 @@ public final class SubPseudoBooleanFormula implements PseudoBooleanFormula {
 
     @Override
     public IVecInt variables() {
-
+        return VecInt.EMPTY;
     }
 
     @Override
@@ -79,6 +79,7 @@ public final class SubPseudoBooleanFormula implements PseudoBooleanFormula {
         var newAssumptions = new VecInt(assumptions.size() + 1);
         assumptions.copyTo(newAssumptions);
         newAssumptions.push(literal);
+        return null;
     }
 
     @Override
