@@ -85,8 +85,8 @@ all these jars, bundled with a script for executing PBD4.
 
 After having built PBD4, you may want to execute it from the command line.
 
-PBD4 provides a *wrapper* bash script (available in the `exec` directory)
-to make easier its execution: `pbd4.sh`, which executes PBD4 from its jar.
+PBD4 provides a *wrapper* bash script `pbd4.sh` (available in the `exec`
+directory) to make easier its execution from its jar and required modules.
 
 By default, this script considers that the jars of PBD4 are stored in their
 output directory, that is `dist/jars`.
