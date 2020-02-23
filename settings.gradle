@@ -1,0 +1,6 @@
+/*
+ * This is the settings.gradle configuration file of PBD4.
+ */
+
+// Declaring the name of the project.
+rootProject.name = "PBD4"

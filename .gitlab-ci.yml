@@ -1,0 +1,23 @@
+test:
+
+    script:
+        - gradle clean test jacocoTestReport
+        - sonar-scanner
+
+    tags:
+        - gradle
+        - sonar
+
+build:
+
+    script:
+        - gradle pbd4
+
+    artifacts:
+        paths:
+            - dist/jars/PBD4.jar
+            - dist/pbd4.tgz
+        expire_in: 1000 years
+
+    tags:
+        - gradle

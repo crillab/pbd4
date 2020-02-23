@@ -1,1 +1,17 @@
-/bin/
+# Eclipse Configuration Files
+.classpath
+.metadata
+.project
+.settings
+
+# Build files
+.gradle
+.scannerwork
+
+# Binaries
+bin
+build
+dist
+
+# Miscellaneous
+.DS_Store

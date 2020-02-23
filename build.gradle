@@ -1,0 +1,138 @@
+/*
+ * This is the build.gradle configuration file of PBD4.
+ */
+
+/************************
+ * Plugin Configuration *
+ ************************/
+
+apply plugin: "eclipse"
+apply plugin: "java"
+apply plugin: "jacoco"
+
+/**********************
+ * Main Configuration *
+ **********************/
+
+def outDir = "${rootDir}/dist"
+def jarDir = "${outDir}/jars"
+
+ext.moduleName = "fr.univartois.cril.pbd4"
+
+/****************
+ * Dependencies *
+ ****************/
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    implementation files("lib/jkahypar-module-0.1.0.jar")
+    implementation files("lib/jna-5.5.0.jar")
+    implementation files("lib/org.sat4j.core.jar")
+    implementation files("lib/org.sat4j.pb.jar")
+
+    testImplementation group: "org.junit.jupiter", name: "junit-jupiter-engine", version: "5.2.0"
+    testImplementation group: "org.junit.jupiter", name: "junit-jupiter-params", version: "5.2.0"
+}
+
+/*************************
+ * Eclipse Configuration *
+ *************************/
+
+eclipse.classpath.file.whenMerged {
+    // Modularizing project dependencies.
+    entries.findAll{ isModule(it) }.each{ it.entryAttributes["module"] = "true" }
+}
+
+/****************************************
+ * Compilation Configuration for Jigsaw *
+ ****************************************/
+
+afterEvaluate {
+    compileJava {
+        // Setting the module name.
+        inputs.property("moduleName", moduleName)
+
+        // Adding the classpath to the module path.
+        doFirst {
+            options.compilerArgs = [
+                "--module-path", classpath.asPath
+            ]
+            classpath = files()
+        }
+    }
+}
+
+/**********************
+ * Test Configuration *
+ **********************/
+
+// Making test resources available during test execution.
+task copyTestResources(type: Copy) {
+    from "${projectDir}/src/test/resources"
+    into "${buildDir}/classes/java/test"
+}
+processTestResources.dependsOn copyTestResources
+
+// Configuring the use of JUnit 5.
+test {
+    useJUnitPlatform()
+}
+
+// Configuring the version of JaCoCo to use.
+jacoco {
+    toolVersion = "0.8.5"
+}
+
+// Asking for an XML output for JaCoCo.
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}
+
+/*************
+ * Packaging *
+ *************/
+
+// Putting the generated jars in the output directory.
+tasks.withType(Jar) {
+    destinationDirectory = file("${jarDir}")
+}
+
+// Gathering PBD4 dependencies into the output directory.
+task gather(type: Copy) {
+    from "lib"
+    include "*.jar"
+    into "${jarDir}"
+}
+
+// Creating a gzipped-tarball with PBD4 and its dependencies.
+task pbd4(type: Tar) {
+    dependsOn jar
+    dependsOn gather
+
+    from file("${jarDir}"), file("exec/pbd4.sh")
+    destinationDirectory = file("${outDir}")
+    archiveBaseName = "pbd4"
+    archiveExtension = "tgz"
+
+    compression = Compression.GZIP
+}
+
+// Removes the binary files of PBD4 when cleaning.
+task removeBinaries(type: Delete) {
+    delete "dist"
+}
+clean.dependsOn removeBinaries
+
+/*************
+ * Functions *
+ *************/
+
+// Checking whether an Eclipse classpath entry must be put in the module path.
+boolean isModule(entry) {
+    (entry.kind == "src") || ((entry.kind == "lib") && (entry.entryAttributes["gradle_used_by_scope"] != "test"))
+}
