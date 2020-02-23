@@ -1,6 +1,6 @@
 # PBD4, A Pseudo-Boolean-Based Implementation of the D4 Compiler
 
-[![build status](https://gitlab.univ-artois.fr/wallon-phd/softwares/pbd4/badges/master/build.svg)](https://gitlab.univ-artois.fr/wallon-phd/softwares/pbd4/commits/master)
+[![pipeline status](https://gitlab.univ-artois.fr/wallon-phd/softwares/pbd4/badges/master/pipeline.svg)](https://gitlab.univ-artois.fr/wallon-phd/softwares/pbd4/commits/master)
 
 `PBD4` is a pseudo-Boolean based implementation of the D4 compiler and model
 counter written in Java that is made to be easily extensible and reusable.
