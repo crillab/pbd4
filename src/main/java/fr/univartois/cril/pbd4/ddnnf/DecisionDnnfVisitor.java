@@ -1,6 +1,6 @@
 /**
  * PBD4, a pseudo-Boolean based implementation of the D4 compiler.
- * Copyright (c) 2020 - Romain WALLON.
+ * Copyright (c) 2020 - Univ Artois & CNRS.
  * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -21,7 +21,10 @@
 package fr.univartois.cril.pbd4.ddnnf;
 
 /**
- * The DecisionDnnfVisitor allows to visit a d-DNNF in a depth-first manner.
+ * The DecisionDnnfVisitor allows to visit a decision-DNNF.
+ * Visiting may be performed in either a depth-first or breadth-first manner.
+ * Visitor implementations are not required to support both traversals, but should
+ * document whether they do.
  *
  * @author Romain WALLON
  *
@@ -29,16 +32,14 @@ package fr.univartois.cril.pbd4.ddnnf;
  */
 public interface DecisionDnnfVisitor {
 
-    /***
-     * Notifies this visitor that it is going to visit a d-DNNF.
-     * This method may be used to perform some initializations before actually visiting
-     * the d-DNNF.
+    /**
+     * Enters a {@link ConjunctionNode}.
      *
-     * @param root The root node of the d-DNNF to visit.
+     * @param node The node to enter.
      *
      * @implSpec The default implementation does nothing.
      */
-    default void enter(DecisionDnnf root) {
+    default void enter(ConjunctionNode node) {
         // Nothing to do by default.
     }
 
@@ -50,11 +51,55 @@ public interface DecisionDnnfVisitor {
     void visit(ConjunctionNode node);
 
     /**
+     * Exits a {@link ConjunctionNode}.
+     *
+     * @param node The node to exit.
+     *
+     * @implSpec The default implementation does nothing.
+     */
+    default void exit(ConjunctionNode node) {
+        // Nothing to do by default.
+    }
+
+    /**
+     * Enters a {@link DecisionNode}.
+     *
+     * @param node The node to enter.
+     *
+     * @implSpec The default implementation does nothing.
+     */
+    default void enter(DecisionNode node) {
+        // Nothing to do by default.
+    }
+
+    /**
      * Visits a {@link DecisionNode}.
      *
      * @param node The node to visit.
      */
     void visit(DecisionNode node);
+
+    /**
+     * Exits a {@link DecisionNode}.
+     *
+     * @param node The node to exit.
+     *
+     * @implSpec The default implementation does nothing.
+     */
+    default void exit(DecisionNode node) {
+        // Nothing to do by default.
+    }
+
+    /**
+     * Enters a {@link LiteralNode}.
+     *
+     * @param node The node to enter.
+     *
+     * @implSpec The default implementation does nothing.
+     */
+    default void enter(LiteralNode node) {
+        // Nothing to do by default.
+    }
 
     /**
      * Visits a {@link LiteralNode}.
@@ -64,6 +109,28 @@ public interface DecisionDnnfVisitor {
     void visit(LiteralNode node);
 
     /**
+     * Exits a {@link LiteralNode}.
+     *
+     * @param node The node to exit.
+     *
+     * @implSpec The default implementation does nothing.
+     */
+    default void exit(LiteralNode node) {
+        // Nothing to do by default.
+    }
+
+    /**
+     * Enters a {@link LeafNode}.
+     *
+     * @param node The node to enter.
+     *
+     * @implSpec The default implementation does nothing.
+     */
+    default void enter(LeafNode node) {
+        // Nothing to do by default.
+    }
+
+    /**
      * Visits a {@link LeafNode}.
      *
      * @param node The node to visit.
@@ -71,15 +138,13 @@ public interface DecisionDnnfVisitor {
     void visit(LeafNode node);
 
     /**
-     * Notifies this visitor that it has visited a whole d-DNNF.
-     * This method may be used to perform some last computations after having visited the
-     * d-DNNF.
+     * Exits a {@link LeafNode}.
      *
-     * @param root The root node of the d-DNNF that has been visited.
+     * @param node The node to exit.
      *
      * @implSpec The default implementation does nothing.
      */
-    default void exit(DecisionDnnf root) {
+    default void exit(LeafNode node) {
         // Nothing to do by default.
     }
 

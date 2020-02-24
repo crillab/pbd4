@@ -1,6 +1,6 @@
 /**
  * PBD4, a pseudo-Boolean based implementation of the D4 compiler.
- * Copyright (c) 2020 - Romain WALLON.
+ * Copyright (c) 2020 - Univ Artois & CNRS.
  * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -21,7 +21,8 @@
 package fr.univartois.cril.pbd4.ddnnf;
 
 /**
- * The LiteralNode is a node representing a single literal.
+ * The LiteralNode is a node representing a single literal, i.e., a variable or its
+ * negation.
  *
  * @author Romain WALLON
  *
@@ -58,12 +59,36 @@ public final class LiteralNode extends InternalNode {
      * (non-Javadoc)
      * 
      * @see
-     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnf#accept(fr.univartois.cril.pbd4.ddnnf.
-     * DecisionDnnfVisitor)
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnf#depthFirstAccept(fr.univartois.cril.pbd4
+     * .ddnnf.DecisionDnnfVisitor)
      */
     @Override
-    public void accept(DecisionDnnfVisitor visitor) {
+    public void depthFirstAccept(DecisionDnnfVisitor visitor) {
+        accept(visitor);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnf#breadthFirstAccept(fr.univartois.cril.
+     * pbd4.ddnnf.DecisionDnnfVisitor)
+     */
+    @Override
+    public void breadthFirstAccept(DecisionDnnfVisitor visitor) {
+        accept(visitor);
+    }
+
+    /**
+     * Accepts a visitor, in either depth-first or breadth-first manner (there is no
+     * difference for a literal node).
+     * 
+     * @param visitor The visitor to accept.
+     */
+    private void accept(DecisionDnnfVisitor visitor) {
+        visitor.enter(this);
         visitor.visit(this);
+        visitor.exit(this);
     }
 
     /**

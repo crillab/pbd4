@@ -1,6 +1,6 @@
 /**
  * PBD4, a pseudo-Boolean based implementation of the D4 compiler.
- * Copyright (c) 2020 - Romain WALLON.
+ * Copyright (c) 2020 - Univ Artois & CNRS.
  * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -20,10 +20,15 @@
 
 package fr.univartois.cril.pbd4.ddnnf;
 
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toSet;
+
 import java.io.OutputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * The DecisionDnnf defines the interface for manipulating d-DNNFs.
+ * The DecisionDnnf defines the interface for manipulating decision-DNNFs.
  *
  * @author Romain WALLON
  *
@@ -32,30 +37,80 @@ import java.io.OutputStream;
 public interface DecisionDnnf {
 
     /**
-     * Accepts a {@link DecisionDnnfVisitor}.
-     * Visiting a d-DNNF is performed in a depth-first manner.
+     * Accepts a {@link DecisionDnnfVisitor} in a depth-first manner.
      *
      * @param visitor The visitor to accept.
      */
-    void accept(DecisionDnnfVisitor visitor);
+    void depthFirstAccept(DecisionDnnfVisitor visitor);
 
     /**
-     * Writes this d-DNNF to the given output stream, using the NNF format.
+     * Accepts a {@link DecisionDnnfVisitor} in a breadth-first manner.
      *
-     * @param outputStream The output stream in which to write this d-DNNF.
+     * @param visitor The visitor to accept.
+     */
+    void breadthFirstAccept(DecisionDnnfVisitor visitor);
+
+    /**
+     * Evaluates this decision-DNNF on the given assignment.
+     * An assignment is given by the set of literals it satisfies, given in DIMACS format.
+     *
+     * @param assignment The assignment on which to evaluate this decision-DNNF.
+     *
+     * @return Whether this decision-DNNF is satisfied by the given assignment.
+     */
+    default boolean evaluate(Set<Integer> assignment) {
+        var evaluator = new DecisionDnnfEvaluator(assignment);
+        breadthFirstAccept(evaluator);
+        return evaluator.evaluate();
+    }
+
+    /**
+     * Evaluates this decision-DNNF on the given assignment.
+     * An assignment is given by the array of literals it satisfies, given in DIMACS
+     * format.
+     *
+     * @param assignment The assignment on which to evaluate this decision-DNNF.
+     *
+     * @return Whether this decision-DNNF is satisfied by the given assignment.
+     */
+    default boolean evaluate(int... assignment) {
+        return evaluate(stream(assignment).boxed().collect(toSet()));
+    }
+
+    /**
+     * Evaluates this decision-DNNF on the given assignment.
+     * An assignment is given by the array of Boolean values it assigns to the variables
+     * of the decision-DNNF.
+     * In other words, {@code assignment[i]} is {@code true} if, and only if, variable
+     * {@code i + 1} is satisfied.
+     *
+     * @param assignment The assignment on which to evaluate this decision-DNNF.
+     *
+     * @return Whether this decision-DNNF is satisfied by the given assignment.
+     */
+    default boolean evaluate(boolean[] assignment) {
+        var set = new HashSet<Integer>();
+        for (int i = 0; i < assignment.length; i++) {
+            set.add(assignment[i] ? (i + 1) : (-i - 1));
+        }
+        return evaluate(set);
+    }
+
+    /**
+     * Writes this decision-DNNF to the given output stream, using the NNF format.
+     *
+     * @param outputStream The output stream in which to write this decision-DNNF.
      */
     default void writeTo(OutputStream outputStream) {
         try (var visitor = new DecisionDnnfWriter(outputStream)) {
-            visitor.enter(this);
-            accept(visitor);
-            visitor.exit(this);
+            depthFirstAccept(visitor);
         }
     }
 
     /**
-     * Computes a String representation of this d-DNNF, using the NNF format.
+     * Computes a String representation of this decision-DNNF, using the NNF format.
      *
-     * @return A String representation of this d-DNNF.
+     * @return A String representation of this decision-DNNF.
      */
     String toString();
 

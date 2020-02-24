@@ -1,6 +1,6 @@
 /**
  * PBD4, a pseudo-Boolean based implementation of the D4 compiler.
- * Copyright (c) 2020 - Romain WALLON.
+ * Copyright (c) 2020 - Univ Artois & CNRS.
  * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -154,17 +154,6 @@ public final class DecisionDnnfWriter implements DecisionDnnfVisitor, Closeable 
         currentIndex++;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#exit(fr.univartois.cril.pbd4.
-     * ddnnf.DecisionDnnf)
-     */
-    @Override
-    public void exit(DecisionDnnf root) {
-        writer.flush();
-    }
 
     /*
      * (non-Javadoc)

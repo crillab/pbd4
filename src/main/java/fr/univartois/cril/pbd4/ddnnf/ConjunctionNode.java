@@ -1,6 +1,6 @@
 /**
  * PBD4, a pseudo-Boolean based implementation of the D4 compiler.
- * Copyright (c) 2020 - Romain WALLON.
+ * Copyright (c) 2020 - Univ Artois & CNRS.
  * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * The ConjunctionNode represents the conjunction of several d-DNNFs (there may be
+ * The ConjunctionNode represents a conjunction of several decision-DNNFs (there may be
  * arbitrary many conjuncts).
  *
  * @author Romain WALLON
@@ -35,14 +35,15 @@ import java.util.List;
 public final class ConjunctionNode extends InternalNode {
 
     /**
-     * The d-DNNFs for which this node is a representation of the conjunction.
+     * The decision-DNNFs for which this node is a representation of the conjunction.
      */
     private final Collection<DecisionDnnf> conjuncts;
 
     /**
      * Creates a new ConjunctionNode.
      *
-     * @param conjuncts The d-DNNFs for which the node is a representation of the conjunction.
+     * @param conjuncts The decision-DNNFs for which the node is a representation of the
+     *        conjunction.
      */
     private ConjunctionNode(Collection<DecisionDnnf> conjuncts) {
         this.conjuncts = conjuncts;
@@ -51,7 +52,8 @@ public final class ConjunctionNode extends InternalNode {
     /**
      * Creates a new ConjunctionNode.
      *
-     * @param conjuncts The d-DNNFs for which the node is a representation of the conjunction.
+     * @param conjuncts The decision-DNNFs for which the node is a representation of the
+     *        conjunction.
      *
      * @return The created node.
      */
@@ -62,7 +64,8 @@ public final class ConjunctionNode extends InternalNode {
     /**
      * Creates a new ConjunctionNode.
      *
-     * @param conjuncts The d-DNNFs for which the node is a representation of the conjunction.
+     * @param conjuncts The decision-DNNFs for which the node is a representation of the
+     *        conjunction.
      *
      * @return The created node.
      */
@@ -74,13 +77,30 @@ public final class ConjunctionNode extends InternalNode {
      * (non-Javadoc)
      * 
      * @see
-     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnf#accept(fr.univartois.cril.pbd4.ddnnf.
-     * DecisionDnnfVisitor)
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnf#depthFirstAccept(fr.univartois.cril.pbd4
+     * .ddnnf.DecisionDnnfVisitor)
      */
     @Override
-    public void accept(DecisionDnnfVisitor visitor) {
-        conjuncts.forEach(c -> c.accept(visitor));
+    public void depthFirstAccept(DecisionDnnfVisitor visitor) {
+        visitor.enter(this);
+        conjuncts.forEach(c -> c.depthFirstAccept(visitor));
         visitor.visit(this);
+        visitor.exit(this);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnf#breadthFirstAccept(fr.univartois.cril.
+     * pbd4.ddnnf.DecisionDnnfVisitor)
+     */
+    @Override
+    public void breadthFirstAccept(DecisionDnnfVisitor visitor) {
+        visitor.enter(this);
+        visitor.visit(this);
+        conjuncts.forEach(c -> c.breadthFirstAccept(visitor));
+        visitor.exit(this);
     }
 
 }
