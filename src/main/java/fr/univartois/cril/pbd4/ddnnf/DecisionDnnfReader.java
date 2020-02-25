@@ -22,7 +22,7 @@ package fr.univartois.cril.pbd4.ddnnf;
 
 import static fr.univartois.cril.pbd4.ddnnf.LiteralNode.literal;
 import static fr.univartois.cril.pbd4.ddnnf.ConjunctionNode.and;
-import static fr.univartois.cril.pbd4.ddnnf.DecisionNode.ifThenElse;
+import static fr.univartois.cril.pbd4.ddnnf.DecisionNode.or;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -148,7 +148,7 @@ public final class DecisionDnnfReader implements Closeable {
 
         if (nbConjuncts == 0) {
             // The node actually represents the Boolean constant TRUE.
-            return LeafNode.TRUE;
+            return ConstantNode.TRUE;
         }
 
         // Retrieving the conjuncts.
@@ -172,11 +172,11 @@ public final class DecisionDnnfReader implements Closeable {
 
         if (variable == 0) {
             // The node actually represents the Boolean constant FALSE.
-            return LeafNode.FALSE;
+            return ConstantNode.FALSE;
         }
 
         // Retrieving the two children of the node.
-        return ifThenElse(variable,
+        return or(variable,
                 readNodes.get(Integer.parseInt(line[3])),
                 readNodes.get(Integer.parseInt(line[4])));
     }

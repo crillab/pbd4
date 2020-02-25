@@ -36,43 +36,40 @@ public final class DecisionNode implements DecisionDnnfNode {
     private final int variable;
 
     /**
-     * The decision-DNNF node representing the case in which the variable is satisfied.
+     * The decision-DNNF node that is the left child of this node.
      */
-    private final DecisionDnnfNode ifTrue;
+    private final DecisionDnnfNode leftChild;
 
     /**
-     * The decision-DNNF node representing the case in which the variable is falsified.
+     * The decision-DNNF node that is the right child of this node.
      */
-    private final DecisionDnnfNode ifFalse;
+    private final DecisionDnnfNode rightChild;
 
     /**
      * Creates a new DecisionNode.
      *
      * @param variable The variable for which the node represents a decision on.
-     * @param ifTrue The decision-DNNF node representing the case in which the variable is
-     *        satisfied.
-     * @param ifFalse The decision-DNNF node representing the case in which the variable
-     *        is falsified.
+     * @param leftChild The decision-DNNF node that is the left child of the node.
+     * @param rightChild The decision-DNNF node that is the right child of the node.
      */
-    private DecisionNode(int variable, DecisionDnnfNode ifTrue, DecisionDnnfNode ifFalse) {
+    private DecisionNode(int variable, DecisionDnnfNode leftChild, DecisionDnnfNode rightChild) {
         this.variable = variable;
-        this.ifTrue = ifTrue;
-        this.ifFalse = ifFalse;
+        this.leftChild = leftChild;
+        this.rightChild = rightChild;
     }
 
     /**
      * Creates a new DecisionNode.
      *
-     * @param ifTrue The decision-DNNF node representing the case in which the variable is
-     *        satisfied.
-     * @param ifFalse The decision-DNNF node representing the case in which the variable
-     *        is falsified.
+     * @param variable The variable for which the node represents a decision on.
+     * @param leftChild The decision-DNNF node that is the left child of the node.
+     * @param rightChild The decision-DNNF node that is the right child of the node.
      *
      * @return The created node.
      */
-    public static DecisionDnnfNode ifThenElse(int variable, DecisionDnnfNode ifTrue,
-            DecisionDnnfNode ifFalse) {
-        return new DecisionNode(variable, ifTrue, ifFalse);
+    public static DecisionDnnfNode or(int variable, DecisionDnnfNode leftChild,
+            DecisionDnnfNode rightChild) {
+        return new DecisionNode(variable, leftChild, rightChild);
     }
 
     /*
@@ -84,9 +81,11 @@ public final class DecisionNode implements DecisionDnnfNode {
      */
     @Override
     public void depthFirstAccept(DecisionDnnfVisitor visitor) {
-        ifTrue.depthFirstAccept(visitor);
-        ifFalse.depthFirstAccept(visitor);
+        visitor.enter(this);
+        leftChild.depthFirstAccept(visitor);
+        rightChild.depthFirstAccept(visitor);
         visitor.visit(this);
+        visitor.exit(this);
     }
 
     /*
@@ -98,9 +97,11 @@ public final class DecisionNode implements DecisionDnnfNode {
      */
     @Override
     public void breadthFirstAccept(DecisionDnnfVisitor visitor) {
+        visitor.enter(this);
         visitor.visit(this);
-        ifTrue.breadthFirstAccept(visitor);
-        ifFalse.breadthFirstAccept(visitor);
+        leftChild.breadthFirstAccept(visitor);
+        rightChild.breadthFirstAccept(visitor);
+        visitor.exit(this);
     }
 
     /**

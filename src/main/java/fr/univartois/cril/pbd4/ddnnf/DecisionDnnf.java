@@ -30,6 +30,8 @@ import java.util.Set;
 
 /**
  * The DecisionDnnf represents the decision-DNNFs computed by the compiler.
+ * It encapsulates the root node of the decision-DNNF, and provides convenient
+ * methods for manipulating it.
  *
  * @author Romain WALLON
  *
@@ -98,41 +100,41 @@ public final class DecisionDnnf {
     }
 
     /**
-     * Evaluates this decision-DNNF node on the given assignment.
+     * Evaluates this decision-DNNF on the given assignment.
      * An assignment is given by the set of literals it satisfies, given in DIMACS format.
      *
-     * @param assignment The assignment on which to evaluate this decision-DNNF node.
+     * @param assignment The assignment on which to evaluate this decision-DNNF.
      *
-     * @return Whether this decision-DNNF node is satisfied by the given assignment.
+     * @return Whether this decision-DNNF is satisfied by the given assignment.
      */
     public boolean evaluate(Set<Integer> assignment) {
         var evaluator = new DecisionDnnfEvaluator(assignment);
-        breadthFirstAccept(evaluator);
+        depthFirstAccept(evaluator);
         return evaluator.evaluate();
     }
 
     /**
-     * Evaluates this decision-DNNF node on the given assignment.
+     * Evaluates this decision-DNNF on the given assignment.
      * An assignment is given by the array of literals it satisfies, given in DIMACS
      * format.
      *
-     * @param assignment The assignment on which to evaluate this decision-DNNF node.
+     * @param assignment The assignment on which to evaluate this decision-DNNF.
      *
-     * @return Whether this decision-DNNF node is satisfied by the given assignment.
+     * @return Whether this decision-DNNF is satisfied by the given assignment.
      */
     public boolean evaluate(int... assignment) {
         return evaluate(stream(assignment).boxed().collect(toSet()));
     }
 
     /**
-     * Evaluates this decision-DNNF node on the given assignment.
+     * Evaluates this decision-DNNF on the given assignment.
      * An assignment is given by the array of Boolean values it assigns to the variables.
      * In other words, {@code assignment[i]} is {@code true} if, and only if, variable
      * {@code i + 1} is satisfied.
      *
-     * @param assignment The assignment on which to evaluate this decision-DNNF node.
+     * @param assignment The assignment on which to evaluate this decision-DNNF.
      *
-     * @return Whether this decision-DNNF node is satisfied by the given assignment.
+     * @return Whether this decision-DNNF is satisfied by the given assignment.
      */
     public boolean evaluate(boolean[] assignment) {
         var set = new HashSet<Integer>();
@@ -184,9 +186,7 @@ public final class DecisionDnnf {
      * @param outputStream The output stream in which to write this decision-DNNF node.
      */
     public void writeTo(OutputStream outputStream) {
-        try (var visitor = new DecisionDnnfWriter(outputStream)) {
-            depthFirstAccept(visitor);
-        }
+        depthFirstAccept(new DecisionDnnfWriter(outputStream));
     }
 
     /**

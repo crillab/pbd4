@@ -21,13 +21,13 @@
 package fr.univartois.cril.pbd4.ddnnf;
 
 /**
- * The LeafNode represents a leaf node of a decision-DNNF, i.e., a Boolean constant.
+ * The ConstantNode represents a Boolean constant.
  *
  * @author Romain WALLON
  *
  * @version 0.1.0
  */
-public enum LeafNode implements DecisionDnnfNode {
+public enum ConstantNode implements DecisionDnnfNode {
 
     /**
      * The FALSE Boolean constant.
@@ -40,16 +40,16 @@ public enum LeafNode implements DecisionDnnfNode {
     TRUE("A 0");
 
     /**
-     * The NNF representation of this leaf.
+     * The NNF representation of this constant.
      */
     private final String nnfString;
 
     /**
-     * Creates a new LeafNode.
+     * Creates a new ConstantNode.
      *
-     * @param nnfString The NNF representation of the leaf.
+     * @param nnfString The NNF representation of the constant.
      */
-    private LeafNode(String nnfString) {
+    private ConstantNode(String nnfString) {
         this.nnfString = nnfString;
     }
 
@@ -79,7 +79,7 @@ public enum LeafNode implements DecisionDnnfNode {
 
     /**
      * Accepts a visitor, in either depth-first or breadth-first manner (there is no
-     * difference for a leaf node).
+     * difference for a constant node).
      * 
      * @param visitor The visitor to accept.
      */
@@ -90,9 +90,9 @@ public enum LeafNode implements DecisionDnnfNode {
     }
 
     /**
-     * Gives The NNF representation of this leaf.
+     * Gives The NNF representation of this constant.
      *
-     * @return The NNF representation of this leaf.
+     * @return The NNF representation of this constant.
      */
     public String toNNF() {
         return nnfString;

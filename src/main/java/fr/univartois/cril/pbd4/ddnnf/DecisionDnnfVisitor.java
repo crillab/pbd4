@@ -22,7 +22,7 @@ package fr.univartois.cril.pbd4.ddnnf;
 
 /**
  * The DecisionDnnfVisitor allows to visit a decision-DNNF.
- * Visiting may be performed in either a depth-first or breadth-first manner.
+ * Visiting may be performed in either depth-first or breadth-first manner.
  * Visitor implementations are not required to support both traversals, but should
  * document whether they do.
  *
@@ -153,31 +153,31 @@ public interface DecisionDnnfVisitor {
     }
 
     /**
-     * Enters a {@link LeafNode}.
+     * Enters a {@link ConstantNode}.
      *
      * @param node The node to enter.
      *
      * @implSpec The default implementation does nothing.
      */
-    default void enter(LeafNode node) {
+    default void enter(ConstantNode node) {
         // Nothing to do by default.
     }
 
     /**
-     * Visits a {@link LeafNode}.
+     * Visits a {@link ConstantNode}.
      *
      * @param node The node to visit.
      */
-    void visit(LeafNode node);
+    void visit(ConstantNode node);
 
     /**
-     * Exits a {@link LeafNode}.
+     * Exits a {@link ConstantNode}.
      *
      * @param node The node to exit.
      *
      * @implSpec The default implementation does nothing.
      */
-    default void exit(LeafNode node) {
+    default void exit(ConstantNode node) {
         // Nothing to do by default.
     }
 

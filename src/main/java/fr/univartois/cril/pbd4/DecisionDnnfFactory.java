@@ -89,7 +89,7 @@ final class DecisionDnnfFactory {
      * @return The created d-DNNF.
      */
     public DecisionDnnfNode ifThenElse(int variable, DecisionDnnfNode ifTrue, DecisionDnnfNode ifFalse) {
-        return DecisionNode.ifThenElse(variable, ifTrue, ifFalse);
+        return DecisionNode.or(variable, ifTrue, ifFalse);
     }
 
 }

@@ -41,6 +41,9 @@ public final class TestDecisionDnnfReader extends AbstractTestDecisionDnnf {
     @Test
     public void testEvaluateExample1() {
         var ddnnf = read("example-1.nnf");
+        assertEquals(4, ddnnf.getNumberOfVariables());
+        assertEquals(15, ddnnf.getNumberOfNodes());
+        assertEquals(17, ddnnf.getNumberOfEdges());
         assertEquals(nnfOfExample1(), ddnnf.toString());
     }
 
@@ -76,6 +79,9 @@ public final class TestDecisionDnnfReader extends AbstractTestDecisionDnnf {
     @Test
     public void testEvaluateExample2() {
         var ddnnf = read("example-2.nnf");
+        assertEquals(3, ddnnf.getNumberOfVariables());
+        assertEquals(15, ddnnf.getNumberOfNodes());
+        assertEquals(15, ddnnf.getNumberOfEdges());
         assertEquals(nnfOfExample2(), ddnnf.toString());
     }
 
@@ -86,7 +92,7 @@ public final class TestDecisionDnnfReader extends AbstractTestDecisionDnnf {
      * @return The String representation of the decision-DNNF.
      */
     static String nnfOfExample2() {
-        return "nnf 15 14 3" + System.lineSeparator() +
+        return "nnf 15 15 3" + System.lineSeparator() +
                 "O 0 0" + System.lineSeparator() +
                 "A 0" + System.lineSeparator() +
                 "L -1" + System.lineSeparator() +

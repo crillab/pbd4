@@ -20,81 +20,188 @@
 
 package fr.univartois.cril.pbd4.ddnnf;
 
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.Set;
+import java.util.function.BinaryOperator;
 
 /**
- * The DecisionDnnfEvaluator
+ * The DecisionDnnfEvaluator is a {@link DecisionDnnfVisitor} which evaluates the truth
+ * value of a decision-DNNF, given an assignment of its variables.
+ *
+ * Visiting must be performed in a depth-first manner.
  *
  * @author Romain WALLON
  *
  * @version 0.1.0
  */
-public class DecisionDnnfEvaluator implements DecisionDnnfVisitor {
+final class DecisionDnnfEvaluator implements DecisionDnnfVisitor {
 
+    /**
+     * The Boolean operator used to compute conjunctions.
+     */
+    private static final BinaryOperator<Boolean> AND = (x, y) -> x && y;
+
+    /**
+     * The Boolean operator used to compute disjunctions.
+     */
+    private static final BinaryOperator<Boolean> OR = (x, y) -> x || y;
+
+    /**
+     * The assignment of the variables.
+     */
     private final Set<Integer> assignment;
-    
-    
-    
+
+    /**
+     * The stack of partial evaluations that have been computed.
+     */
+    private final Deque<Boolean> partialEvaluations;
+
+    /**
+     * The stack of the operation to perform.
+     */
+    private final Deque<BinaryOperator<Boolean>> operations;
+
+    /**
+     * Creates a new DecisionDnnfEvaluator.
+     *
+     * @param assignment The assignment of the variables.
+     */
     public DecisionDnnfEvaluator(Set<Integer> assignment) {
         this.assignment = assignment;
-    }
-    
-    public DecisionDnnfEvaluator(Integer... assignment) {
-        this(Set.of(assignment));
+        this.partialEvaluations = new LinkedList<>();
+        this.operations = new LinkedList<>();
     }
 
-    /* 
+    /*
      * (non-Javadoc)
      * 
-     * @see fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#visit(fr.univartois.cril.pbd4.ddnnf.ConjunctionNode)
+     * @see
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#enter(fr.univartois.cril.pbd4.
+     * ddnnf.ConjunctionNode)
+     */
+    @Override
+    public void enter(ConjunctionNode node) {
+        partialEvaluations.push(true);
+        operations.push(AND);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#visit(fr.univartois.cril.pbd4.
+     * ddnnf.ConjunctionNode)
      */
     @Override
     public void visit(ConjunctionNode node) {
-        // TODO Auto-generated method stub
-
+        // Nothing to do when visiting this node.
     }
 
-    /* 
+    /*
      * (non-Javadoc)
      * 
-     * @see fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#visit(fr.univartois.cril.pbd4.ddnnf.DecisionNode)
+     * @see
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#exit(fr.univartois.cril.pbd4.
+     * ddnnf.ConjunctionNode)
+     */
+    @Override
+    public void exit(ConjunctionNode node) {
+        exitInternal();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#enter(fr.univartois.cril.pbd4.
+     * ddnnf.DecisionNode)
+     */
+    @Override
+    public void enter(DecisionNode node) {
+        partialEvaluations.push(false);
+        operations.push(OR);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#visit(fr.univartois.cril.pbd4.
+     * ddnnf.DecisionNode)
      */
     @Override
     public void visit(DecisionNode node) {
-        // TODO Auto-generated method stub
-
+        // Nothing to do when visiting this node.
     }
 
-    /* 
+    /*
      * (non-Javadoc)
      * 
-     * @see fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#visit(fr.univartois.cril.pbd4.ddnnf.LiteralNode)
+     * @see
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#exit(fr.univartois.cril.pbd4.
+     * ddnnf.DecisionNode)
+     */
+    @Override
+    public void exit(DecisionNode node) {
+        exitInternal();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#visit(fr.univartois.cril.pbd4.
+     * ddnnf.LiteralNode)
      */
     @Override
     public void visit(LiteralNode node) {
-        // TODO Auto-generated method stub
-
+        pushPartialEvaluation(assignment.contains(node.getLiteral()));
     }
 
-    /* 
+    /*
      * (non-Javadoc)
      * 
-     * @see fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#visit(fr.univartois.cril.pbd4.ddnnf.LeafNode)
+     * @see
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#visit(fr.univartois.cril.pbd4.
+     * ddnnf.ConstantNode)
      */
     @Override
-    public void visit(LeafNode node) {
-        // TODO Auto-generated method stub
-
+    public void visit(ConstantNode node) {
+        pushPartialEvaluation(node == ConstantNode.TRUE);
     }
 
+    /**
+     * Pushes a partial evaluation on {@link #partialEvaluations}.
+     * The last operation is applied between {@code value} and the last value on the
+     * stack.
+     * 
+     * @param value The value to push.
+     */
+    private void pushPartialEvaluation(boolean value) {
+        boolean previous = partialEvaluations.pop();
+        partialEvaluations.push(operations.peek().apply(previous, value));
+    }
+
+    /**
+     * Exits an internal node.
+     * Unless if the node is the root node, the last pushed value is consumed.
+     */
+    private void exitInternal() {
+        if (operations.size() > 1) {
+            // The value of the exited node must be consummed.
+            operations.pop();
+            pushPartialEvaluation(partialEvaluations.pop());
+        }
+    }
+
+    /**
+     * Gives the value of the decision-DNNF evaluated on the associated assignment.
+     * 
+     * @return The result of the evaluation.
+     */
     public boolean evaluate() {
-        return false;
+        return partialEvaluations.peek();
     }
 
-    @Override
-    public void visit(DecisionDnnf ddnnf) {
-        // TODO Auto-generated method stub
-        
-    }
 }
-

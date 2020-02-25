@@ -82,7 +82,7 @@ public final class LiteralNode implements DecisionDnnfNode {
     /**
      * Accepts a visitor, in either depth-first or breadth-first manner (there is no
      * difference for a literal node).
-     * 
+     *
      * @param visitor The visitor to accept.
      */
     private void accept(DecisionDnnfVisitor visitor) {

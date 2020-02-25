@@ -31,7 +31,8 @@ import org.sat4j.core.VecInt;
 import org.sat4j.specs.IVecInt;
 
 /**
- * The DecisionDnnfWriter allows to write a d-DNNF to an output stream, using the NNF format.
+ * The DecisionDnnfWriter allows to write a d-DNNF to an output stream, using the NNF
+ * format.
  *
  * @author Romain WALLON
  *
@@ -43,12 +44,12 @@ public final class DecisionDnnfWriter implements DecisionDnnfVisitor, Closeable 
      * The writer to use to print the d-DNNF to an output stream.
      */
     private final PrintWriter writer;
-    
+
     /**
      * The children of the node being explored.
      */
     private final IVecInt children;
-    
+
     /**
      * The index of the current node in the output.
      */
@@ -84,11 +85,6 @@ public final class DecisionDnnfWriter implements DecisionDnnfVisitor, Closeable 
         this.children = new VecInt();
     }
 
-    /* 
-     * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#enter(fr.univartois.cril.pbd4.ddnnf.DecisionDnnf)
-     */
     @Override
     public void enter(DecisionDnnf ddnnf) {
         writer.printf("nnf %d %d %d%n",
@@ -98,9 +94,8 @@ public final class DecisionDnnfWriter implements DecisionDnnfVisitor, Closeable 
     }
 
     @Override
-    public void visit(DecisionDnnf ddnnf) {
-        // TODO Auto-generated method stub
-        
+    public void exit(DecisionDnnf ddnnf) {
+        writer.flush();
     }
 
     /*
@@ -113,9 +108,7 @@ public final class DecisionDnnfWriter implements DecisionDnnfVisitor, Closeable 
     @Override
     public void visit(ConjunctionNode node) {
         writer.printf("A %d", children.size());
-        printCurrentChildren();
-        pushNode();
-        
+
     }
 
     /*
@@ -128,8 +121,6 @@ public final class DecisionDnnfWriter implements DecisionDnnfVisitor, Closeable 
     @Override
     public void visit(DecisionNode node) {
         writer.printf("O %d %d", node.getVariable(), children.size());
-        printCurrentChildren();
-        pushNode();
     }
 
     /*
@@ -142,7 +133,6 @@ public final class DecisionDnnfWriter implements DecisionDnnfVisitor, Closeable 
     @Override
     public void visit(LiteralNode node) {
         writer.printf("L %d%n", node.getLiteral());
-        pushNode();
     }
 
     /*
@@ -153,26 +143,9 @@ public final class DecisionDnnfWriter implements DecisionDnnfVisitor, Closeable 
      * ddnnf.LeafNode)
      */
     @Override
-    public void visit(LeafNode node) {
+    public void visit(ConstantNode node) {
         writer.println(node.toNNF());
-        pushNode();
     }
-
-    /**
-     * Prints the children of the current node to the output stream, and removes them once finished.
-     */
-    private void printCurrentChildren() {
-        // TODO
-    }
-
-    /**
-     * Adds a child of the node currently visited.
-     */
-    private void pushNode() {
-        children.push(currentIndex);
-        currentIndex++;
-    }
-
 
     /*
      * (non-Javadoc)

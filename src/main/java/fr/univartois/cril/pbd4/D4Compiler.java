@@ -26,7 +26,7 @@ import java.util.Collection;
 import org.sat4j.specs.IVecInt;
 
 import fr.univartois.cril.pbd4.ddnnf.DecisionDnnfNode;
-import fr.univartois.cril.pbd4.ddnnf.LeafNode;
+import fr.univartois.cril.pbd4.ddnnf.ConstantNode;
 import fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula;
 
 /**
@@ -60,7 +60,7 @@ final class D4Compiler extends AbstractD4<DecisionDnnfNode> {
      */
     @Override
     protected DecisionDnnfNode unsatisfiable() {
-        return LeafNode.FALSE;
+        return ConstantNode.FALSE;
     }
 
     /*
