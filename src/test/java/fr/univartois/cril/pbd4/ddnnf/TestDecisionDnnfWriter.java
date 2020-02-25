@@ -50,10 +50,10 @@ public final class TestDecisionDnnfWriter {
 
     /**
      * Creates the decision-DNNF used as an example in the C2D manual.
-     * 
+     *
      * @return The created decision-DNNF.
      */
-    static DecisionDnnfNode createExample1() {
+    static DecisionDnnf createExample1() {
         // Creating the literal nodes.
         var l1 = literal(1);
         var l2 = literal(2);
@@ -73,7 +73,8 @@ public final class TestDecisionDnnfWriter {
         var a13 = and(a9, o12);
 
         // Creating the root node.
-        return ifThenElse(4, a13, a7);
+        var root = ifThenElse(4, a13, a7);
+        return new DecisionDnnf(4, 15, 17, root);
     }
 
     /**
@@ -88,10 +89,10 @@ public final class TestDecisionDnnfWriter {
 
     /**
      * Creates the decision-DNNF used as an example on the D4 web page.
-     * 
+     *
      * @return The created decision-DNNF.
      */
-    static DecisionDnnfNode createExample2() {
+    static DecisionDnnf createExample2() {
         // Creating the literal nodes.
         var l1 = literal(1);
         var notl1 = literal(-1);
@@ -108,7 +109,8 @@ public final class TestDecisionDnnfWriter {
         var a13 = and(notl3, l2, notl1, TRUE);
 
         // Creating the root node.
-        return ifThenElse(2, a13, a9);
+        var root = ifThenElse(2, a13, a9);
+        return new DecisionDnnf(3, 15, 14, root);
     }
 
 }

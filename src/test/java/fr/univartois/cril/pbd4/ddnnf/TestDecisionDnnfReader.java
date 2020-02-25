@@ -86,7 +86,7 @@ public final class TestDecisionDnnfReader extends AbstractTestDecisionDnnf {
      * @return The String representation of the decision-DNNF.
      */
     static String nnfOfExample2() {
-        return "nnf 15 4 3" + System.lineSeparator() +
+        return "nnf 15 14 3" + System.lineSeparator() +
                 "O 0 0" + System.lineSeparator() +
                 "A 0" + System.lineSeparator() +
                 "L -1" + System.lineSeparator() +
