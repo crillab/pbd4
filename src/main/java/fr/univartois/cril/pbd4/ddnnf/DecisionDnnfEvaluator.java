@@ -90,5 +90,11 @@ public class DecisionDnnfEvaluator implements DecisionDnnfVisitor {
     public boolean evaluate() {
         return false;
     }
+
+    @Override
+    public void visit(DecisionDnnf ddnnf) {
+        // TODO Auto-generated method stub
+        
+    }
 }
 

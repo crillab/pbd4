@@ -23,72 +23,118 @@ package fr.univartois.cril.pbd4.ddnnf;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toSet;
 
+import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * The DecisionDnnf defines the interface for manipulating decision-DNNFs.
+ * The DecisionDnnf represents the decision-DNNFs computed by the compiler.
  *
  * @author Romain WALLON
  *
  * @version 0.1.0
  */
-public interface DecisionDnnf {
+public final class DecisionDnnf {
+
+    /**
+     * The number of variables in this decision-DNNF.
+     */
+    private final int numberOfVariables;
+
+    /**
+     * The number of nodes in this decision-DNNF.
+     */
+    private final int numberOfNodes;
+
+    /**
+     * The number of edges in this decision-DNNF.
+     */
+    private final int numberOfEdges;
+
+    /**
+     * The root node of this decision-DNNF.
+     */
+    private final DecisionDnnfNode rootNode;
+
+    /**
+     * Creates a new DecisionDnnf.
+     *
+     * @param numberOfVariables The number of variables in the decision-DNNF.
+     * @param numberOfNodes The number of nodes in the decision-DNNF.
+     * @param numberOfEdges The number of edges in the decision-DNNF.
+     * @param rootNode The root node of the decision-DNNF.
+     */
+    public DecisionDnnf(int numberOfVariables, int numberOfNodes, int numberOfEdges,
+            DecisionDnnfNode rootNode) {
+        this.numberOfVariables = numberOfVariables;
+        this.numberOfNodes = numberOfNodes;
+        this.numberOfEdges = numberOfEdges;
+        this.rootNode = rootNode;
+    }
 
     /**
      * Accepts a {@link DecisionDnnfVisitor} in a depth-first manner.
      *
      * @param visitor The visitor to accept.
      */
-    void depthFirstAccept(DecisionDnnfVisitor visitor);
+    public void depthFirstAccept(DecisionDnnfVisitor visitor) {
+        visitor.enter(this);
+        rootNode.depthFirstAccept(visitor);
+        visitor.visit(this);
+        visitor.exit(this);
+    }
 
     /**
      * Accepts a {@link DecisionDnnfVisitor} in a breadth-first manner.
      *
      * @param visitor The visitor to accept.
      */
-    void breadthFirstAccept(DecisionDnnfVisitor visitor);
+    public void breadthFirstAccept(DecisionDnnfVisitor visitor) {
+        visitor.enter(this);
+        visitor.visit(this);
+        rootNode.breadthFirstAccept(visitor);
+        visitor.exit(this);
+    }
 
     /**
-     * Evaluates this decision-DNNF on the given assignment.
+     * Evaluates this decision-DNNF node on the given assignment.
      * An assignment is given by the set of literals it satisfies, given in DIMACS format.
      *
-     * @param assignment The assignment on which to evaluate this decision-DNNF.
+     * @param assignment The assignment on which to evaluate this decision-DNNF node.
      *
-     * @return Whether this decision-DNNF is satisfied by the given assignment.
+     * @return Whether this decision-DNNF node is satisfied by the given assignment.
      */
-    default boolean evaluate(Set<Integer> assignment) {
+    public boolean evaluate(Set<Integer> assignment) {
         var evaluator = new DecisionDnnfEvaluator(assignment);
         breadthFirstAccept(evaluator);
         return evaluator.evaluate();
     }
 
     /**
-     * Evaluates this decision-DNNF on the given assignment.
+     * Evaluates this decision-DNNF node on the given assignment.
      * An assignment is given by the array of literals it satisfies, given in DIMACS
      * format.
      *
-     * @param assignment The assignment on which to evaluate this decision-DNNF.
+     * @param assignment The assignment on which to evaluate this decision-DNNF node.
      *
-     * @return Whether this decision-DNNF is satisfied by the given assignment.
+     * @return Whether this decision-DNNF node is satisfied by the given assignment.
      */
-    default boolean evaluate(int... assignment) {
+    public boolean evaluate(int... assignment) {
         return evaluate(stream(assignment).boxed().collect(toSet()));
     }
 
     /**
-     * Evaluates this decision-DNNF on the given assignment.
-     * An assignment is given by the array of Boolean values it assigns to the variables
-     * of the decision-DNNF.
+     * Evaluates this decision-DNNF node on the given assignment.
+     * An assignment is given by the array of Boolean values it assigns to the variables.
      * In other words, {@code assignment[i]} is {@code true} if, and only if, variable
      * {@code i + 1} is satisfied.
      *
-     * @param assignment The assignment on which to evaluate this decision-DNNF.
+     * @param assignment The assignment on which to evaluate this decision-DNNF node.
      *
-     * @return Whether this decision-DNNF is satisfied by the given assignment.
+     * @return Whether this decision-DNNF node is satisfied by the given assignment.
      */
-    default boolean evaluate(boolean[] assignment) {
+    public boolean evaluate(boolean[] assignment) {
         var set = new HashSet<Integer>();
         for (int i = 0; i < assignment.length; i++) {
             set.add(assignment[i] ? (i + 1) : (-i - 1));
@@ -97,21 +143,62 @@ public interface DecisionDnnf {
     }
 
     /**
-     * Writes this decision-DNNF to the given output stream, using the NNF format.
+     * Gives the number of variables in this decision-DNNF.
      *
-     * @param outputStream The output stream in which to write this decision-DNNF.
+     * @return The number of variables in this decision-DNNF.
      */
-    default void writeTo(OutputStream outputStream) {
+    public int getNumberOfVariables() {
+        return numberOfVariables;
+    }
+
+    /**
+     * Gives the number of nodes in this decision-DNNF.
+     *
+     * @return The number of nodes in this decision-DNNF.
+     */
+    public int getNumberOfNodes() {
+        return numberOfNodes;
+    }
+
+    /**
+     * Gives the number of edges in this decision-DNNF.
+     *
+     * @return The number of edges in this decision-DNNF.
+     */
+    public int getNumberOfEdges() {
+        return numberOfEdges;
+    }
+
+    /**
+     * Gives the root node of this decision-DNNF.
+     *
+     * @return The root node of this decision-DNNF.
+     */
+    public DecisionDnnfNode getRootNode() {
+        return rootNode;
+    }
+
+    /**
+     * Writes this decision-DNNF node to the given output stream, using the NNF format.
+     *
+     * @param outputStream The output stream in which to write this decision-DNNF node.
+     */
+    public void writeTo(OutputStream outputStream) {
         try (var visitor = new DecisionDnnfWriter(outputStream)) {
             depthFirstAccept(visitor);
         }
     }
 
     /**
-     * Computes a String representation of this decision-DNNF, using the NNF format.
+     * Computes a String representation of this decision-DNNF node, using the NNF format.
      *
-     * @return A String representation of this decision-DNNF.
+     * @return A String representation of this decision-DNNF node.
      */
-    String toString();
+    @Override
+    public String toString() {
+        var output = new ByteArrayOutputStream();
+        writeTo(output);
+        return output.toString();
+    }
 
 }

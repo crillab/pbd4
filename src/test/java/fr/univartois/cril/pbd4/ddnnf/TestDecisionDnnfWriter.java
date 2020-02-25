@@ -53,7 +53,7 @@ public final class TestDecisionDnnfWriter {
      * 
      * @return The created decision-DNNF.
      */
-    static DecisionDnnf createExample1() {
+    static DecisionDnnfNode createExample1() {
         // Creating the literal nodes.
         var l1 = literal(1);
         var l2 = literal(2);
@@ -91,7 +91,7 @@ public final class TestDecisionDnnfWriter {
      * 
      * @return The created decision-DNNF.
      */
-    static DecisionDnnf createExample2() {
+    static DecisionDnnfNode createExample2() {
         // Creating the literal nodes.
         var l1 = literal(1);
         var notl1 = literal(-1);

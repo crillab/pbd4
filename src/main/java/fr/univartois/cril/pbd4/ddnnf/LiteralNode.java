@@ -21,14 +21,14 @@
 package fr.univartois.cril.pbd4.ddnnf;
 
 /**
- * The LiteralNode is a node representing a single literal, i.e., a variable or its
- * negation.
+ * The LiteralNode is a node of a decision-DNNF representing a single literal,
+ * i.e., a variable or its negation.
  *
  * @author Romain WALLON
  *
  * @version 0.1.0
  */
-public final class LiteralNode extends InternalNode {
+public final class LiteralNode implements DecisionDnnfNode {
 
     /**
      * The DIMACS identifier of the literal represented by this node.
@@ -51,7 +51,7 @@ public final class LiteralNode extends InternalNode {
      *
      * @return The created node.
      */
-    public static DecisionDnnf literal(int dimacs) {
+    public static DecisionDnnfNode literal(int dimacs) {
         return new LiteralNode(dimacs);
     }
 
@@ -59,8 +59,8 @@ public final class LiteralNode extends InternalNode {
      * (non-Javadoc)
      * 
      * @see
-     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnf#depthFirstAccept(fr.univartois.cril.pbd4
-     * .ddnnf.DecisionDnnfVisitor)
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfNode#depthFirstAccept(fr.univartois.cril.
+     * pbd4.ddnnf.DecisionDnnfVisitor)
      */
     @Override
     public void depthFirstAccept(DecisionDnnfVisitor visitor) {
@@ -71,8 +71,8 @@ public final class LiteralNode extends InternalNode {
      * (non-Javadoc)
      * 
      * @see
-     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnf#breadthFirstAccept(fr.univartois.cril.
-     * pbd4.ddnnf.DecisionDnnfVisitor)
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfNode#breadthFirstAccept(fr.univartois.
+     * cril.pbd4.ddnnf.DecisionDnnfVisitor)
      */
     @Override
     public void breadthFirstAccept(DecisionDnnfVisitor visitor) {

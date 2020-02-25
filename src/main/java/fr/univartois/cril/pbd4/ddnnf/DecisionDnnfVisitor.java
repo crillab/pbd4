@@ -33,6 +33,39 @@ package fr.univartois.cril.pbd4.ddnnf;
 public interface DecisionDnnfVisitor {
 
     /**
+     * Enters a {@link DecisionDnnf}.
+     *
+     * @param ddnnf The decision-DNNF to enter.
+     *
+     * @implSpec The default implementation does nothing.
+     */
+    default void enter(DecisionDnnf ddnnf) {
+        // Nothing to do by default.
+    }
+
+    /**
+     * Visits a {@link DecisionDnnf}.
+     *
+     * @param ddnnf The decision-DNNF to visit.
+     *
+     * @implSpec The default implementation does nothing.
+     */
+    default void visit(DecisionDnnf ddnnf) {
+        // Nothing to do by default.
+    }
+
+    /**
+     * Exits a {@link DecisionDnnf}.
+     *
+     * @param ddnnf The decision-DNNF to exit.
+     *
+     * @implSpec The default implementation does nothing.
+     */
+    default void exit(DecisionDnnf ddnnf) {
+        // Nothing to do by default.
+    }
+
+    /**
      * Enters a {@link ConjunctionNode}.
      *
      * @param node The node to enter.

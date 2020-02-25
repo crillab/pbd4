@@ -27,7 +27,7 @@ package fr.univartois.cril.pbd4.ddnnf;
  *
  * @version 0.1.0
  */
-public enum LeafNode implements DecisionDnnf {
+public enum LeafNode implements DecisionDnnfNode {
 
     /**
      * The FALSE Boolean constant.
@@ -57,8 +57,8 @@ public enum LeafNode implements DecisionDnnf {
      * (non-Javadoc)
      * 
      * @see
-     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnf#depthFirstAccept(fr.univartois.cril.pbd4
-     * .ddnnf.DecisionDnnfVisitor)
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfNode#depthFirstAccept(fr.univartois.cril.
+     * pbd4.ddnnf.DecisionDnnfVisitor)
      */
     @Override
     public void depthFirstAccept(DecisionDnnfVisitor visitor) {
@@ -69,8 +69,8 @@ public enum LeafNode implements DecisionDnnf {
      * (non-Javadoc)
      * 
      * @see
-     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnf#breadthFirstAccept(fr.univartois.cril.
-     * pbd4.ddnnf.DecisionDnnfVisitor)
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfNode#breadthFirstAccept(fr.univartois.
+     * cril.pbd4.ddnnf.DecisionDnnfVisitor)
      */
     @Override
     public void breadthFirstAccept(DecisionDnnfVisitor visitor) {

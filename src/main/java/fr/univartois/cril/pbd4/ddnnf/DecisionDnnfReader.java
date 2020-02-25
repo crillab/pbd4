@@ -51,7 +51,7 @@ public final class DecisionDnnfReader implements Closeable {
     /**
      * The decision-DNNF nodes that have been read so far.
      */
-    private List<DecisionDnnf> readNodes;
+    private List<DecisionDnnfNode> readNodes;
 
     /**
      * Creates a new DecisionDnnfReader.
@@ -82,6 +82,8 @@ public final class DecisionDnnfReader implements Closeable {
         // Reading the description of the decision-DNNF.
         var description = input.readLine().split("\\s+");
         int nbNodes = Integer.parseInt(description[1]);
+        int nbEdges = Integer.parseInt(description[2]);
+        int nbVariables = Integer.parseInt(description[3]);
         
         // Reading the nodes of the decision-DNNF.
         readNodes = new ArrayList<>(nbNodes);
@@ -90,7 +92,8 @@ public final class DecisionDnnfReader implements Closeable {
         }
 
         // The root of the decision-DNNF is the last node of the list.
-        return readNodes.get(nbNodes - 1);
+        var rootNode = readNodes.get(nbNodes - 1);
+        return new DecisionDnnf(nbVariables, nbNodes, nbEdges, rootNode);
     }
 
     /**
@@ -100,7 +103,7 @@ public final class DecisionDnnfReader implements Closeable {
      *
      * @throws IOException If an I/O error occurs while reading the file.
      */
-    private DecisionDnnf next() throws IOException {
+    private DecisionDnnfNode next() throws IOException {
         var line = input.readLine().split("\\s+");
 
         if ("L".equals(line[0])) {
@@ -129,7 +132,7 @@ public final class DecisionDnnfReader implements Closeable {
      *
      * @return The read node.
      */
-    private DecisionDnnf nextLiteral(String[] line) {
+    private DecisionDnnfNode nextLiteral(String[] line) {
         return literal(Integer.parseInt(line[1]));
     }
 
@@ -140,7 +143,7 @@ public final class DecisionDnnfReader implements Closeable {
      *
      * @return The read node.
      */
-    private DecisionDnnf nextConjunctionNode(String[] line) {
+    private DecisionDnnfNode nextConjunctionNode(String[] line) {
         int nbConjuncts = Integer.parseInt(line[1]);
 
         if (nbConjuncts == 0) {
@@ -149,7 +152,7 @@ public final class DecisionDnnfReader implements Closeable {
         }
 
         // Retrieving the conjuncts.
-        var conjuncts = new ArrayList<DecisionDnnf>(nbConjuncts);
+        var conjuncts = new ArrayList<DecisionDnnfNode>(nbConjuncts);
         for (int i = 0; i < nbConjuncts; i++) {
             int conjunct = Integer.parseInt(line[i + 2]);
             conjuncts.add(readNodes.get(conjunct));
@@ -164,7 +167,7 @@ public final class DecisionDnnfReader implements Closeable {
      *
      * @return The read node.
      */
-    private DecisionDnnf nextDecisionNode(String[] line) {
+    private DecisionDnnfNode nextDecisionNode(String[] line) {
         int variable = Integer.parseInt(line[1]);
 
         if (variable == 0) {

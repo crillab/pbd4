@@ -20,27 +20,28 @@
 
 package fr.univartois.cril.pbd4.ddnnf;
 
-import java.io.ByteArrayOutputStream;
-
 /**
- * The InternalNode is the parent class for the internal nodes in a decision-DNNF.
+ * The DecisionDnnfNode defines the interface for manipulating the nodes of a
+ * decision-DNNF.
  *
  * @author Romain WALLON
  *
  * @version 0.1.0
  */
-abstract class InternalNode implements DecisionDnnf {
+public interface DecisionDnnfNode {
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Accepts a {@link DecisionDnnfVisitor} in a depth-first manner.
      *
-     * @see java.lang.Object#toString()
+     * @param visitor The visitor to accept.
      */
-    @Override
-    public String toString() {
-        var output = new ByteArrayOutputStream();
-        writeTo(output);
-        return output.toString();
-    }
+    void depthFirstAccept(DecisionDnnfVisitor visitor);
+
+    /**
+     * Accepts a {@link DecisionDnnfVisitor} in a breadth-first manner.
+     *
+     * @param visitor The visitor to accept.
+     */
+    void breadthFirstAccept(DecisionDnnfVisitor visitor);
 
 }

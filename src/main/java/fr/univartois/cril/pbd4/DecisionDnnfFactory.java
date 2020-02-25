@@ -25,7 +25,7 @@ import java.util.Collection;
 import org.sat4j.core.LiteralsUtils;
 
 import fr.univartois.cril.pbd4.ddnnf.ConjunctionNode;
-import fr.univartois.cril.pbd4.ddnnf.DecisionDnnf;
+import fr.univartois.cril.pbd4.ddnnf.DecisionDnnfNode;
 import fr.univartois.cril.pbd4.ddnnf.DecisionNode;
 import fr.univartois.cril.pbd4.ddnnf.LiteralNode;
 
@@ -42,7 +42,7 @@ final class DecisionDnnfFactory {
     /**
      * The d-DNNF representations of the literals.
      */
-    private DecisionDnnf[] literals;
+    private DecisionDnnfNode[] literals;
 
     /**
      * Creates a new DecisionDnnfFactory.
@@ -60,7 +60,7 @@ final class DecisionDnnfFactory {
      *
      * @return The d-DNNF representing {@code literal}.
      */
-    public DecisionDnnf literal(int literal) {
+    public DecisionDnnfNode literal(int literal) {
         int index = LiteralsUtils.toInternal(literal);
         if (literals[index] == null) {
             literals[index] = LiteralNode.literal(literal);
@@ -75,7 +75,7 @@ final class DecisionDnnfFactory {
      *
      * @return The d-DNNF representing the conjunctions of the given d-DNNFs.
      */
-    public DecisionDnnf conjunctionOf(Collection<DecisionDnnf> conjuncts) {
+    public DecisionDnnfNode conjunctionOf(Collection<DecisionDnnfNode> conjuncts) {
         return ConjunctionNode.and(conjuncts);
     }
 
@@ -88,7 +88,7 @@ final class DecisionDnnfFactory {
      *
      * @return The created d-DNNF.
      */
-    public DecisionDnnf ifThenElse(int variable, DecisionDnnf ifTrue, DecisionDnnf ifFalse) {
+    public DecisionDnnfNode ifThenElse(int variable, DecisionDnnfNode ifTrue, DecisionDnnfNode ifFalse) {
         return DecisionNode.ifThenElse(variable, ifTrue, ifFalse);
     }
 

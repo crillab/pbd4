@@ -23,7 +23,7 @@ package fr.univartois.cril.pbd4;
 import java.math.BigInteger;
 import java.util.function.Function;
 
-import fr.univartois.cril.pbd4.ddnnf.DecisionDnnf;
+import fr.univartois.cril.pbd4.ddnnf.DecisionDnnfNode;
 import fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula;
 
 /**
@@ -121,7 +121,7 @@ public final class D4 {
      *
      * @return A d-DNNF representing the associated formula.
      */
-    public DecisionDnnf compile() {
+    public DecisionDnnfNode compile() {
         var compiler = create(D4Compiler::new);
         return compiler.compute();
     }

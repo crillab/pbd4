@@ -84,6 +84,25 @@ public final class DecisionDnnfWriter implements DecisionDnnfVisitor, Closeable 
         this.children = new VecInt();
     }
 
+    /* 
+     * (non-Javadoc)
+     * 
+     * @see fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#enter(fr.univartois.cril.pbd4.ddnnf.DecisionDnnf)
+     */
+    @Override
+    public void enter(DecisionDnnf ddnnf) {
+        writer.printf("nnf %d %d %d%n",
+                ddnnf.getNumberOfNodes(),
+                ddnnf.getNumberOfEdges(),
+                ddnnf.getNumberOfVariables());
+    }
+
+    @Override
+    public void visit(DecisionDnnf ddnnf) {
+        // TODO Auto-generated method stub
+        
+    }
+
     /*
      * (non-Javadoc)
      * 

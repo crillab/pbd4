@@ -25,51 +25,51 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * The ConjunctionNode represents a conjunction of several decision-DNNFs (there may be
- * arbitrary many conjuncts).
+ * The ConjunctionNode represents a conjunction of several decision-DNNF nodes (there may
+ * be arbitrary many conjuncts).
  *
  * @author Romain WALLON
  *
  * @version 0.1.0
  */
-public final class ConjunctionNode extends InternalNode {
+public final class ConjunctionNode implements DecisionDnnfNode {
 
     /**
-     * The decision-DNNFs for which this node is a representation of the conjunction.
+     * The decision-DNNF nodes for which this node is a representation of the conjunction.
      */
-    private final Collection<DecisionDnnf> conjuncts;
+    private final Collection<DecisionDnnfNode> conjuncts;
 
     /**
      * Creates a new ConjunctionNode.
      *
-     * @param conjuncts The decision-DNNFs for which the node is a representation of the
-     *        conjunction.
+     * @param conjuncts The decision-DNNF nodes for which the node is a representation of
+     *        the conjunction.
      */
-    private ConjunctionNode(Collection<DecisionDnnf> conjuncts) {
+    private ConjunctionNode(Collection<DecisionDnnfNode> conjuncts) {
         this.conjuncts = conjuncts;
     }
 
     /**
      * Creates a new ConjunctionNode.
      *
-     * @param conjuncts The decision-DNNFs for which the node is a representation of the
-     *        conjunction.
+     * @param conjuncts The decision-DNNF nodes for which the node is a representation of
+     *        the conjunction.
      *
      * @return The created node.
      */
-    public static final DecisionDnnf and(DecisionDnnf... conjuncts) {
+    public static final DecisionDnnfNode and(DecisionDnnfNode... conjuncts) {
         return new ConjunctionNode(List.of(conjuncts));
     }
 
     /**
      * Creates a new ConjunctionNode.
      *
-     * @param conjuncts The decision-DNNFs for which the node is a representation of the
-     *        conjunction.
+     * @param conjuncts The decision-DNNF nodes for which the node is a representation of
+     *        the conjunction.
      *
      * @return The created node.
      */
-    public static final DecisionDnnf and(Collection<DecisionDnnf> conjuncts) {
+    public static final DecisionDnnfNode and(Collection<DecisionDnnfNode> conjuncts) {
         return new ConjunctionNode(Collections.unmodifiableCollection(conjuncts));
     }
 
@@ -77,8 +77,8 @@ public final class ConjunctionNode extends InternalNode {
      * (non-Javadoc)
      * 
      * @see
-     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnf#depthFirstAccept(fr.univartois.cril.pbd4
-     * .ddnnf.DecisionDnnfVisitor)
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfNode#depthFirstAccept(fr.univartois.cril.
+     * pbd4.ddnnf.DecisionDnnfVisitor)
      */
     @Override
     public void depthFirstAccept(DecisionDnnfVisitor visitor) {
@@ -92,8 +92,8 @@ public final class ConjunctionNode extends InternalNode {
      * (non-Javadoc)
      * 
      * @see
-     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnf#breadthFirstAccept(fr.univartois.cril.
-     * pbd4.ddnnf.DecisionDnnfVisitor)
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfNode#breadthFirstAccept(fr.univartois.
+     * cril.pbd4.ddnnf.DecisionDnnfVisitor)
      */
     @Override
     public void breadthFirstAccept(DecisionDnnfVisitor visitor) {

@@ -28,7 +28,7 @@ package fr.univartois.cril.pbd4.ddnnf;
  *
  * @version 0.1.0
  */
-public final class DecisionNode extends InternalNode {
+public final class DecisionNode implements DecisionDnnfNode {
 
     /**
      * The variable for which this node represents a decision on.
@@ -36,25 +36,25 @@ public final class DecisionNode extends InternalNode {
     private final int variable;
 
     /**
-     * The decision-DNNF representing the case in which the variable is satisfied.
+     * The decision-DNNF node representing the case in which the variable is satisfied.
      */
-    private final DecisionDnnf ifTrue;
+    private final DecisionDnnfNode ifTrue;
 
     /**
-     * The decision-DNNF representing the case in which the variable is falsified.
+     * The decision-DNNF node representing the case in which the variable is falsified.
      */
-    private final DecisionDnnf ifFalse;
+    private final DecisionDnnfNode ifFalse;
 
     /**
      * Creates a new DecisionNode.
      *
      * @param variable The variable for which the node represents a decision on.
-     * @param ifTrue The decision-DNNF representing the case in which the variable is
+     * @param ifTrue The decision-DNNF node representing the case in which the variable is
      *        satisfied.
-     * @param ifFalse The decision-DNNF representing the case in which the variable is
-     *        falsified.
+     * @param ifFalse The decision-DNNF node representing the case in which the variable
+     *        is falsified.
      */
-    private DecisionNode(int variable, DecisionDnnf ifTrue, DecisionDnnf ifFalse) {
+    private DecisionNode(int variable, DecisionDnnfNode ifTrue, DecisionDnnfNode ifFalse) {
         this.variable = variable;
         this.ifTrue = ifTrue;
         this.ifFalse = ifFalse;
@@ -63,15 +63,15 @@ public final class DecisionNode extends InternalNode {
     /**
      * Creates a new DecisionNode.
      *
-     * @param variable The variable for which the node represents a decision on.
-     * @param ifTrue The decision-DNNF representing the case in which the variable is
+     * @param ifTrue The decision-DNNF node representing the case in which the variable is
      *        satisfied.
-     * @param ifFalse The decision-DNNF representing the case in which the variable is
-     *        falsified.
+     * @param ifFalse The decision-DNNF node representing the case in which the variable
+     *        is falsified.
      *
      * @return The created node.
      */
-    public static DecisionDnnf ifThenElse(int variable, DecisionDnnf ifTrue, DecisionDnnf ifFalse) {
+    public static DecisionDnnfNode ifThenElse(int variable, DecisionDnnfNode ifTrue,
+            DecisionDnnfNode ifFalse) {
         return new DecisionNode(variable, ifTrue, ifFalse);
     }
 
@@ -79,8 +79,8 @@ public final class DecisionNode extends InternalNode {
      * (non-Javadoc)
      * 
      * @see
-     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnf#depthFirstAccept(fr.univartois.cril.pbd4
-     * .ddnnf.DecisionDnnfVisitor)
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfNode#depthFirstAccept(fr.univartois.cril.
+     * pbd4.ddnnf.DecisionDnnfVisitor)
      */
     @Override
     public void depthFirstAccept(DecisionDnnfVisitor visitor) {
@@ -93,8 +93,8 @@ public final class DecisionNode extends InternalNode {
      * (non-Javadoc)
      * 
      * @see
-     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnf#breadthFirstAccept(fr.univartois.cril.
-     * pbd4.ddnnf.DecisionDnnfVisitor)
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfNode#breadthFirstAccept(fr.univartois.
+     * cril.pbd4.ddnnf.DecisionDnnfVisitor)
      */
     @Override
     public void breadthFirstAccept(DecisionDnnfVisitor visitor) {
