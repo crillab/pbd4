@@ -25,16 +25,48 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-
-class TestPropagate {
-
-    @BeforeEach
-    void setUp() throws Exception {
-    }
+/**
+ * 
+ * @author Romain WALLON
+ *
+ * @version 0.1.0
+ */
+public final class TestPropagate extends AbstractTestPseudoBooleanSolving {
 
     @Test
-    void test() {
-        fail("Not yet implemented");
+    public void testCnfExample1() {
+        var formula = readCnf("example-1.cnf");
+        
+        var res = formula.propagate();
+        assertEquals(0, res.getPropagatedLiterals().size());
+        assertEquals(SolverStatus.UNKNOWN, res.getStatus());
+        
+        var outFormula = res.getSimplifiedFormula();
+		assertEquals(4, formula.numberOfVariables());
+		assertEquals(4, formula.numberOfConstraints());
+        
+		var fNot1 = outFormula.satisfy(-1);
+		var res2 = fNot1.propagate();
+		var propagatedLit = res2.getPropagatedLiterals();
+		assertEquals(3, fNot1.numberOfVariables());
+		assertEquals(4, fNot1.numberOfConstraints());
+		assertEquals(1, propagatedLit.size());
+		assertTrue(propagatedLit.contains(-4));
+        assertEquals(SolverStatus.UNKNOWN, res2.getStatus());
+        
+        var sf = res2.getSimplifiedFormula();
+		assertEquals(2, sf.numberOfVariables());
+		assertEquals(2, sf.numberOfConstraints());
+        var res2bis = sf.satisfy(-3).propagate();
+        
+        assertEquals(SolverStatus.UNSATISFIABLE, res2bis.getStatus());
+        
+        var fNot12 = res2.getSimplifiedFormula().satisfy(-2);
+        var res3 = fNot12.propagate();
+		var propagatedLit2 = res3.getPropagatedLiterals();
+		assertEquals(3, propagatedLit2.size());
+		assertTrue(propagatedLit2.contains(3));
+        assertEquals(SolverStatus.SATISFIABLE, res3.getStatus());
     }
 
 }

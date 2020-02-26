@@ -20,7 +20,6 @@
 
 package fr.univartois.cril.pbd4.pbc;
 
-import org.sat4j.pb.constraints.pb.PBConstr;
 import org.sat4j.specs.IVecInt;
 
 /**

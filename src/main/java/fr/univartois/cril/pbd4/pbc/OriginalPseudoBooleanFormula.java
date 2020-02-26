@@ -61,7 +61,6 @@ public class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
      * The scores of the DLCS heuristic (i.e., the number of occurrences of each variable
      * in the formula).
      */
-    private final int[] dlcsScores;
     
     private final IVecInt variables;
     
@@ -69,21 +68,19 @@ public class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
      * Creates a new Sat4jAdapter.
      *
      * @param solver The solver to adapt.
-     * @param dlcsScores The scores of the DLCS heuristic
      */
-    OriginalPseudoBooleanFormula(PBSelectorDecorator solver, int[] dlcsScores) {
+    OriginalPseudoBooleanFormula(PBSelectorDecorator solver) {
         this.solver = solver;
         this.solver.setKeepSolverHot(true);
         this.engine = (ISolverService) solver.getSolvingEngine();
         this.listener = new UnitPropagationListener();
         this.vsidsScores = engine.getVariableHeuristics();
-        this.dlcsScores = dlcsScores;
-        this.variables = range(1, numberOfVariables());
+        this.variables = range(1, numberOfVariables() + 1);
     }
 
     @Override
     public int numberOfVariables() {
-        return solver.nVars() - solver.getVarToHighLevel().size();
+        return solver.nVars();
     }
 
     @Override

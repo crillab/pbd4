@@ -1,6 +1,6 @@
 /**
  * PBD4, a pseudo-Boolean based implementation of the D4 compiler.
- * Copyright (c) 2020 - Romain WALLON.
+ * Copyright (c) 2020 - Univ Artois & CNRS.
  * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -55,7 +55,9 @@ final class UnitPropagationListener extends SearchListenerAdapter<ISolverService
      */
     @Override
     public void init(ISolverService solverService) {
-        propagatedLiterals = new VecInt(solverService.nVars());
+    	if (propagatedLiterals == null) {
+    		propagatedLiterals = new VecInt(solverService.nVars());
+    	}
     }
 
     /*

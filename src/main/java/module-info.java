@@ -16,6 +16,8 @@ module fr.univartois.cril.pbd4 {
 
     exports fr.univartois.cril.pbd4.ddnnf;
 
+    exports fr.univartois.cril.pbd4.pbc;
+
     // Modules required for dealing with pseudo-Boolean formulae.
 
     requires org.ow2.sat4j.core;

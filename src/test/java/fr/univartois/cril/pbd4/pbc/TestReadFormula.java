@@ -22,20 +22,30 @@ package fr.univartois.cril.pbd4.pbc;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+/**
+ * The TestReadFormula is a JUnit test case testing the reading of input pseudo-Boolean
+ * formulae with {@link PseudoBooleanFormulaReader}.
+ *
+ * @author Romain WALLON
+ *
+ * @version 0.1.0
+ */
+public final class TestReadFormula extends AbstractTestPseudoBooleanSolving {
 
-class TestPartialAssignments {
-
-    @BeforeEach
-    void setUp() throws Exception {
-    }
-
-    @Test
-    void test() {
-        fail("Not yet implemented");
-    }
+	@Test
+	public void testExample1() {
+		var formula = readCnf("example-1.cnf");
+		assertEquals(4, formula.numberOfVariables());
+		assertEquals(4, formula.numberOfConstraints());
+		
+		var variables = formula.variables();
+		assertEquals(4, variables.size());
+		assertTrue(variables.contains(1));
+		assertTrue(variables.contains(2));
+		assertTrue(variables.contains(3));
+		assertTrue(variables.contains(4));
+	}
 
 }
-

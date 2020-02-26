@@ -33,8 +33,10 @@ dependencies {
     implementation files("lib/org.sat4j.core.jar")
     implementation files("lib/org.sat4j.pb.jar")
 
-    testImplementation group: "org.junit.jupiter", name: "junit-jupiter-engine", version: "5.2.0"
-    testImplementation group: "org.junit.jupiter", name: "junit-jupiter-params", version: "5.2.0"
+    testImplementation group: "org.junit.jupiter", name: "junit-jupiter-engine", version: "5.6.0"
+    testImplementation group: "org.junit.jupiter", name: "junit-jupiter-params", version: "5.6.0"
+    testImplementation group: "org.junit.platform", name: "junit-platform-launcher", version: "1.6.0"
+    testImplementation group: "org.junit.platform", name: "junit-platform-runner", version: "1.6.0"
 }
 
 /*************************

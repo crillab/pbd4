@@ -20,9 +20,12 @@
 
 package fr.univartois.cril.pbd4.pbc;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 
 /**
- * The AbstractTestPseudoBooleanSolving
+ * The AbstractTestPseudoBooleanSolving is the parent class for the test cases of the
+ * representation of pseudo-Boolean formulae.
  *
  * @author Romain WALLON
  *
@@ -30,12 +33,42 @@ package fr.univartois.cril.pbd4.pbc;
  */
 public abstract class AbstractTestPseudoBooleanSolving {
 
+    /**
+     * Reads a pseudo-Boolean formula from a CNF resource file.
+     *
+     * @param filename The name of the file to read.
+     *        This file is supposed to be located in the {@code cnf} resource folder.
+     *
+     * @return The read pseudo-Boolean formula.
+     *
+     * @throws UncheckedIOException If an I/O error occurs while reading.
+     */
     protected PseudoBooleanFormula readCnf(String filename) {
-        return null;
-    }
-    
-    protected PseudoBooleanFormula readOpb(String filename) {
-        return null;
-    }
-}
+        try (var input = getClass().getResourceAsStream("/cnf/" + filename)) {
+            return PseudoBooleanFormulaReader.readCnf(input);
 
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    /**
+     * Reads a pseudo-Boolean formula from an OPB resource file.
+     *
+     * @param filename The name of the file to read.
+     *        This file is supposed to be located in the {@code opb} resource folder.
+     *
+     * @return The read pseudo-Boolean formula.
+     *
+     * @throws UncheckedIOException If an I/O error occurs while reading.
+     */
+    protected PseudoBooleanFormula readOpb(String filename) {
+        try (var input = getClass().getResourceAsStream("/opb/" + filename)) {
+            return PseudoBooleanFormulaReader.readOpb(input);
+
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+}
