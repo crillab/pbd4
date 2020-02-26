@@ -27,7 +27,7 @@ import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.IteratorInt;
 
 /**
- * The VecIntRange is an implementation of {@link IVecInt} representing a range of
+ * The RangeVecInt is an implementation of {@link IVecInt} representing a range of
  * consecutive integers.
  * This implementation is immutable by definition.
  *
@@ -53,7 +53,7 @@ public final class RangeVecInt implements IVecInt {
     private final int upperBound;
 
     /**
-     * Creates a new VecIntRange.
+     * Creates a new RangeVecInt.
      *
      * @param lowerBound The lower bound (inclusive) of the range.
      * @param upperBound The upper bound (exclusive) of the range.
@@ -64,7 +64,7 @@ public final class RangeVecInt implements IVecInt {
     }
 
     /**
-     * Creates a new VecIntRange.
+     * Creates a new RangeVecInt.
      *
      * @param lowerBound The lower bound (inclusive) of the range.
      * @param upperBound The upper bound (exclusive) of the range.
@@ -76,7 +76,7 @@ public final class RangeVecInt implements IVecInt {
     }
 
     /**
-     * Creates a new VecIntRange, starting from {@code 0}.
+     * Creates a new RangeVecInt, starting from {@code 0}.
      *
      * @param upperBound The upper bound (exclusive) of the range.
      *
@@ -103,6 +103,7 @@ public final class RangeVecInt implements IVecInt {
      */
     @Override
     public IVecInt clone() {
+        // As a range is immutable, returning this will not break anything.
         return this;
     }
 
@@ -400,7 +401,7 @@ public final class RangeVecInt implements IVecInt {
      * @see org.sat4j.specs.IVecInt#sort(java.util.Comparator)
      */
     @Override
-    public void sort(Comparator<Integer> arg0) {
+    public void sort(Comparator<Integer> cmp) {
         throw new UnsupportedOperationException();
     }
 
@@ -411,7 +412,7 @@ public final class RangeVecInt implements IVecInt {
      */
     @Override
     public void sortUnique() {
-        throw new UnsupportedOperationException();
+        // A range is already sorted and has unique values.
     }
 
     /*
@@ -420,7 +421,7 @@ public final class RangeVecInt implements IVecInt {
      * @see org.sat4j.specs.IVecInt#subset(int)
      */
     @Override
-    public IVecInt[] subset(int nbSubsets) {
+    public IVecInt[] subset(int cardinal) {
         throw new UnsupportedOperationException();
     }
 
@@ -452,7 +453,7 @@ public final class RangeVecInt implements IVecInt {
      * @see org.sat4j.specs.IVecInt#unsafePush(int)
      */
     @Override
-    public void unsafePush(int arg0) {
+    public void unsafePush(int elt) {
         throw new UnsupportedOperationException();
     }
 

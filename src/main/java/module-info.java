@@ -20,9 +20,9 @@ module fr.univartois.cril.pbd4 {
 
     // Modules required for dealing with pseudo-Boolean formulae.
 
-    requires org.ow2.sat4j.core;
+    requires transitive org.ow2.sat4j.core;
 
-    requires org.ow2.sat4j.pb;
+    requires transitive org.ow2.sat4j.pb;
 
     // Module required for hypergraph partitioning.
 

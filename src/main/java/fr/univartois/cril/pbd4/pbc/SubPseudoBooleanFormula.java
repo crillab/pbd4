@@ -24,7 +24,6 @@ import java.util.BitSet;
 import java.util.Collection;
 
 import org.sat4j.core.LiteralsUtils;
-import org.sat4j.core.Vec;
 import org.sat4j.core.VecInt;
 import org.sat4j.specs.IVecInt;
 
@@ -35,7 +34,7 @@ import org.sat4j.specs.IVecInt;
  *
  * @version 0.1.0
  */
-public final class SubPseudoBooleanFormula implements PseudoBooleanFormula {
+final class SubPseudoBooleanFormula implements PseudoBooleanFormula {
 
     private final IVecInt assumptions;
 
@@ -59,11 +58,21 @@ public final class SubPseudoBooleanFormula implements PseudoBooleanFormula {
         this.assumptions = assumptions;
     }
 
+    /* 
+     * (non-Javadoc)
+     * 
+     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#numberOfVariables()
+     */
     @Override
     public int numberOfVariables() {
         return decorated.numberOfVariables() - assumptions.size();
     }
 
+    /* 
+     * (non-Javadoc)
+     * 
+     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#numberOfConstraints()
+     */
     @Override
     public int numberOfConstraints() {
         return inactiveConstraint.size() - inactiveConstraint.cardinality();
@@ -72,6 +81,12 @@ public final class SubPseudoBooleanFormula implements PseudoBooleanFormula {
     @Override
     public IVecInt variables() {
         return VecInt.EMPTY;
+    }
+    
+    @Override
+    public double score(int variable) {
+        // TODO Auto-generated method stub
+        return 0;
     }
 
     @Override
@@ -82,16 +97,24 @@ public final class SubPseudoBooleanFormula implements PseudoBooleanFormula {
         return null;
     }
 
+    /* 
+     * (non-Javadoc)
+     * 
+     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#cutset()
+     */
     @Override
     public IVecInt cutset() {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 
+    /* 
+     * (non-Javadoc)
+     * 
+     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#connectedComponents()
+     */
     @Override
     public Collection<PseudoBooleanFormula> connectedComponents() {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override

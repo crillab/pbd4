@@ -1,6 +1,6 @@
 /**
  * The {@code fr.univartois.cril.pbd4} package provides the main classes defining
- * the pseudo-Boolean implementation of the D4 compiler.
+ * the pseudo-Boolean implementation of the D4 compiler and model counter.
  *
  * @author Romain WALLON
  *

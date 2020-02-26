@@ -34,18 +34,37 @@ import org.junit.jupiter.api.Test;
  */
 public final class TestReadFormula extends AbstractTestPseudoBooleanSolving {
 
-	@Test
-	public void testExample1() {
-		var formula = readCnf("example-1.cnf");
-		assertEquals(4, formula.numberOfVariables());
-		assertEquals(4, formula.numberOfConstraints());
-		
-		var variables = formula.variables();
-		assertEquals(4, variables.size());
-		assertTrue(variables.contains(1));
-		assertTrue(variables.contains(2));
-		assertTrue(variables.contains(3));
-		assertTrue(variables.contains(4));
-	}
+    /**
+     * Tests that the CNF formula is properly read from the file {@code example-1.cnf}.
+     */
+    @Test
+    public void testExample1() {
+        var formula = readCnf("example-1.cnf");
+        assertEquals(4, formula.numberOfVariables());
+        assertEquals(4, formula.numberOfConstraints());
+
+        var variables = formula.variables();
+        assertEquals(4, variables.size());
+        assertTrue(variables.contains(1));
+        assertTrue(variables.contains(2));
+        assertTrue(variables.contains(3));
+        assertTrue(variables.contains(4));
+    }
+
+    /**
+     * Tests that the CNF formula is properly read from the file {@code example-2.cnf}.
+     */
+    @Test
+    public void testExample2() {
+        var formula = readCnf("example-2.cnf");
+        assertEquals(3, formula.numberOfVariables());
+        assertEquals(3, formula.numberOfConstraints());
+
+        var variables = formula.variables();
+        assertEquals(3, variables.size());
+        assertTrue(variables.contains(1));
+        assertTrue(variables.contains(2));
+        assertTrue(variables.contains(3));
+    }
 
 }

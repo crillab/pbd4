@@ -166,4 +166,14 @@ public abstract class AbstractD4<T> {
         return restricted;
     }
 
+
+    /**
+     * Compares the scores of two variables
+     * @param x The first variable to compare.
+     * @param y The second variable to compare.
+     * @return
+     */
+    int compare(int x, int y) {
+        return Double.compare(formula.score(y), formula.score(x));
+    }
 }

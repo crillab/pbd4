@@ -57,6 +57,8 @@ public interface PseudoBooleanFormula {
 	 * @return The variables in this formula.
 	 */
 	IVecInt variables();
+	
+	double score(int variable);
 
 	/**
 	 * Gives the pseudo-Boolean formula obtained from this formula by satisfying the
