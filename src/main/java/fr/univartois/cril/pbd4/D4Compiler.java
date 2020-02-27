@@ -72,7 +72,7 @@ final class D4Compiler extends AbstractD4<DecisionDnnf, DecisionDnnfNode> {
      */
     @Override
     protected DecisionDnnfNode model(PseudoBooleanFormula currentFormula, IVecInt propagatedLiterals) {
-        return conjunctionOf(toDecisionDnnf(propagatedLiterals));
+        return factory.and(toDecisionDnnf(propagatedLiterals));
     }
 
     /*
@@ -85,7 +85,7 @@ final class D4Compiler extends AbstractD4<DecisionDnnf, DecisionDnnfNode> {
     protected DecisionDnnfNode cached(IVecInt propagatedLiterals, DecisionDnnfNode cached) {
         var nodes = toDecisionDnnf(propagatedLiterals);
         nodes.add(cached);
-        return conjunctionOf(nodes);
+        return factory.and(nodes);
     }
 
     /*
@@ -94,7 +94,7 @@ final class D4Compiler extends AbstractD4<DecisionDnnf, DecisionDnnfNode> {
      * @see fr.univartois.cril.pbd4.AbstractD4#conjunctionOf(java.util.Collection)
      */
     @Override
-    protected DecisionDnnfNode conjunctionOf(Collection<DecisionDnnfNode> conjuncts) {
+    protected DecisionDnnfNode conjunctionOf(int nbFreeVar, Collection<DecisionDnnfNode> conjuncts) {
         return factory.and(conjuncts);
     }
 

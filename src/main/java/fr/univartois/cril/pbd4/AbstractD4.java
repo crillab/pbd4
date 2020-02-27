@@ -107,7 +107,9 @@ public abstract class AbstractD4<T, U> {
         }
 
         var lnd = new LinkedList<U>();
+        int nbVar = 0;
         for (var c : simplifiedFormula.connectedComponents()) {
+            nbVar += c.numberOfVariables();
             var lvc = restrict(variables, simplifiedFormula.variables());
             if (lvc.isEmpty()) {
                 lvc = hgp(simplifiedFormula);
@@ -119,7 +121,7 @@ public abstract class AbstractD4<T, U> {
         }
 
         // Caching the result.
-        var result = conjunctionOf(lnd);
+        var result = conjunctionOf(currentFormula.numberOfVariables() - nbVar, lnd);
         cache.put(simplifiedFormula, result);
         return result;
 
@@ -150,7 +152,7 @@ public abstract class AbstractD4<T, U> {
 
     protected abstract U ifThenElse(int v, U compile, U compile2);
 
-    protected abstract U conjunctionOf(Collection<U> lnd);
+    protected abstract U conjunctionOf(int nbFreeVar, Collection<U> lnd);
 
     protected abstract U cached(IVecInt propagatedLiterals, U cached);
 

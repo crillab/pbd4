@@ -86,8 +86,8 @@ final class D4Counter extends AbstractD4<BigInteger, BigInteger> {
      * @see fr.univartois.cril.pbd4.AbstractD4#conjunctionOf(java.util.Collection)
      */
     @Override
-    protected BigInteger conjunctionOf(Collection<BigInteger> conjuncts) {
-        return conjuncts.stream().reduce(BigInteger.ONE, BigInteger::multiply);
+    protected BigInteger conjunctionOf(int nbFreeVar, Collection<BigInteger> conjuncts) {
+        return BigInteger.ONE.shiftLeft(nbFreeVar).multiply(conjuncts.stream().reduce(BigInteger.ONE, BigInteger::multiply));
     }
 
     /*
