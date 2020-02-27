@@ -43,7 +43,7 @@ import fr.univartois.cril.pbd4.pbc.SolverStatus;
  *
  * @version 0.1.0
  */
-public abstract class AbstractD4<T> {
+public abstract class AbstractD4<T, U> {
 
     /**
      * The pseudo-Boolean solver to use as an oracle during the compilation process.
@@ -53,7 +53,7 @@ public abstract class AbstractD4<T> {
     /**
      * The cache in which formula that have already been treated are stored.
      */
-    private final CachingStrategy<T> cache;
+    private final CachingStrategy<U> cache;
 
     /**
      * Creates a new AbstractD4.
@@ -71,8 +71,11 @@ public abstract class AbstractD4<T> {
      * @return The output of the algorithm on the input formula.
      */
     public T compute() {
-        return compile(formula, new VecInt());
+        U result = compile(formula, new VecInt());
+        return wrap(result);
     }
+
+    protected abstract T wrap(U result);
 
     /**
      * Compiles the associated pseudo-Boolean formula into a d-DNNF.
@@ -81,18 +84,17 @@ public abstract class AbstractD4<T> {
      *
      * @return The root node of a d-DNNF equivalent to the associated formula.
      */
-    private T compile(PseudoBooleanFormula currentFormula, IVecInt variables) {
+    private U compile(PseudoBooleanFormula currentFormula, IVecInt variables) {
         // Applying BCP to the formula.
         var output = currentFormula.propagate();
-        var status = output.getStatus();
 
-        if (status == SolverStatus.UNSATISFIABLE) {
+        if (output.isUnsatisfiable()) {
             // A conflict has been encountered while propagating.
             return unsatisfiable();
         }
 
         var propagatedLiterals = output.getPropagatedLiterals();
-        if (status == SolverStatus.SATISFIABLE) {
+        if (output.isSatisfiable()) {
             // A solution has been found while propagating.
             return model(currentFormula, propagatedLiterals);
         }
@@ -104,17 +106,16 @@ public abstract class AbstractD4<T> {
             return cached(propagatedLiterals, cached.get());
         }
 
-        var lnd = new LinkedList<T>();
+        var lnd = new LinkedList<U>();
         for (var c : simplifiedFormula.connectedComponents()) {
             var lvc = restrict(variables, simplifiedFormula.variables());
             if (lvc.isEmpty()) {
-                lvc = simplifiedFormula.cutset();
+                lvc = hgp(simplifiedFormula);
             }
 
             var v = lvc.last();
             lvc = lvc.pop();
-            lnd.add(ifThenElse(v, compile(simplifiedFormula.satisfy(v), lvc),
-                    compile(simplifiedFormula.satisfy(-v), lvc)));
+            lnd.add(ifThenElse(v, compile(c.satisfy(v), lvc), compile(c.satisfy(-v), lvc)));
         }
 
         // Caching the result.
@@ -123,13 +124,19 @@ public abstract class AbstractD4<T> {
         return result;
 
     }
+
+    private IVecInt hgp(PseudoBooleanFormula simplifiedFormula) {
+        var cutset = simplifiedFormula.cutset();
+        cutset.sort((x, y) -> Double.compare(formula.score(y), formula.score(x)));
+        return cutset;
+    }
     
     /**
      * Produces the output of the algorithm in the case of an unsatisfiable formula.
      *
      * @return The output of the algorithm on an unsatisfiable formula.
      */
-    protected abstract T unsatisfiable();
+    protected abstract U unsatisfiable();
 
     /**
      * Produces the output of the algorithm when a model of the input formula is found.
@@ -139,13 +146,13 @@ public abstract class AbstractD4<T> {
      * 
      * @return
      */
-    protected abstract T model(PseudoBooleanFormula currentFormula, IVecInt propagatedLiterals);
+    protected abstract U model(PseudoBooleanFormula currentFormula, IVecInt propagatedLiterals);
 
-    protected abstract T ifThenElse(int v, T compile, T compile2);
+    protected abstract U ifThenElse(int v, U compile, U compile2);
 
-    protected abstract T conjunctionOf(Collection<T> lnd);
+    protected abstract U conjunctionOf(Collection<U> lnd);
 
-    protected abstract T cached(IVecInt propagatedLiterals, T cached);
+    protected abstract U cached(IVecInt propagatedLiterals, U cached);
 
     /**
      * Restrict the content of an {@link IVecInt} to the elements appearing in an other
@@ -166,14 +173,4 @@ public abstract class AbstractD4<T> {
         return restricted;
     }
 
-
-    /**
-     * Compares the scores of two variables
-     * @param x The first variable to compare.
-     * @param y The second variable to compare.
-     * @return
-     */
-    int compare(int x, int y) {
-        return Double.compare(formula.score(y), formula.score(x));
-    }
 }

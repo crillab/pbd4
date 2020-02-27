@@ -20,11 +20,13 @@
 
 package fr.univartois.cril.pbd4;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
-import java.util.function.Function;
 
-import fr.univartois.cril.pbd4.ddnnf.DecisionDnnfNode;
+import fr.univartois.cril.pbd4.ddnnf.DecisionDnnf;
 import fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula;
+import fr.univartois.cril.pbd4.pbc.PseudoBooleanFormulaReader;
 
 /**
  * The D4 class makes easier the configuration and use of D4-based compilers or model
@@ -35,12 +37,12 @@ import fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula;
  * @version 0.1.0
  */
 public final class D4 {
-    
+
     /**
      * The pseudo-Boolean formula to consider in the algorithm.
      */
     private PseudoBooleanFormula formula;
-    
+
     /**
      * The caching strategy to use in the algorithm.
      */
@@ -61,15 +63,57 @@ public final class D4 {
     public static D4 newInstance() {
         return new D4();
     }
-    
+
     /**
-     * Specifies the path to the input formula to compile.
+     * Specifies the path of the file containing the input formula to compile.
      *
-     * @param path The path to the input file.
+     * @param path The path of the input file.
+     *
+     * @return This configurator.
+     *
+     * @throws IOException If an I/O error occurs while reading the formula.
+     */
+    public D4 whenCompiling(String path) throws IOException {
+        return whenCompiling(PseudoBooleanFormulaReader.read(path));
+    }
+
+    /**
+     * Specifies the stream from which to read the input formula to compile.
+     * The stream is supposed to use the CNF format.
+     *
+     * @param stream The input stream to read the formula from.
+     * 
+     * @return This configurator.
+     *
+     * @throws IOException If an I/O error occurs while reading the formula.
+     */
+    public D4 whenCompilingCnf(InputStream stream) throws IOException {
+        return whenCompiling(PseudoBooleanFormulaReader.readCnf(stream));
+    }
+
+    /**
+     * Specifies the stream from which to read the input formula to compile.
+     * The stream is supposed to use the OPB format.
+     *
+     * @param stream The input stream to read the formula from.
+     * 
+     * @return This configurator.
+     *
+     * @throws IOException If an I/O error occurs while reading the formula.
+     */
+    public D4 whenCompilingOpb(InputStream stream) throws IOException {
+        return whenCompiling(PseudoBooleanFormulaReader.readOpb(stream));
+    }
+
+    /**
+     * Specifies the input formula to compile.
+     *
+     * @param formula The formula to compile.
      * 
      * @return This configurator.
      */
-    public D4 whenCompiling(String path) {
+    public D4 whenCompiling(PseudoBooleanFormula formula) {
+        this.formula = formula;
         return this;
     }
 
@@ -81,7 +125,7 @@ public final class D4 {
     PseudoBooleanFormula getFormula() {
         return formula;
     }
-    
+
     /**
      * Specifies the caching strategy to use during the compilation.
      *
@@ -97,37 +141,33 @@ public final class D4 {
     /**
      * Gives the caching strategy to use during the compilation.
      *
-     * @param <T> The type of the elements to store in the cache.
+     * @param <U> The type of the elements to store in the cache.
      *
      * @return The caching strategy to use.
      */
     @SuppressWarnings("unchecked")
-    <T> CachingStrategy<T> getCache() {
-        return (CachingStrategy<T>) cache;
+    <U> CachingStrategy<U> getCache() {
+        return (CachingStrategy<U>) cache;
     }
 
     /**
-     * Counts the number of models of the associated formula.
+     * Counts the number of models of the formula.
      *
      * @return The number of models.
      */
     public BigInteger countModels() {
-        var modelCounter = create(D4Counter::new);
+        var modelCounter = new D4Counter(this);
         return modelCounter.compute();
     }
 
     /**
-     * Compiles the associated formula into a d-DNNF.
+     * Compiles the formula into a decision-DNNF.
      *
-     * @return A d-DNNF representing the associated formula.
+     * @return A decision-DNNF representing the formula.
      */
-    public DecisionDnnfNode compile() {
-        var compiler = create(D4Compiler::new);
+    public DecisionDnnf compile() {
+        var compiler = new D4Compiler(this);
         return compiler.compute();
-    }
-    
-    public <T, U extends AbstractD4<T>> U create(Function<D4, U> factory) {
-        return factory.apply(this);
     }
 
 }

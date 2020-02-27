@@ -30,65 +30,67 @@ import fr.univartois.cril.pbd4.ddnnf.DecisionNode;
 import fr.univartois.cril.pbd4.ddnnf.LiteralNode;
 
 /**
- * The DecisionDnnfFactory allows to create the d-DNNF representations used in the
- * compiled form of the input formula.
+ * The DecisionDnnfNodeFactory allows to create the decision-DNNF nodes appearing in the
+ * compiled form of an input formula.
  *
  * @author Romain WALLON
  *
  * @version 0.1.0
  */
-final class DecisionDnnfFactory {
+final class DecisionDnnfNodeFactory {
 
     /**
-     * The d-DNNF representations of the literals.
+     * The decision-DNNF nodes representing the literals.
      */
     private DecisionDnnfNode[] literals;
 
     /**
-     * Creates a new DecisionDnnfFactory.
+     * Creates a new DecisionDnnfNodeFactory.
      *
      * @param numberOfVariables The number of variables in the formula being compiled.
      */
-    public DecisionDnnfFactory(int numberOfVariables) {
-        this.literals = new LiteralNode[2 + (numberOfVariables << 1)];
+    public DecisionDnnfNodeFactory(int numberOfVariables) {
+        this.literals = new DecisionDnnfNode[2 + (numberOfVariables << 1)];
     }
 
     /**
-     * Gives a d-DNNF representing the given literal.
+     * Gives a decision-DNNF node representing a literal.
      *
-     * @param literal The literal to get the d-DNNF representation of.
+     * @param dimacs The identifier of the literal to get the decision-DNNF node of.
      *
-     * @return The d-DNNF representing {@code literal}.
+     * @return The decision-DNNF node representing the literal.
      */
-    public DecisionDnnfNode literal(int literal) {
-        int index = LiteralsUtils.toInternal(literal);
+    public DecisionDnnfNode literal(int dimacs) {
+        int index = LiteralsUtils.toInternal(dimacs);
         if (literals[index] == null) {
-            literals[index] = LiteralNode.literal(literal);
+            literals[index] = LiteralNode.literal(dimacs);
         }
         return literals[index];
     }
 
     /**
-     * Creates a d-DNNF representing the conjunction of the given d-DNNFs.
+     * Creates a decision-DNNF node representing the conjunction of the given nodes.
      *
-     * @param conjuncts The d-DNNF representations to create the conjunction of.
+     * @param conjuncts The decision-DNNF nodes to create the conjunction of.
      *
-     * @return The d-DNNF representing the conjunctions of the given d-DNNFs.
+     * @return The decision-DNNF representing the conjunctions of the given nodes.
      */
-    public DecisionDnnfNode conjunctionOf(Collection<DecisionDnnfNode> conjuncts) {
+    public DecisionDnnfNode and(Collection<DecisionDnnfNode> conjuncts) {
         return ConjunctionNode.and(conjuncts);
     }
 
     /**
-     * Creates a d-DNNF representing a decision taken on a given variable.
+     * Creates a decision-DNNF node representing a decision taken on a given variable.
      *
      * @param variable The variable on which a decision is taken.
-     * @param ifTrue The d-DNNF representing the case in which the variable is satisfied.
-     * @param ifFalse The d-DNNF representing the case in which the variable is falsified.
+     * @param ifTrue The decision-DNNF node representing the case in which the variable is
+     *        satisfied.
+     * @param ifFalse The decision-DNNF node representing the case in which the variable
+     *        is falsified.
      *
-     * @return The created d-DNNF.
+     * @return The decision-DNNF node representing the decision.
      */
-    public DecisionDnnfNode ifThenElse(int variable, DecisionDnnfNode ifTrue, DecisionDnnfNode ifFalse) {
+    public DecisionDnnfNode or(int variable, DecisionDnnfNode ifTrue, DecisionDnnfNode ifFalse) {
         return DecisionNode.or(variable, ifTrue, ifFalse);
     }
 

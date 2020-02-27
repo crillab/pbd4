@@ -35,7 +35,7 @@ import fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula;
  *
  * @version 0.1.0
  */
-final class D4Counter extends AbstractD4<BigInteger> {
+final class D4Counter extends AbstractD4<BigInteger, BigInteger> {
 
     /**
      * Creates a new D4Counter.
@@ -99,6 +99,11 @@ final class D4Counter extends AbstractD4<BigInteger> {
     @Override
     protected BigInteger ifThenElse(int variable, BigInteger ifTrue, BigInteger ifFalse) {
         return ifTrue.add(ifFalse);
+    }
+
+    @Override
+    protected BigInteger wrap(BigInteger result) {
+        return result;
     }
 
 }

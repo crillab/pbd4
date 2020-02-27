@@ -95,14 +95,31 @@ public final class PropagationOutput {
     }
 
     /**
-     * Gives the status of the solver after BCP.
+     * Checks whether the propagation has proven that the formula is satisfiable.
+     * In this case, the propagated literals form a model of the formula.
      *
-     * @return The status of the solver after BCP.
-     *
-     * @see #getStatus()
+     * @return Whether the formula is satisfiable.
      */
-    public SolverStatus getStatus() {
-        return status;
+    public boolean isSatisfiable() {
+        return status == SolverStatus.SATISFIABLE;
+    }
+
+    /**
+     * Checks whether the propagation has proven that the formula is unsatisfiable.
+     *
+     * @return Whether the formula is unsatisfiable.
+     */
+    public boolean isUnsatisfiable() {
+        return status == SolverStatus.UNSATISFIABLE;
+    }
+
+    /**
+     * Checks whether the propagation has not been able to prove anything about the formula.
+     *
+     * @return Whether the status of the formula is unknown.
+     */
+    public boolean isUnknown() {
+        return status == SolverStatus.UNKNOWN;
     }
 
     /**

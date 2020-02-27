@@ -25,8 +25,9 @@ import java.util.Collection;
 
 import org.sat4j.specs.IVecInt;
 
-import fr.univartois.cril.pbd4.ddnnf.DecisionDnnfNode;
 import fr.univartois.cril.pbd4.ddnnf.ConstantNode;
+import fr.univartois.cril.pbd4.ddnnf.DecisionDnnf;
+import fr.univartois.cril.pbd4.ddnnf.DecisionDnnfNode;
 import fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula;
 
 /**
@@ -36,12 +37,12 @@ import fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula;
  *
  * @version 0.1.0
  */
-final class D4Compiler extends AbstractD4<DecisionDnnfNode> {
+final class D4Compiler extends AbstractD4<DecisionDnnf, DecisionDnnfNode> {
 
     /**
      * The factory used to create the different nodes of the d-DNNF being computed.
      */
-    private final DecisionDnnfFactory factory;
+    private final DecisionDnnfNodeFactory factory;
 
     /**
      * Creates a new D4Compiler.
@@ -50,7 +51,7 @@ final class D4Compiler extends AbstractD4<DecisionDnnfNode> {
      */
     D4Compiler(D4 configuration) {
         super(configuration);
-        this.factory = new DecisionDnnfFactory(configuration.getFormula().numberOfVariables());
+        this.factory = new DecisionDnnfNodeFactory(configuration.getFormula().numberOfVariables());
     }
 
     /*
@@ -94,7 +95,7 @@ final class D4Compiler extends AbstractD4<DecisionDnnfNode> {
      */
     @Override
     protected DecisionDnnfNode conjunctionOf(Collection<DecisionDnnfNode> conjuncts) {
-        return factory.conjunctionOf(conjuncts);
+        return factory.and(conjuncts);
     }
 
     /*
@@ -105,7 +106,7 @@ final class D4Compiler extends AbstractD4<DecisionDnnfNode> {
      */
     @Override
     protected DecisionDnnfNode ifThenElse(int variable, DecisionDnnfNode ifTrue, DecisionDnnfNode ifFalse) {
-        return factory.ifThenElse(variable, ifTrue, ifFalse);
+        return factory.or(variable, ifTrue, ifFalse);
     }
 
     /**
@@ -121,6 +122,12 @@ final class D4Compiler extends AbstractD4<DecisionDnnfNode> {
             nodes.add(factory.literal(it.next()));
         }
         return nodes;
+    }
+
+    @Override
+    protected DecisionDnnf wrap(DecisionDnnfNode result) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }
