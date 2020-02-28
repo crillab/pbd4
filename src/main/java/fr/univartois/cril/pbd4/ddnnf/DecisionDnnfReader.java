@@ -22,7 +22,7 @@ package fr.univartois.cril.pbd4.ddnnf;
 
 import static fr.univartois.cril.pbd4.ddnnf.LiteralNode.literal;
 import static fr.univartois.cril.pbd4.ddnnf.ConjunctionNode.and;
-import static fr.univartois.cril.pbd4.ddnnf.DecisionNode.or;
+import static fr.univartois.cril.pbd4.ddnnf.DecisionNode.decision;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -176,7 +176,7 @@ public final class DecisionDnnfReader implements Closeable {
         }
 
         // Retrieving the two children of the node.
-        return or(variable,
+        return decision(variable,
                 readNodes.get(Integer.parseInt(line[3])),
                 readNodes.get(Integer.parseInt(line[4])));
     }

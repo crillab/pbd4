@@ -67,7 +67,7 @@ public final class DecisionNode implements DecisionDnnfNode {
      *
      * @return The created node.
      */
-    public static DecisionDnnfNode or(int variable, DecisionDnnfNode leftChild,
+    public static DecisionDnnfNode decision(int variable, DecisionDnnfNode leftChild,
             DecisionDnnfNode rightChild) {
         return new DecisionNode(variable, leftChild, rightChild);
     }

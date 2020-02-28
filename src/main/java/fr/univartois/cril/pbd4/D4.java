@@ -141,13 +141,13 @@ public final class D4 {
     /**
      * Gives the caching strategy to use during the compilation.
      *
-     * @param <U> The type of the elements to store in the cache.
+     * @param <T> The type of the elements to store in the cache.
      *
      * @return The caching strategy to use.
      */
     @SuppressWarnings("unchecked")
-    <U> CachingStrategy<U> getCache() {
-        return (CachingStrategy<U>) cache;
+    <T> CachingStrategy<T> getCache() {
+        return (CachingStrategy<T>) cache;
     }
 
     /**
@@ -156,7 +156,7 @@ public final class D4 {
      * @return The number of models.
      */
     public BigInteger countModels() {
-        var modelCounter = new D4Counter(this);
+        var modelCounter = new D4ModelCounter(this);
         return modelCounter.compute();
     }
 
@@ -165,8 +165,8 @@ public final class D4 {
      *
      * @return A decision-DNNF representing the formula.
      */
-    public DecisionDnnf compile() {
-        var compiler = new D4Compiler(this);
+    public DecisionDnnf compileToDecisionDnnf() {
+        var compiler = new D4DecisionDnnfCompiler(this);
         return compiler.compute();
     }
 

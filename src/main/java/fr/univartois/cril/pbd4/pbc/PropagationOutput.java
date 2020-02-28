@@ -96,7 +96,7 @@ public final class PropagationOutput {
 
     /**
      * Checks whether the propagation has proven that the formula is satisfiable.
-     * In this case, the propagated literals form a model of the formula.
+     * In this case, the propagated literals form an implicant of the formula.
      *
      * @return Whether the formula is satisfiable.
      */

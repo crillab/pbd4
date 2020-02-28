@@ -20,40 +20,37 @@
 
 package fr.univartois.cril.pbd4;
 
-import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
 import org.sat4j.core.VecInt;
 import org.sat4j.specs.IVecInt;
 
 import fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula;
-import fr.univartois.cril.pbd4.pbc.SolverStatus;
 
 /**
- * The AbstractD4 class implements the "skeleton" of the D4 algorithm [Lagniez and
- * Marquis, 2017].
- * It relies on the Template Method design pattern to allow the computation of either the
- * number of models of the input pseudo-Boolean formula, or its representation as a
- * d-DNNF.
+ * The AbstractD4 class implements the "skeleton" of the D4 algorithm [Lagniez and Marquis, 2017].
+ * It relies on the Template Method design pattern to allow the computation of different outputs.
  *
- * @param <T> The type of the value computed by the D4 algorithm.
+ * @param <T> The type of intermediate results of the algorithm.
+ * @param <R> The type of the value eventually computed by the algorithm.
  *
  * @author Romain WALLON
  *
  * @version 0.1.0
  */
-public abstract class AbstractD4<T, U> {
+public abstract class AbstractD4<T, R> {
 
     /**
-     * The pseudo-Boolean solver to use as an oracle during the compilation process.
+     * The input pseudo-Boolean formula.
      */
-    private final PseudoBooleanFormula formula;
+    protected final PseudoBooleanFormula formula;
 
     /**
-     * The cache in which formula that have already been treated are stored.
+     * The cache in which formulae that have already been treated are stored.
      */
-    private final CachingStrategy<U> cache;
+    private final CachingStrategy<T> cache;
 
     /**
      * Creates a new AbstractD4.
@@ -70,99 +67,112 @@ public abstract class AbstractD4<T, U> {
      *
      * @return The output of the algorithm on the input formula.
      */
-    public T compute() {
-        U result = compile(formula, new VecInt());
-        return wrap(result);
+    public final R compute() {
+        T intermediateResult = compute(formula, VecInt.EMPTY);
+        return toFinalResult(intermediateResult);
     }
 
-    protected abstract T wrap(U result);
-
     /**
-     * Compiles the associated pseudo-Boolean formula into a d-DNNF.
-     * 
-     * @param variables TODO
+     * Executes the D4 algorithm on the given pseudo-Boolean formula.
      *
-     * @return The root node of a d-DNNF equivalent to the associated formula.
+     * @param subFormula The sub-formula for which a computation must be performed.
+     * @param variables The subset of variables to consider while performing the
+     *        computation.
+     *
+     * @return The (intermediate) result of the computation on the given formula.
      */
-    private U compile(PseudoBooleanFormula currentFormula, IVecInt variables) {
+    private T compute(PseudoBooleanFormula subFormula, IVecInt variables) {
         // Applying BCP to the formula.
-        var output = currentFormula.propagate();
+        var output = subFormula.propagate();
 
         if (output.isUnsatisfiable()) {
             // A conflict has been encountered while propagating.
             return unsatisfiable();
         }
 
+        // Retrieving the literals that have been propagated.
         var propagatedLiterals = output.getPropagatedLiterals();
+        int nbFreeVariables = subFormula.numberOfVariables() - propagatedLiterals.size();
+        
         if (output.isSatisfiable()) {
             // A solution has been found while propagating.
-            return model(currentFormula, propagatedLiterals);
+            // The propagated literals form an implicant of the sub-formula.
+            return implicant(nbFreeVariables, propagatedLiterals);
         }
-
-        // Retrieving the formula from the cache.
+        
+        // Looking for the resulting formula in the cache.
         var simplifiedFormula = output.getSimplifiedFormula();
+        nbFreeVariables -= simplifiedFormula.numberOfVariables();
         var cached = cache.get(simplifiedFormula);
         if (cached.isPresent()) {
-            return cached(propagatedLiterals, cached.get());
+            return cached(nbFreeVariables, propagatedLiterals, cached.get());
         }
 
-        var lnd = new LinkedList<U>();
-        int nbVar = 0;
-        for (var c : simplifiedFormula.connectedComponents()) {
-            nbVar += c.numberOfVariables();
-            var lvc = restrict(variables, simplifiedFormula.variables());
-            if (lvc.isEmpty()) {
-                lvc = hgp(simplifiedFormula);
+        // Recursively compiling the connected components of the resulting formula.
+        var conjuncts = new LinkedList<T>();
+        for (var component : simplifiedFormula.connectedComponents()) {
+            // Updating the variables to consider.
+            var componentVariables = restrict(variables, component.variables());
+            if (componentVariables.isEmpty()) {
+                componentVariables = component.cutset();
             }
 
-            var v = lvc.last();
-            lvc = lvc.pop();
-            lnd.add(ifThenElse(v, compile(c.satisfy(v), lvc), compile(c.satisfy(-v), lvc)));
+            // Making a decision.
+            var v = componentVariables.last();
+            componentVariables = componentVariables.pop();
+            conjuncts.add(decision(v,
+                    compute(component.satisfy(v), componentVariables),
+                    compute(component.satisfy(-v), componentVariables)));
         }
 
-        // Caching the result.
-        var result = conjunctionOf(currentFormula.numberOfVariables() - nbVar, lnd);
+        // Computing the result of the conjunction, and caching the result.
+        T result = conjunction(nbFreeVariables, propagatedLiterals, conjuncts);
         cache.put(simplifiedFormula, result);
         return result;
-
     }
 
-    private IVecInt hgp(PseudoBooleanFormula simplifiedFormula) {
-        var cutset = simplifiedFormula.cutset();
-        cutset.sort((x, y) -> Double.compare(formula.score(y), formula.score(x)));
-        return cutset;
-    }
-    
     /**
-     * Produces the output of the algorithm in the case of an unsatisfiable formula.
+     * Produces the intermediate result of the algorithm in the case of an unsatisfiable
+     * formula.
      *
-     * @return The output of the algorithm on an unsatisfiable formula.
+     * @return The intermediate result of the algorithm on an unsatisfiable formula.
      */
-    protected abstract U unsatisfiable();
+    protected abstract T unsatisfiable();
 
     /**
-     * Produces the output of the algorithm when a model of the input formula is found.
-     * 
-     * @param currentFormula The formula of which a model has been found.
-     * @param propagatedLiterals The literals that were propagated after the 
-     * 
-     * @return
+     * Produces the intermediate result of the algorithm when an implicant of the input
+     * formula is found.
+     *
+     * @param nbFreeVariables The number of variables that are now free (i.e., that may take
+     *        any truth value regardless of the assignment of the other literals).
+     * @param implicant The literals forming an implicant of the formula.
+     *
+     * @return The intermediate result of the algorithm on a satisfiable formula.
      */
-    protected abstract U model(PseudoBooleanFormula currentFormula, IVecInt propagatedLiterals);
+    protected abstract T implicant(int nbFreeVariables, IVecInt implicant);
 
-    protected abstract U ifThenElse(int v, U compile, U compile2);
-
-    protected abstract U conjunctionOf(int nbFreeVar, Collection<U> lnd);
-
-    protected abstract U cached(IVecInt propagatedLiterals, U cached);
+    /**
+     * Produces the intermediate result of the algorithm when BCP yields a formula that
+     * has been cached.
+     *
+     * @param nbFreeVariables The number of free variables (i.e., that may take any truth
+     *        value regardless of the assignment of the other literals).
+     * @param propagatedLiterals The literals that have been propagated,
+     *        yielding a cached formula.
+     * @param cached The value that have been cached.
+     *
+     * @return The intermediate result of the algorithm for the cached value.
+     */
+    protected abstract T cached(int nbFreeVariables, IVecInt propagatedLiterals, T cached);
 
     /**
      * Restrict the content of an {@link IVecInt} to the elements appearing in an other
      * {@link IVecInt}.
-     * 
+     *
      * @param elements The elements to filter out.
      * @param toKeep The elements to keep in the vector.
-     * @return
+     *
+     * @return The restricted {@link IVecInt}.
      */
     private IVecInt restrict(IVecInt elements, IVecInt toKeep) {
         var restricted = new VecInt();
@@ -174,5 +184,41 @@ public abstract class AbstractD4<T, U> {
         }
         return restricted;
     }
+
+    /**
+     * Produces the intermediate result of the algorithm when a decision is made on a
+     * variable.
+     *
+     * @param variable The variable on which a decision is made.
+     * @param ifTrue The intermediate result of the algorithm when considering the
+     *        variable as satisfied.
+     * @param ifFalse The intermediate result of the algorithm when considering the
+     *        variable as falsified.
+     *
+     * @return The intermediate result of the algorithm for the decision.
+     */
+    protected abstract T decision(int variable, T ifTrue, T ifFalse);
+
+    /**
+     * Produces the intermediate result of the algorithm for a conjunction.
+     *
+     * @param nbFreeVariables The number of variables that are free in the conjunction
+     *        (i.e., that may take any truth value regardless of the assignment of the
+     *        other literals).
+     * @param literals The literals taking part in the conjunction.
+     * @param conjuncts The intermediate results of the algorithm to conjunct.
+     *
+     * @return The intermediate result of the algorithm for the conjunction.
+     */
+    protected abstract T conjunction(int nbFreeVariables, IVecInt literals, List<T> conjuncts);
+
+    /**
+     * Produces the final result of the algorithm from the intermediate result it has produced.
+     *
+     * @param intermediateResult The intermediate result produced by the algorithm.
+     *
+     * @return The final result of the algorithm.
+     */
+    protected abstract R toFinalResult(T intermediateResult);
 
 }

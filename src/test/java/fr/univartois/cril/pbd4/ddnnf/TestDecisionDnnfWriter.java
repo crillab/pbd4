@@ -21,7 +21,7 @@
 package fr.univartois.cril.pbd4.ddnnf;
 
 import static fr.univartois.cril.pbd4.ddnnf.ConjunctionNode.and;
-import static fr.univartois.cril.pbd4.ddnnf.DecisionNode.or;
+import static fr.univartois.cril.pbd4.ddnnf.DecisionNode.decision;
 import static fr.univartois.cril.pbd4.ddnnf.ConstantNode.TRUE;
 import static fr.univartois.cril.pbd4.ddnnf.LiteralNode.literal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -65,15 +65,15 @@ public final class TestDecisionDnnfWriter {
 
         // Creating the internal nodes.
         var a3 = and(notl3, notl2, l1);
-        var o5 = or(3, l3, a3);
+        var o5 = decision(3, l3, a3);
         var a7 = and(o5, notl4);
         var a9 = and(l1, l4);
         var a10 = and(notl2, l3);
-        var o12 = or(2, l2, a10);
+        var o12 = decision(2, l2, a10);
         var a13 = and(a9, o12);
 
         // Creating the root node.
-        var root = or(4, a13, a7);
+        var root = decision(4, a13, a7);
         return new DecisionDnnf(4, 15, 17, root);
     }
 
@@ -104,12 +104,12 @@ public final class TestDecisionDnnfWriter {
         // Creating the internal nodes.
         var a4 = and(l3, notl1, TRUE);
         var a6 = and(l1, TRUE);
-        var o7 = or(1, a6, a4);
+        var o7 = decision(1, a6, a4);
         var a9 = and(notl2, o7);
         var a13 = and(notl3, l2, notl1, TRUE);
 
         // Creating the root node.
-        var root = or(2, a13, a9);
+        var root = decision(2, a13, a9);
         return new DecisionDnnf(3, 15, 14, root);
     }
 
