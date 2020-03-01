@@ -131,6 +131,7 @@ final class SubPseudoBooleanFormulaBuilder {
      */
     SubPseudoBooleanFormulaBuilder decision(int literal) {
         this.decision = OptionalInt.of(literal);
+        this.newAssumptions = VecInt.of(literal);
         return this;
     }
 
@@ -349,7 +350,7 @@ final class SubPseudoBooleanFormulaBuilder {
         var posLit = LiteralsUtils.posLit(variable);
         var negLit = LiteralsUtils.posLit(variable);
 
-        if (satisfiedLiterals.get(posLit) || satisfiedLiterals.get(negLit)) {
+        if (getSatisfiedLiterals().get(posLit) ||getSatisfiedLiterals().get(negLit)) {
             // This variable is assigned, so it does not appear in the formula anymore.
             return false;
         }
@@ -357,7 +358,7 @@ final class SubPseudoBooleanFormulaBuilder {
         // Looking for the constraints containing the variable.
         for (var it = original.getConstraintsContaining(variable).iterator(); it.hasNext();) {
             var constr = it.next();
-            if (!inactiveConstraints.get(constr)) {
+            if (!getInactiveConstraints().get(constr)) {
                 updatedDlcsScores[variable]++;
             }
         }

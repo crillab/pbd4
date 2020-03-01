@@ -22,7 +22,6 @@ package fr.univartois.cril.pbd4.pbc;
 
 import java.io.Serializable;
 
-import org.sat4j.core.LiteralsUtils;
 import org.sat4j.core.VecInt;
 import org.sat4j.specs.ISolverService;
 import org.sat4j.specs.IVecInt;
@@ -44,6 +43,11 @@ final class UnitPropagationListener extends SearchListenerAdapter<ISolverService
     private static final long serialVersionUID = 1L;
 
     /**
+     * The number of variables in the formula.
+     */
+    private int numberOfVariables;
+    
+    /**
      * The vector in which to store propagated literals.
      */
     private IVecInt propagatedLiterals;
@@ -56,7 +60,8 @@ final class UnitPropagationListener extends SearchListenerAdapter<ISolverService
     @Override
     public void init(ISolverService solverService) {
     	if (propagatedLiterals == null) {
-    		propagatedLiterals = new VecInt(solverService.nVars());
+            numberOfVariables = solverService.nVars();
+    		propagatedLiterals = new VecInt(numberOfVariables);
     	}
     }
 
@@ -67,7 +72,9 @@ final class UnitPropagationListener extends SearchListenerAdapter<ISolverService
      */
     @Override
     public void propagating(int p) {
-        propagatedLiterals.push(LiteralsUtils.toDimacs(p));
+        if (Math.abs(p) <= numberOfVariables) {
+            propagatedLiterals.push(p);
+        }
     }
 
     /**
@@ -84,7 +91,9 @@ final class UnitPropagationListener extends SearchListenerAdapter<ISolverService
      * Resets this listener, to forget all literals that were propagated previously.
      */
     public void reset() {
-        propagatedLiterals.clear();
+        if (propagatedLiterals != null) {
+            propagatedLiterals.clear();
+        }
     }
 
 }

@@ -24,7 +24,6 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.OptionalInt;
 
-import org.sat4j.core.LiteralsUtils;
 import org.sat4j.core.VecInt;
 import org.sat4j.specs.IVecInt;
 
@@ -213,20 +212,21 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula {
      */
     private IVecInt computeAssumptions() {
         // Copying the true literal assumptions.
-        var effectiveAssumptions = new VecInt(assumptions.size() + inactiveConstraints.size());
+        var effectiveAssumptions = new VecInt(assumptions.size() + decorated.numberOfConstraints());
         assumptions.copyTo(effectiveAssumptions);
-
+        
         // Computing the assumptions for the constraint selectors.
-        for (int i = 0; i < inactiveConstraints.size(); i++) {
+        for (int i = 0; i < decorated.numberOfConstraints(); i++) {
             if (inactiveConstraints.get(i)) {
                 // This constraint must be ignored.
-                effectiveAssumptions.push(LiteralsUtils.posLit(numberOfVariables() + i + 1));
+                effectiveAssumptions.push(numberOfVariables() + i + 1);
 
             } else {
                 // This constraint must be considered.
-                effectiveAssumptions.push(LiteralsUtils.negLit(numberOfVariables() + i + 1));
+                effectiveAssumptions.push(-numberOfVariables() - i - 1);
             }
         }
+
         return effectiveAssumptions;
     }
 
