@@ -327,6 +327,12 @@ final class PBSelectorSolver extends GroupPBSelectorSolver {
     private void storeVariables(IVecInt literals, int startIndex, int nbConstr) {
         for (var it = literals.iterator(); it.hasNext();) {
             var variable = Math.abs(it.next());
+
+            if (variable > nVars()) {
+                // This variable is a selector.
+                continue;
+            }
+
             if (constraintsContainingVariable[variable] == null) {
                 constraintsContainingVariable[variable] = new VecInt();
             }
