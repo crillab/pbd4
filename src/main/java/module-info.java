@@ -18,6 +18,14 @@ module fr.univartois.cril.pbd4 {
 
     exports fr.univartois.cril.pbd4.pbc;
 
+    // Required Java modules.
+
+    requires java.logging;
+
+    // Module required for parsing the command line.
+
+    requires fr.cril.cli;
+
     // Modules required for dealing with pseudo-Boolean formulae.
 
     requires transitive org.ow2.sat4j.core;

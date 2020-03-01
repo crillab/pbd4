@@ -186,11 +186,7 @@ final class D4DecisionDnnfCompiler extends AbstractD4<DecisionDnnfNode, Decision
      */
     @Override
     protected DecisionDnnf toFinalResult(DecisionDnnfNode intermediateResult) {
-        return new DecisionDnnf(
-                numberOfVariables,
-                numberOfNodes,
-                numberOfEdges,
-                intermediateResult);
+        return new DecisionDnnf(numberOfVariables, numberOfNodes, numberOfEdges, intermediateResult);
     }
 
 }

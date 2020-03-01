@@ -79,7 +79,7 @@ public abstract class AbstractD4<T, R> {
      * @param variables The subset of variables to consider while performing the
      *        computation.
      *
-     * @return The (intermediate) result of the computation on the given formula.
+     * @return The intermediate result of the computation on the given formula.
      */
     private T compute(PseudoBooleanFormula subFormula, IVecInt variables) {
         // Applying BCP to the formula.
@@ -121,8 +121,8 @@ public abstract class AbstractD4<T, R> {
             var v = componentVariables.last();
             componentVariables = componentVariables.pop();
             conjuncts.add(decision(v,
-                    compute(component.satisfy(v), componentVariables),
-                    compute(component.satisfy(-v), componentVariables)));
+                    compute(component.assume(v), componentVariables),
+                    compute(component.assume(-v), componentVariables)));
         }
 
         // Computing the result of the conjunction, and caching the result.
@@ -143,8 +143,8 @@ public abstract class AbstractD4<T, R> {
      * Produces the intermediate result of the algorithm when an implicant of the input
      * formula is found.
      *
-     * @param nbFreeVariables The number of variables that are now free (i.e., that may take
-     *        any truth value regardless of the assignment of the other literals).
+     * @param nbFreeVariables The number of free variables (i.e., that may take any truth
+     *        value regardless of the assignment of the other literals).
      * @param implicant The literals forming an implicant of the formula.
      *
      * @return The intermediate result of the algorithm on a satisfiable formula.
@@ -157,9 +157,9 @@ public abstract class AbstractD4<T, R> {
      *
      * @param nbFreeVariables The number of free variables (i.e., that may take any truth
      *        value regardless of the assignment of the other literals).
-     * @param propagatedLiterals The literals that have been propagated,
-     *        yielding a cached formula.
-     * @param cached The value that have been cached.
+     * @param propagatedLiterals The literals that have been propagated, yielding a
+     *        cached formula.
+     * @param cached The intermediate value that have been cached.
      *
      * @return The intermediate result of the algorithm for the cached value.
      */
@@ -202,9 +202,8 @@ public abstract class AbstractD4<T, R> {
     /**
      * Produces the intermediate result of the algorithm for a conjunction.
      *
-     * @param nbFreeVariables The number of variables that are free in the conjunction
-     *        (i.e., that may take any truth value regardless of the assignment of the
-     *        other literals).
+     * @param nbFreeVariables The number of free variables (i.e., that may take any truth
+     *        value regardless of the assignment of the other literals).
      * @param literals The literals taking part in the conjunction.
      * @param conjuncts The intermediate results of the algorithm to conjunct.
      *

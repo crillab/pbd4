@@ -56,7 +56,7 @@ final class D4ModelCounter extends AbstractD4<BigInteger, BigInteger> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.AbstractD4#implicant(int, org.sat4j.specs.IVecInt)
      */
     @Override

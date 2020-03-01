@@ -28,6 +28,7 @@ repositories {
 }
 
 dependencies {
+    implementation files("lib/fr.cril.cli-1.0.1-SNAPSHOT.jar")
     implementation files("lib/jkahypar-module-0.1.0.jar")
     implementation files("lib/jna-5.5.0.jar")
     implementation files("lib/org.sat4j.core.jar")
