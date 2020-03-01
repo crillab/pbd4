@@ -60,7 +60,7 @@ public final class PseudoBooleanFormulaReader {
      */
     public static PseudoBooleanFormula read(String path) throws IOException {
         try {
-            var solver = new PBSelectorSolver(SolverFactory.newCuttingPlanes());
+            var solver = new PBSelectorSolver(SolverFactory.newDefault());
             var reader = new PBInstanceReader(solver);
             reader.parseInstance(path);
             return new OriginalPseudoBooleanFormula(solver);
@@ -78,7 +78,7 @@ public final class PseudoBooleanFormulaReader {
     /**
      * Reads a pseudo-Boolean formula from a CNF stream.
      *
-     * @param path The stream to read.
+     * @param inputStream The stream to read.
      *
      * @return The read formula.
      *
@@ -86,7 +86,7 @@ public final class PseudoBooleanFormulaReader {
      */
     public static PseudoBooleanFormula readCnf(InputStream inputStream) throws IOException {
         try {
-            var solver = new PBSelectorSolver(SolverFactory.newCuttingPlanes());
+            var solver = new PBSelectorSolver(SolverFactory.newDefault());
             var reader = new LecteurDimacs(solver);
             reader.parseInstance(inputStream);
             return new OriginalPseudoBooleanFormula(solver);
@@ -104,7 +104,7 @@ public final class PseudoBooleanFormulaReader {
     /**
      * Reads a pseudo-Boolean formula from an OPB stream.
      *
-     * @param path The stream to read.
+     * @param inputStream The stream to read.
      *
      * @return The read formula.
      *
@@ -112,7 +112,7 @@ public final class PseudoBooleanFormulaReader {
      */
     public static PseudoBooleanFormula readOpb(InputStream inputStream) throws IOException {
         try {
-            var solver = new PBSelectorSolver(SolverFactory.newCuttingPlanes());
+            var solver = new PBSelectorSolver(SolverFactory.newDefault());
             var reader = new PBInstanceReader(solver);
             reader.parseInstance(inputStream);
             return new OriginalPseudoBooleanFormula(solver);

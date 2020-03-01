@@ -45,7 +45,7 @@ public final class TestPropagate extends AbstractTestPseudoBooleanSolving {
 		assertEquals(4, formula.numberOfVariables());
 		assertEquals(4, formula.numberOfConstraints());
         
-		var fNot1 = outFormula.satisfy(-1);
+		var fNot1 = outFormula.assume(-1);
 		var res2 = fNot1.propagate();
 		var propagatedLit = res2.getPropagatedLiterals();
 		assertEquals(3, fNot1.numberOfVariables());
@@ -57,11 +57,11 @@ public final class TestPropagate extends AbstractTestPseudoBooleanSolving {
         var sf = res2.getSimplifiedFormula();
 		assertEquals(2, sf.numberOfVariables());
 		assertEquals(2, sf.numberOfConstraints());
-        var res2bis = sf.satisfy(-3).propagate();
+        var res2bis = sf.assume(-3).propagate();
 
         assertTrue(res2bis.isUnsatisfiable());
         
-        var fNot12 = res2.getSimplifiedFormula().satisfy(-2);
+        var fNot12 = res2.getSimplifiedFormula().assume(-2);
         var res3 = fNot12.propagate();
 		var propagatedLit2 = res3.getPropagatedLiterals();
 		assertEquals(3, propagatedLit2.size());

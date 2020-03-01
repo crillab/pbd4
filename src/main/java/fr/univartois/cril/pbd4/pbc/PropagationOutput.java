@@ -44,22 +44,22 @@ public final class PropagationOutput {
     private final IVecInt propagatedLiterals;
 
     /**
-     * The original formula on which BCP is applied.
+     * The formula on which BCP is applied.
      */
-    private final OriginalPseudoBooleanFormula original;
+    private final PseudoBooleanFormula formula;
 
     /**
      * Creates a new PropagationOutput.
      *
      * @param status The status of the solver after BCP.
      * @param propagatedLiterals The literals that have been propagated during BCP.
-     * @param original The original formula on which BCP is applied.
+     * @param formula The formula on which BCP is applied.
      */
     private PropagationOutput(SolverStatus status, IVecInt propagatedLiterals,
-            OriginalPseudoBooleanFormula original) {
+            PseudoBooleanFormula formula) {
         this.status = status;
         this.propagatedLiterals = propagatedLiterals;
-        this.original = original;
+        this.formula = formula;
     }
     
     /**
@@ -86,12 +86,12 @@ public final class PropagationOutput {
      * Creates a PropagationOutput for a formula for which the status is not known yet.
      *
      * @param propagatedLiterals The literals that have been propagated during BCP.
-     * @param original The original formula on which BCP is applied.
+     * @param formula The formula on which BCP is applied.
      *
      * @return The created propagation output.
      */
-    static PropagationOutput unknown(IVecInt propagatedLiterals, OriginalPseudoBooleanFormula original) {
-        return new PropagationOutput(SolverStatus.UNKNOWN, propagatedLiterals, original);
+    static PropagationOutput unknown(IVecInt propagatedLiterals, PseudoBooleanFormula formula) {
+        return new PropagationOutput(SolverStatus.UNKNOWN, propagatedLiterals, formula);
     }
 
     /**
@@ -114,7 +114,8 @@ public final class PropagationOutput {
     }
 
     /**
-     * Checks whether the propagation has not been able to prove anything about the formula.
+     * Checks whether the propagation has not been able to prove anything about the
+     * formula.
      *
      * @return Whether the status of the formula is unknown.
      */
@@ -128,6 +129,10 @@ public final class PropagationOutput {
      * {@link SolverStatus#UNSATISFIABLE}.
      *
      * @return The literals that have been propagated during BCP.
+     *
+     * @see #isSatisfiable()
+     * @see #isUnsatisfiable()
+     * @see #isUnknown()
      */
     public IVecInt getPropagatedLiterals() {
         return propagatedLiterals;
@@ -136,23 +141,17 @@ public final class PropagationOutput {
     /**
      * Gives the formula obtained after having simplified the formula with respect to the
      * literals that have been propagated.
-     * The result of this method is undefined if the solver status was
-     * {@link SolverStatus#UNSATISFIABLE}.
+     * The result of this method is undefined if the solver status was not
+     * {@link SolverStatus#UNKNOWN}.
      * 
      * @return The simplified pseudo-Boolean formula.
      *
-     * @see #getStatus()
+     * @see #isSatisfiable()
+     * @see #isUnsatisfiable()
+     * @see #isUnknown()
      */
     public PseudoBooleanFormula getSimplifiedFormula() {
-        for (int i = 0; i < original.numberOfConstraints(); i++) {
-            var constr = original.getConstraint(i);
-            for (int l = 0; l < constr.size(); l++) {
-                // Ajouter les coef
-                // Ajouter les liens dans l'hypergraphe
-
-            }
-        }
-        return null;
+        return formula.assume(propagatedLiterals);
     }
 
 }

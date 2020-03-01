@@ -29,8 +29,8 @@ import org.sat4j.specs.IVecInt;
 /**
  * The Contradiction represents a pseudo-Boolean formula that is unsatisfiable.
  * The methods it defines are mainly place-holders.
- * The main purpose of this class is to return {@link SolverStatus#UNSATISFIABLE} as
- * propagation output when propagating.
+ * The main purpose of this class is to return {@link PropagationOutput#unsatisfiable()}
+ * when propagating.
  *
  * @author Romain WALLON
  *
@@ -102,10 +102,20 @@ public final class Contradiction implements PseudoBooleanFormula {
     /*
      * (non-Javadoc)
      * 
-     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#satisfy(int)
+     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#assume(int)
      */
     @Override
-    public PseudoBooleanFormula satisfy(int literal) {
+    public PseudoBooleanFormula assume(int literal) {
+        return this;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#assume(IVecInt)
+     */
+    @Override
+    public PseudoBooleanFormula assume(IVecInt literals) {
         return this;
     }
 

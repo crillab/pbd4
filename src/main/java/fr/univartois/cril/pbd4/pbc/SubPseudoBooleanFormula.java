@@ -22,13 +22,15 @@ package fr.univartois.cril.pbd4.pbc;
 
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.OptionalInt;
 
 import org.sat4j.core.LiteralsUtils;
 import org.sat4j.core.VecInt;
 import org.sat4j.specs.IVecInt;
 
 /**
- * The SubPseudoBooleanFormula
+ * The SubPseudoBooleanFormula represents a sub-part of a pseudo-Boolean formula that is
+ * being compiled.
  *
  * @author Romain WALLON
  *
@@ -36,68 +38,129 @@ import org.sat4j.specs.IVecInt;
  */
 final class SubPseudoBooleanFormula implements PseudoBooleanFormula {
 
-    private final IVecInt assumptions;
-
+    /**
+     * The original formula, from which this sub-formula has been extracted.
+     */
     private final OriginalPseudoBooleanFormula decorated;
 
-    private final BitSet inactiveConstraint;
+    /**
+     * The literal on which a decision has been made (if any).
+     */
+    private final OptionalInt decision;
 
-    private IVecInt variables;
+    /**
+     * The assumptions that have been made to create this sub-formula.
+     */
+    private final IVecInt assumptions;
 
-    public SubPseudoBooleanFormula(OriginalPseudoBooleanFormula decorated, IVecInt assumptions) {
-        this.decorated = decorated;
-        this.inactiveConstraint = new BitSet(decorated.numberOfConstraints());
-        this.assumptions = assumptions;
-        assumptions.sort();
+    /**
+     * The literals that have been satisfied.
+     */
+    private final BitSet satisfiedLiterals;
+
+    /**
+     * The constraints that have been deactivated.
+     */
+    private final BitSet inactiveConstraints;
+
+    /**
+     * The variables appearing in this formula.
+     */
+    private final IVecInt variables;
+
+    /**
+     * The DLCS scores of the variables, updated w.r.t. the constraints in this sub-formula.
+     */
+    private final int[] updatedDlcsScores;
+    
+    /**
+     * Creates a new SubPseudoBooleanFormula.
+     *
+     * @param builder The builder used to initialize the formula.
+     */
+    SubPseudoBooleanFormula(SubPseudoBooleanFormulaBuilder builder) {
+        this.decorated = builder.getOriginalFormula();
+        this.decision = builder.getDecision();
+        this.assumptions = builder.getAssumptions();
+        this.satisfiedLiterals = builder.getSatisfiedLiterals();
+        this.inactiveConstraints = builder.getInactiveConstraints();
+        this.variables = builder.getVariables();
+        this.updatedDlcsScores = builder.getUpdatedDlcsScores();
     }
 
-    public SubPseudoBooleanFormula(OriginalPseudoBooleanFormula decorated, IVecInt assumptions,
-            BitSet activeConstraints) {
-        this.decorated = decorated;
-        this.inactiveConstraint = activeConstraints;
-        this.assumptions = assumptions;
-    }
-
-    /* 
+    /*
      * (non-Javadoc)
      * 
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#numberOfVariables()
      */
     @Override
     public int numberOfVariables() {
-        return decorated.numberOfVariables() - assumptions.size();
+        return variables.size();
     }
 
-    /* 
+    /*
      * (non-Javadoc)
      * 
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#numberOfConstraints()
      */
     @Override
     public int numberOfConstraints() {
-        return inactiveConstraint.size() - inactiveConstraint.cardinality();
+        return decorated.numberOfConstraints() - inactiveConstraints.cardinality();
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#variables()
+     */
     @Override
     public IVecInt variables() {
-        return VecInt.EMPTY;
+        return variables;
     }
-    
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#score()
+     */
     @Override
     public double score(int variable) {
-        // TODO Auto-generated method stub
-        return 0;
+        return decorated.score(variable, updatedDlcsScores[variable]);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#assume(int)
+     */
     @Override
-    public PseudoBooleanFormula satisfy(int literal) {
-        var newAssumptions = new VecInt(assumptions.size() + 1);
-        assumptions.copyTo(newAssumptions);
-        newAssumptions.push(literal);
-        return null;
+    public PseudoBooleanFormula assume(int literal) {
+        return SubPseudoBooleanFormulaBuilder.of(decorated)
+                .initialAssumptions(assumptions)
+                .satisfiedLiterals((BitSet) satisfiedLiterals.clone())
+                .inactiveConstraints((BitSet) inactiveConstraints.clone())
+                .possibleVariable(variables)
+                .decision(literal)
+                .build();
     }
 
-    /* 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#assume(IVecInt)
+     */
+    @Override
+    public PseudoBooleanFormula assume(IVecInt literals) {
+        return SubPseudoBooleanFormulaBuilder.of(decorated)
+                .initialAssumptions(assumptions)
+                .satisfiedLiterals((BitSet) satisfiedLiterals.clone())
+                .inactiveConstraints((BitSet) inactiveConstraints.clone()) 
+                .possibleVariable(variables)
+                .newAssumptions(literals)
+                .build();
+    }
+
+    /*
      * (non-Javadoc)
      * 
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#cutset()
@@ -107,7 +170,7 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula {
         throw new UnsupportedOperationException();
     }
 
-    /* 
+    /*
      * (non-Javadoc)
      * 
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#connectedComponents()
@@ -117,19 +180,54 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula {
         throw new UnsupportedOperationException();
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#propagate()
+     */
     @Override
     public PropagationOutput propagate() {
-        var effectiveAssumptions = new VecInt();
+        // Applying BCP to the formula with the assumptions characterizing this sub-formula.
+        var output = decorated.propagate(computeAssumptions());
+
+        if (output.isUnsatisfiable()) {
+            // There is nothing more to do.
+            return output;
+        }
+
+        // The decision, if any, must be added to the propagated literals.
+        var propagatedLiterals = output.getPropagatedLiterals();
+        decision.ifPresent(propagatedLiterals::push);
+
+        // Returning the appropriate output.
+        if (output.isSatisfiable()) {
+            return PropagationOutput.satisfiable(propagatedLiterals);
+        }
+        return PropagationOutput.unknown(propagatedLiterals, this);
+    }
+
+    /**
+     * Computes the assumptions characterizing this sub-formula.
+     *
+     * @return The assumptions characterizing this sub-formula.
+     */
+    private IVecInt computeAssumptions() {
+        // Copying the true literal assumptions.
+        var effectiveAssumptions = new VecInt(assumptions.size() + inactiveConstraints.size());
         assumptions.copyTo(effectiveAssumptions);
-        for (int i = 0; i < inactiveConstraint.size(); i++) {
-            if (inactiveConstraint.get(i)) {
+
+        // Computing the assumptions for the constraint selectors.
+        for (int i = 0; i < inactiveConstraints.size(); i++) {
+            if (inactiveConstraints.get(i)) {
+                // This constraint must be ignored.
                 effectiveAssumptions.push(LiteralsUtils.posLit(numberOfVariables() + i + 1));
+
             } else {
+                // This constraint must be considered.
                 effectiveAssumptions.push(LiteralsUtils.negLit(numberOfVariables() + i + 1));
             }
         }
-
-        return decorated.propagate(effectiveAssumptions);
+        return effectiveAssumptions;
     }
 
 }

@@ -58,17 +58,34 @@ public interface PseudoBooleanFormula {
 	 */
 	IVecInt variables();
 	
+	/**
+	 * Gives the VSADS score of a variable in this formula.
+	 *
+	 * @param variable The variable to get the score of.
+	 *
+	 * @return The score of the variable.
+	 */
 	double score(int variable);
 
 	/**
-	 * Gives the pseudo-Boolean formula obtained from this formula by satisfying the
+	 * Gives the pseudo-Boolean formula obtained from this formula by assuming the
 	 * given literal.
 	 *
-	 * @param literal The literal to satisfy.
+	 * @param literal The literal to assume.
 	 *
 	 * @return The formula obtained by satisfying {@code literal}.
 	 */
-	PseudoBooleanFormula satisfy(int literal);
+	PseudoBooleanFormula assume(int literal);
+
+    /**
+     * Gives the pseudo-Boolean formula obtained from this formula by assuming the
+     * given literals.
+     *
+     * @param literals The literals to assume.
+     *
+     * @return The formula obtained by satisfying the literals.
+     */
+    PseudoBooleanFormula assume(IVecInt literals);
 
 	/**
 	 * Gives a cutset of this formula, i.e., a set of variables to assign so as to

@@ -55,7 +55,8 @@ final class PBSelectorSolver extends GroupPBSelectorSolver {
     private IVec<IConstr> constraints;
 
     /**
-     * The array associating to each variable the index of the constraints in which it appear.
+     * The array associating to each variable the index of the constraints in which it
+     * appears.
      */
     private IVecInt[] constraintsContainingVariable;
 
@@ -73,7 +74,7 @@ final class PBSelectorSolver extends GroupPBSelectorSolver {
         super(solver);
     }
 
-    /* 
+    /*
      * (non-Javadoc)
      * 
      * @see org.sat4j.tools.SolverDecorator#setExpectedNumberOfClauses(int)
@@ -85,7 +86,7 @@ final class PBSelectorSolver extends GroupPBSelectorSolver {
         this.constraintsContainingVariable = new IVecInt[nVars() + 1];
     }
 
-    /* 
+    /*
      * (non-Javadoc)
      * 
      * @see org.sat4j.tools.SolverDecorator#nConstraints()
@@ -94,11 +95,12 @@ final class PBSelectorSolver extends GroupPBSelectorSolver {
     public int nConstraints() {
         return constraints.size();
     }
-    
-    /* 
+
+    /*
      * (non-Javadoc)
      * 
-     * @see org.sat4j.pb.GroupPBSelectorSolver#addAtLeast(org.sat4j.specs.IVecInt, org.sat4j.specs.IVec, java.math.BigInteger)
+     * @see org.sat4j.pb.GroupPBSelectorSolver#addAtLeast(org.sat4j.specs.IVecInt,
+     * org.sat4j.specs.IVec, java.math.BigInteger)
      */
     @Override
     public IConstr addAtLeast(IVecInt literals, IVec<BigInteger> coeffs, BigInteger degree)
@@ -108,10 +110,11 @@ final class PBSelectorSolver extends GroupPBSelectorSolver {
         return constr;
     }
 
-    /* 
+    /*
      * (non-Javadoc)
      * 
-     * @see org.sat4j.pb.GroupPBSelectorSolver#addAtLeast(org.sat4j.specs.IVecInt, org.sat4j.specs.IVecInt, int)
+     * @see org.sat4j.pb.GroupPBSelectorSolver#addAtLeast(org.sat4j.specs.IVecInt,
+     * org.sat4j.specs.IVecInt, int)
      */
     @Override
     public IConstr addAtLeast(IVecInt literals, IVecInt coeffs, int degree)
@@ -121,10 +124,11 @@ final class PBSelectorSolver extends GroupPBSelectorSolver {
         return constr;
     }
 
-    /* 
+    /*
      * (non-Javadoc)
      * 
-     * @see org.sat4j.pb.GroupPBSelectorSolver#addAtMost(org.sat4j.specs.IVecInt, org.sat4j.specs.IVec, java.math.BigInteger)
+     * @see org.sat4j.pb.GroupPBSelectorSolver#addAtMost(org.sat4j.specs.IVecInt,
+     * org.sat4j.specs.IVec, java.math.BigInteger)
      */
     @Override
     public IConstr addAtMost(IVecInt literals, IVec<BigInteger> coeffs, BigInteger degree)
@@ -134,10 +138,11 @@ final class PBSelectorSolver extends GroupPBSelectorSolver {
         return constr;
     }
 
-    /* 
+    /*
      * (non-Javadoc)
      * 
-     * @see org.sat4j.pb.GroupPBSelectorSolver#addAtMost(org.sat4j.specs.IVecInt, org.sat4j.specs.IVecInt, int)
+     * @see org.sat4j.pb.GroupPBSelectorSolver#addAtMost(org.sat4j.specs.IVecInt,
+     * org.sat4j.specs.IVecInt, int)
      */
     @Override
     public IConstr addAtMost(IVecInt literals, IVecInt coeffs, int degree)
@@ -147,10 +152,11 @@ final class PBSelectorSolver extends GroupPBSelectorSolver {
         return constr;
     }
 
-    /* 
+    /*
      * (non-Javadoc)
      * 
-     * @see org.sat4j.pb.GroupPBSelectorSolver#addExactly(org.sat4j.specs.IVecInt, org.sat4j.specs.IVec, java.math.BigInteger)
+     * @see org.sat4j.pb.GroupPBSelectorSolver#addExactly(org.sat4j.specs.IVecInt,
+     * org.sat4j.specs.IVec, java.math.BigInteger)
      */
     @Override
     public IConstr addExactly(IVecInt literals, IVec<BigInteger> coeffs, BigInteger weight)
@@ -160,10 +166,11 @@ final class PBSelectorSolver extends GroupPBSelectorSolver {
         return constr;
     }
 
-    /* 
+    /*
      * (non-Javadoc)
      * 
-     * @see org.sat4j.pb.GroupPBSelectorSolver#addExactly(org.sat4j.specs.IVecInt, org.sat4j.specs.IVecInt, int)
+     * @see org.sat4j.pb.GroupPBSelectorSolver#addExactly(org.sat4j.specs.IVecInt,
+     * org.sat4j.specs.IVecInt, int)
      */
     @Override
     public IConstr addExactly(IVecInt literals, IVecInt coeffs, int weight)
@@ -173,10 +180,11 @@ final class PBSelectorSolver extends GroupPBSelectorSolver {
         return constr;
     }
 
-    /* 
+    /*
      * (non-Javadoc)
      * 
-     * @see org.sat4j.pb.GroupPBSelectorSolver#addPseudoBoolean(org.sat4j.specs.IVecInt, org.sat4j.specs.IVec, boolean, java.math.BigInteger)
+     * @see org.sat4j.pb.GroupPBSelectorSolver#addPseudoBoolean(org.sat4j.specs.IVecInt,
+     * org.sat4j.specs.IVec, boolean, java.math.BigInteger)
      */
     @Override
     public IConstr addPseudoBoolean(IVecInt literals, IVec<BigInteger> coeffs, boolean moreThan,
@@ -186,7 +194,7 @@ final class PBSelectorSolver extends GroupPBSelectorSolver {
         return constr;
     }
 
-    /* 
+    /*
      * (non-Javadoc)
      * 
      * @see org.sat4j.tools.SolverDecorator#addAllClauses(org.sat4j.specs.IVec)
@@ -198,7 +206,7 @@ final class PBSelectorSolver extends GroupPBSelectorSolver {
         }
     }
 
-    /* 
+    /*
      * (non-Javadoc)
      * 
      * @see org.sat4j.tools.SolverDecorator#addAtLeast(org.sat4j.specs.IVecInt, int)
@@ -210,7 +218,7 @@ final class PBSelectorSolver extends GroupPBSelectorSolver {
         return constr;
     }
 
-    /* 
+    /*
      * (non-Javadoc)
      * 
      * @see org.sat4j.tools.SolverDecorator#addAtMost(org.sat4j.specs.IVecInt, int)
@@ -222,7 +230,7 @@ final class PBSelectorSolver extends GroupPBSelectorSolver {
         return constr;
     }
 
-    /* 
+    /*
      * (non-Javadoc)
      * 
      * @see org.sat4j.tools.SolverDecorator#addBlockingClause(org.sat4j.specs.IVecInt)
@@ -234,7 +242,7 @@ final class PBSelectorSolver extends GroupPBSelectorSolver {
         return constr;
     }
 
-    /* 
+    /*
      * (non-Javadoc)
      * 
      * @see org.sat4j.tools.SolverDecorator#addClause(org.sat4j.specs.IVecInt)
@@ -246,7 +254,7 @@ final class PBSelectorSolver extends GroupPBSelectorSolver {
         return constr;
     }
 
-    /* 
+    /*
      * (non-Javadoc)
      * 
      * @see org.sat4j.tools.SolverDecorator#addExactly(org.sat4j.specs.IVecInt, int)
@@ -258,7 +266,7 @@ final class PBSelectorSolver extends GroupPBSelectorSolver {
         return constr;
     }
 
-    /* 
+    /*
      * (non-Javadoc)
      * 
      * @see org.sat4j.tools.SolverDecorator#addParity(org.sat4j.specs.IVecInt, boolean)
@@ -276,41 +284,45 @@ final class PBSelectorSolver extends GroupPBSelectorSolver {
      */
     private void keepConstraint(IVecInt literals, IConstr constr) {
         int index = constraints.size();
-        int nbConstr = stroreConstraint(constr);
+        int nbConstr = storeConstraint(constr);
         storeVariables(literals, index, nbConstr);
     }
 
     /**
      * Stores a constraint in the structure managing the constraints.
-     * If {@code constr} is a {@link ConstrGroup}, all the constraints are added, instead of just the group.
+     * If {@code constr} is a {@link ConstrGroup}, all the constraints are added, instead
+     * of just the group.
      *
      * @param constr The constraint to store.
      *
      * @return The number of constraints that have been stored.
      */
-    private int stroreConstraint(IConstr constr) {
+    private int storeConstraint(IConstr constr) {
         if (constr instanceof ConstrGroup) {
             // The constraints are retrieved from the group.
             var group = (ConstrGroup) constr;
             int nbConstr = group.size();
+
             for (int i = 0; i < nbConstr; i++) {
                 constraints.push(group.getConstr(i));
             }
-            
+
             return nbConstr;
-        } 
-        
+        }
+
         // Simply adding this (single) constraint.
         constraints.push(constr);
         return 1;
     }
 
     /**
-     * Associates to each variable in {@code literals} some constraints in which it appears.
+     * Associates to each variable in {@code literals} some constraints in which it
+     * appears.
      *
      * @param literals The literals to store.
-     * @param startIndex The index at which the constraint(s) is (are) stored in {@link #constraints}.
-     * @param nbConstr The number of successive constraints containing the variables. 
+     * @param startIndex The index at which the constraint(s) is (are) stored in
+     *        {@link #constraints}.
+     * @param nbConstr The number of successive constraints containing the variables.
      */
     private void storeVariables(IVecInt literals, int startIndex, int nbConstr) {
         for (var it = literals.iterator(); it.hasNext();) {
@@ -318,13 +330,13 @@ final class PBSelectorSolver extends GroupPBSelectorSolver {
             if (constraintsContainingVariable[variable] == null) {
                 constraintsContainingVariable[variable] = new VecInt();
             }
-            
+
             for (int i = startIndex; i < nbConstr + startIndex; i++) {
                 constraintsContainingVariable[variable].push(i);
             }
         }
     }
-    
+
     /**
      * Gives the {@code i}-th constraint in the formula.
      * 
@@ -335,7 +347,7 @@ final class PBSelectorSolver extends GroupPBSelectorSolver {
     public PBConstr getConstraint(int i) {
         return (PBConstr) constraints.get(i);
     }
-    
+
     /**
      * Gives the indices of the constraint containing the given variable.
      *

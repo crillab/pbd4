@@ -58,7 +58,7 @@ final class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
     private final UnitPropagationListener listener;
 
     /**
-     * The variable of this formula.
+     * The variables of this formula.
      */
     private final IVecInt variables;
 
@@ -90,7 +90,8 @@ final class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
     }
 
     /**
-     * Initializes this formula, by retrieving the information from the solver.
+     * Initializes this formula, by retrieving the information from the solver, and sets
+     * up the solver for the future calls.
      */
     private void init() {
         // Configuring the solver.
@@ -141,17 +142,41 @@ final class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
      */
     @Override
     public double score(int variable) {
-        return vsidsScores[variable] + 0.5 * dlcsScores[variable];
+        return score(variable, dlcsScores[variable]);
+    }
+
+    /**
+     * Gives the VSADS score of a variable in this formula.
+     *
+     * @param variable The variable to get the score of.
+     * @param dlcs The DLCS score of the variable.
+     *
+     * @return The score of the variable.
+     */
+    double score(int variable, int dlcs) {
+        return vsidsScores[variable] + 0.5 * dlcs;
     }
 
     /*
      * (non-Javadoc)
      * 
-     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#satisfy(int)
+     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#assume(int)
      */
     @Override
-    public PseudoBooleanFormula satisfy(int literal) {
-        return new SubPseudoBooleanFormula(this, VecInt.of(literal));
+    public PseudoBooleanFormula assume(int literal) {
+        throw new UnsupportedOperationException("This method is only available for sub-formulae!");
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#assume(IVecInt)
+     */
+    @Override
+    public PseudoBooleanFormula assume(IVecInt literals) {
+        return SubPseudoBooleanFormulaBuilder.of(this)
+                .newAssumptions(literals)
+                .build();
     }
 
     /*
@@ -161,7 +186,7 @@ final class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
      */
     @Override
     public IVecInt cutset() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("This method is only available for sub-formulae!");
     }
 
     /*
@@ -171,10 +196,10 @@ final class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
      */
     @Override
     public Collection<PseudoBooleanFormula> connectedComponents() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("This method is only available for sub-formulae!");
     }
 
-    /* 
+    /*
      * (non-Javadoc)
      * 
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#propagate()
@@ -206,7 +231,7 @@ final class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
      */
     private PropagationOutput internalPropagate(IVecInt assumptions) {
         listener.reset();
-        
+
         try {
             if (solver.isSatisfiable(assumptions)) {
                 // The solver has found a solution.
@@ -224,14 +249,25 @@ final class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
     }
 
     /**
-     * Gives the constraint at the given index in this formula.
-     *
+     * Gives the {@code i}-th constraint in this formula.
+     * 
      * @param i The index of the constraint to get.
      *
-     * @return The {@code i}-the constraint of this formula.
+     * @return The {@code i}-th constraint.
      */
     PBConstr getConstraint(int i) {
         return solver.getConstraint(i);
     }
-    
+
+    /**
+     * Gives the indices of the constraint containing the given variable.
+     *
+     * @param variable The variable to consider.
+     *
+     * @return The indices of the constraints containing {@code variable}.
+     */
+    IVecInt getConstraintsContaining(int v) {
+        return solver.getConstraintsContaining(v);
+    }
+
 }
