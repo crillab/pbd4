@@ -260,7 +260,7 @@ final class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
     }
 
     /**
-     * Gives the indices of the constraint containing the given variable.
+     * Gives the indices of the constraints containing the given variable.
      *
      * @param variable The variable to consider.
      *

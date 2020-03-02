@@ -22,7 +22,6 @@ package fr.univartois.cril.pbd4.pbc;
 
 import java.math.BigInteger;
 import java.util.BitSet;
-import java.util.OptionalInt;
 
 import org.sat4j.core.LiteralsUtils;
 import org.sat4j.core.VecInt;
@@ -41,11 +40,6 @@ final class SubPseudoBooleanFormulaBuilder {
      * The original formula, from which the sub-formula is extracted.
      */
     private final OriginalPseudoBooleanFormula original;
-
-    /**
-     * The literal on which a decision has been made (if any).
-     */
-    private OptionalInt decision;
 
     /**
      * The assumptions that have been made to create the initial formula.
@@ -95,7 +89,6 @@ final class SubPseudoBooleanFormulaBuilder {
      */
     private SubPseudoBooleanFormulaBuilder(OriginalPseudoBooleanFormula original) {
         this.original = original;
-        this.decision = OptionalInt.empty();
         this.initialAssumptions = VecInt.EMPTY;
         this.newAssumptions = VecInt.EMPTY;
         this.possibleVariables = original.variables();
@@ -130,18 +123,8 @@ final class SubPseudoBooleanFormulaBuilder {
      * @return This builder.
      */
     SubPseudoBooleanFormulaBuilder decision(int literal) {
-        this.decision = OptionalInt.of(literal);
         this.newAssumptions = VecInt.of(literal);
         return this;
-    }
-
-    /**
-     * Gives the literal that is satisfied by the decision (if any).
-     * 
-     * @return The literal on which a decision has been made.
-     */
-    OptionalInt getDecision() {
-        return decision;
     }
 
     /**
@@ -348,9 +331,9 @@ final class SubPseudoBooleanFormulaBuilder {
      */
     private boolean variableAppears(int variable) {
         var posLit = LiteralsUtils.posLit(variable);
-        var negLit = LiteralsUtils.posLit(variable);
+        var negLit = LiteralsUtils.negLit(variable);
 
-        if (getSatisfiedLiterals().get(posLit) ||getSatisfiedLiterals().get(negLit)) {
+        if (getSatisfiedLiterals().get(posLit) || getSatisfiedLiterals().get(negLit)) {
             // This variable is assigned, so it does not appear in the formula anymore.
             return false;
         }

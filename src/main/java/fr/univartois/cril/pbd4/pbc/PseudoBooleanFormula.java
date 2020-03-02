@@ -110,5 +110,14 @@ public interface PseudoBooleanFormula {
 	 * @return The output of the propagation.
 	 */
 	PropagationOutput propagate();
+	
+	/**
+	 * Performs some operations when this formula is being cached, so as to clean up memory.
+	 *
+	 * @implSpec The default implementation does nothing.
+	 */
+	default void onCaching() {
+	    // Nothing to do by default.
+	}
 
 }

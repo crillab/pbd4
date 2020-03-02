@@ -1,7 +1,7 @@
 /**
- * The {@code fr.univartois.cril.pbd4.hypergraph} package provides the
- * representation of the hypergraphs associated to a pseudo-Boolean formula to compile and
- * their partitioning with JKaHyPar.
+ * The {@code fr.univartois.cril.pbd4.hypergraph} package provides the representation of
+ * the hypergraph associated to an input pseudo-Boolean formula to compile and classes for
+ * manipulating this representation.
  *
  * @author Romain WALLON
  *

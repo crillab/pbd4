@@ -1,6 +1,6 @@
 /**
  * PBD4, a pseudo-Boolean based implementation of the D4 compiler.
- * Copyright (c) 2020 - Romain WALLON.
+ * Copyright (c) 2020 - Univ Artois & CNRS.
  * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -20,193 +20,143 @@
 
 package fr.univartois.cril.pbd4.hypergraph;
 
-import org.sat4j.core.LiteralsUtils;
+import static fr.univartois.cril.jkahypar.hypergraph.HypergraphBuilder.createHypergraph;
+import static fr.univartois.cril.jkahypar.hypergraph.UnweightedHyperedge.joining;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.sat4j.core.VecInt;
-import org.sat4j.specs.Constr;
-import org.sat4j.specs.IConstr;
 import org.sat4j.specs.IVecInt;
 
 import fr.univartois.cril.jkahypar.hypergraph.HypergraphBuilder;
 
-import static fr.univartois.cril.jkahypar.hypergraph.HypergraphBuilder.createHypergraph;
-import static fr.univartois.cril.jkahypar.hypergraph.UnweightedHyperedge.joining;
-
 /**
- * The DualHypergraphBuilder allows to build the dual hypergraph of a pseudo-Boolean
- * formula.
+ * The DualHypergraphBuilder allows to build the dual hypergraph associated to a
+ * {@link Hypergraphable}.
  *
  * @author Romain WALLON
  *
  * @version 0.1.0
  */
-public final class DualHypergraphBuilder implements PseudoBooleanFormulaHypergraphBuilder {
+public final class DualHypergraphBuilder {
 
     /**
-     * The constraints of the formula.
+     * The {@link Hypergraphable} to build the dual hypergraph of.
      */
-    private IConstr[] constraints;
+    private final Hypergraphable hypergraphable;
 
     /**
-     * The identifier of the next constraint.
+     * The current hyperedge identifier.
      */
-    private int nextIdentifier;
+    private int currentHyperedgeIdentifier = 0;
 
     /**
-     * The array storing, for each variable, the identifiers of the constraints in which
-     * it appears.
+     * The map associating a hyperedge identifier to the variable it represents.
      */
-    private IVecInt[] constraintsContainingVariable;
+    private final Map<Integer, Integer> identifierToVariable;
 
     /**
-     * The array storing, for each constraint, the identifiers of the hyperedges in which
-     * it appears.
+     * The current vertex identifier.
      */
-    private IVecInt[] hyperedgesContainingConstraint;
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * fr.univartois.cril.pbd4.input.hypergraph.PseudoBooleanFormulaHypergraphBuilder#
-     * setNumberOfVariables(int)
-     */
-    @Override
-    public void setNumberOfVariables(int numberOfVariables) {
-        this.constraintsContainingVariable = new IVecInt[numberOfVariables + 1];
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * fr.univartois.cril.pbd4.input.hypergraph.PseudoBooleanFormulaHypergraphBuilder#
-     * setNumberOfConstraints(int)
-     */
-    @Override
-    public void setNumberOfConstraints(int numberOfConstraints) {
-        this.constraints = new IConstr[numberOfConstraints];
-        this.hyperedgesContainingConstraint = new IVecInt[numberOfConstraints];
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * fr.univartois.cril.pbd4.input.hypergraph.PseudoBooleanFormulaHypergraphBuilder#
-     * addConstraint(org.sat4j.specs.IConstr, org.sat4j.specs.IVecInt)
-     */
-    @Override
-    public void addConstraint(IConstr constraint, IVecInt literals) {
-        // Storing the constraint.
-        constraints[nextIdentifier] = constraint;
-
-        // Updating the pre-hypergraph.
-        for (var it = literals.iterator(); it.hasNext();) {
-            int variable = LiteralsUtils.var(it.next());
-            addConstraintContainingVariable(variable);
-        }
-
-        // Moving to the next identifier.
-        nextIdentifier++;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * fr.univartois.cril.pbd4.input.hypergraph.PseudoBooleanFormulaHypergraphBuilder#
-     * addConstraint(org.sat4j.specs.Constr)
-     */
-    @Override
-    public void addConstraint(Constr constraint) {
-        // Storing the constraint.
-        constraints[nextIdentifier] = constraint;
-
-        // Updating the pre-hypergraph.
-        for (int i = 0; i < constraint.size(); i++) {
-            int variable = LiteralsUtils.var(constraint.get(i));
-            addConstraintContainingVariable(variable);
-        }
-
-        // Moving to the next identifier.
-        nextIdentifier++;
-    }
+    private int currentVertexIdentifier;
 
     /**
-     * Adds the current constraint as containing the given variable.
+     * The map associating a constraint to the vertex identifier which represents it.
+     */
+    private final Map<Integer, Integer> constraintToIdentifier;
+
+    /**
+     * The map associating a vertex identifier to the constraint it represents.
+     */
+    private final Map<Integer, Integer> identifierToConstraint;
+
+    /**
+     * The identifiers of the variables appearing in each constraint.
+     */
+    private final IVecInt[] variablesAppearingInConstraint;
+
+    /**
+     * The builder used to build the hypergraph.
+     */
+    private final HypergraphBuilder builder;
+
+    /**
+     * Creates a new DualHypergraphBuilder.
      *
-     * @param variable The variable to add a constraint to.
+     * @param hypergraphable The {@link Hypergraphable} to build the dual hypergraph of.
      */
-    private void addConstraintContainingVariable(int variable) {
-        var vec = constraintsContainingVariable[variable];
-
-        if (vec == null) {
-            vec = new VecInt();
-            constraintsContainingVariable[variable] = vec;
-        }
-
-        vec.push(nextIdentifier);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * fr.univartois.cril.pbd4.input.hypergraph.PseudoBooleanFormulaHypergraphBuilder#
-     * build()
-     */
-    @Override
-    public PseudoBooleanFormulaHypergraph build() {
-        var builder = createHypergraph(constraints.length, constraintsContainingVariable.length - 1);
-
-        // Adding the hyperedges.
-        for (int v = 1; v < constraintsContainingVariable.length; v++) {
-            var constraintsWithV = constraintsContainingVariable[v];
-            addHyperedge(builder, constraintsWithV);
-            associate(v - 1, constraintsWithV);
-        }
-
-        return new DualHypergraph(constraints,
-                builder.build(), hyperedgesContainingConstraint);
+    DualHypergraphBuilder(Hypergraphable hypergraphable) {
+        this.hypergraphable = hypergraphable;
+        this.identifierToVariable = new HashMap<>();
+        this.constraintToIdentifier = new HashMap<>();
+        this.identifierToConstraint = new HashMap<>();
+        this.variablesAppearingInConstraint = new IVecInt[hypergraphable.numberOfConstraints() + 1];
+        this.builder = createHypergraph(
+                hypergraphable.numberOfConstraints(),
+                hypergraphable.numberOfVariables());
     }
 
     /**
-     * Adds a hyperedge joining the given vertices to the hypergraph built by the given
-     * builder.
-     * 
-     * @param builder The builder used to build the hypergraph.
-     * @param vertices The vertices joined by the hyperedge to add.
-     */
-    private void addHyperedge(HypergraphBuilder builder, IVecInt vertices) {
-        if (vertices == null) {
-            builder.withHyperedge(joining());
-            return;
-        }
-
-        int[] asArray = new int[vertices.size()];
-        vertices.copyTo(asArray);
-        builder.withHyperedge(joining(asArray));
-    }
-
-    /**
-     * Associates the given constraints to a hyperedge joining them in
-     * {@link #hyperedgesContainingConstraint}.
+     * Builds the dual hypergraph representing the associate {@link Hypergraphable}.
      *
-     * @param hyperedgeId The identifier of the hyperedge joining the constraints.
-     * @param joinedConstraints The constraints joined by the hyperedge.
+     * @return The built hypergraph.
      */
-    private void associate(int hyperedgeId, IVecInt joinedConstraints) {
-        for (var it = joinedConstraints.iterator(); it.hasNext();) {
-            int constraintId = it.next();
-            var vec = hyperedgesContainingConstraint[constraintId];
+    DualHypergraph build() {
+        for (var it = hypergraphable.variables().iterator(); it.hasNext();) {
+            var variable = it.next();
+            identifierToVariable.put(variable, ++currentHyperedgeIdentifier);
+            addHyperedge(variable);
+        }
+        
+        return new DualHypergraph(builder.build(), variablesAppearingInConstraint, 
+                identifierToVariable, identifierToConstraint);
+    }
 
-            if (vec == null) {
-                vec = new VecInt();
-                hyperedgesContainingConstraint[constraintId] = vec;
+    /**
+     * Adds a hyperedge representing the given variable to the hypergraph.
+     *
+     * @param variable The variable for which a hyperedge must be added.
+     */
+    private void addHyperedge(int variable) {
+        int index = 0;
+        int[] constraints = new int[hypergraphable.numberOfConstraintsContaining(variable)];
+
+        // Adding each active constraint to the hyperedge.
+        for (var it = hypergraphable.constraintsContaining(variable).iterator(); it.hasNext();) {
+            var constr = it.next();
+
+            if (hypergraphable.isActive(constr)) {
+                int constraintId = getVertexIdentifier(constr);
+                constraints[index] = constraintId;
+                variablesAppearingInConstraint[constraintId].push(currentHyperedgeIdentifier);
+                index++;
             }
-
-            vec.push(hyperedgeId);
         }
+
+        // Actually adding the hyperedge.
+        builder.withHyperedge(joining(constraints));
+    }
+
+    /**
+     * Gives the vertex identifier which represents a given constraint.
+     * 
+     * @param constraint The constraint to get the identifier of.
+     *
+     * @return The vertex identifier representing the constraint.
+     */
+    private int getVertexIdentifier(int constraint) {
+        var identifier = constraintToIdentifier.get(constraint);
+
+        if (identifier == null) {
+            // This constraint does not have an identifier yet.
+            identifier = ++currentVertexIdentifier;
+            constraintToIdentifier.put(constraint, identifier);
+            identifierToConstraint.put(identifier, constraint);
+            variablesAppearingInConstraint[identifier] = new VecInt();
+        }
+
+        return identifier;
     }
 
 }
