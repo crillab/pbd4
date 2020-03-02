@@ -22,6 +22,7 @@ package fr.univartois.cril.pbd4.pbc;
 
 import java.math.BigInteger;
 import java.util.BitSet;
+import java.util.OptionalInt;
 
 import org.sat4j.core.LiteralsUtils;
 import org.sat4j.core.VecInt;
@@ -42,6 +43,11 @@ final class SubPseudoBooleanFormulaBuilder {
     private final OriginalPseudoBooleanFormula original;
 
     /**
+     * The literal on which a decision has been made (if any).
+     */
+    private OptionalInt decision;
+
+    /**
      * The assumptions that have been made to create the initial formula.
      */
     private IVecInt initialAssumptions;
@@ -50,7 +56,6 @@ final class SubPseudoBooleanFormulaBuilder {
      * The assumptions that have been added to create the new sub-formula.
      */
     private IVecInt newAssumptions;
-
     /**
      * The whole set of assumptions, characterizing the new sub-formula.
      */
@@ -123,8 +128,18 @@ final class SubPseudoBooleanFormulaBuilder {
      * @return This builder.
      */
     SubPseudoBooleanFormulaBuilder decision(int literal) {
+        this.decision = OptionalInt.of(literal);
         this.newAssumptions = VecInt.of(literal);
         return this;
+    }
+
+    /**
+     * Gives the literal that is satisfied by the decision (if any).
+     * 
+     * @return The literal on which a decision has been made.
+     */
+    OptionalInt getDecision() {
+        return decision;
     }
 
     /**

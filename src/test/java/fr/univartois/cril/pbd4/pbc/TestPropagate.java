@@ -66,7 +66,8 @@ public final class TestPropagate extends AbstractTestPseudoBooleanSolving {
         assertEquals(2, sf.numberOfConstraints());
         var res3 = fNot12.propagate();
 		var propagatedLit2 = res3.getPropagatedLiterals();
-		assertEquals(3, propagatedLit2.size());
+		System.out.println(propagatedLit2);
+		assertEquals(2, propagatedLit2.size());
 		assertTrue(propagatedLit2.contains(3));
         assertTrue(res3.isSatisfiable());
     }

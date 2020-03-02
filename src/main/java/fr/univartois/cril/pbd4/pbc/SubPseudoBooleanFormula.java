@@ -23,6 +23,7 @@ package fr.univartois.cril.pbd4.pbc;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.OptionalInt;
 
 import org.sat4j.core.VecInt;
 import org.sat4j.specs.IVecInt;
@@ -44,6 +45,11 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula, Hypergrapha
      * The original formula, from which this sub-formula has been extracted.
      */
     private final OriginalPseudoBooleanFormula decorated;
+
+    /**
+     * The literal on which a decision has been made (if any).
+     */
+    private final OptionalInt decision;
     
     /**
      * The dual hypergraph associated to this sub-formula.
@@ -83,6 +89,7 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula, Hypergrapha
      */
     SubPseudoBooleanFormula(SubPseudoBooleanFormulaBuilder builder) {
         this.decorated = builder.getOriginalFormula();
+        this.decision = builder.getDecision();
         this.assumptions = builder.getAssumptions();
         this.satisfiedLiterals = builder.getSatisfiedLiterals();
         this.inactiveConstraints = builder.getInactiveConstraints();
@@ -270,8 +277,23 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula, Hypergrapha
      */
     @Override
     public PropagationOutput propagate() {
-        var effectiveAssumptions = computeAssumptions();
-        return decorated.propagate(effectiveAssumptions);
+        // Applying BCP to the formula with the assumptions characterizing this sub-formula.
+        var output = decorated.propagate(computeAssumptions());
+
+        if (output.isUnsatisfiable()) {
+            // There is nothing more to do.
+            return output;
+        }
+
+        // The decision, if any, must be added to the propagated literals.
+        var propagatedLiterals = output.getPropagatedLiterals();
+        decision.ifPresent(propagatedLiterals::push);
+
+        // Returning the appropriate output.
+        if (output.isSatisfiable()) {
+            return PropagationOutput.satisfiable(propagatedLiterals);
+        }
+        return PropagationOutput.unknown(propagatedLiterals, this);
     }
 
     /**
