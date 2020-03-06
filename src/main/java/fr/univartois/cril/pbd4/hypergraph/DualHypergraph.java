@@ -28,10 +28,9 @@ import org.sat4j.specs.IVecInt;
 import fr.univartois.cril.jkahypar.hypergraph.Hypergraph;
 
 /**
- * The DualHypergraph represents the dual hypergraph of a {@link Hypergraphable}, i.e. the
- * hypergraph in which the vertices are constraints and the hyperedges represents a
- * variable shared
- * between the constraints joined by this hyperedge.
+ * The DualHypergraph represents the dual hypergraph of a {@link Hypergraphable}, i.e.,
+ * the hypergraph in which the vertices are constraints and a hyperedge represents a
+ * variable shared between the constraints joined by this hyperedge.
  *
  * @author Romain WALLON
  *

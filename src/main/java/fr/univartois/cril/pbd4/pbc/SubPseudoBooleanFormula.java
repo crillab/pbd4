@@ -60,7 +60,12 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula, Hypergrapha
      * The assumptions that have been made to create this sub-formula.
      */
     private final IVecInt assumptions;
-
+    
+    /**
+     * The number of variables that have been removed at the current step.
+     */
+    private int latestRemovedVariables;
+    
     /**
      * The literals that have been satisfied.
      */
@@ -91,6 +96,7 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula, Hypergrapha
         this.decorated = builder.getOriginalFormula();
         this.decision = builder.getDecision();
         this.assumptions = builder.getAssumptions();
+        this.latestRemovedVariables = builder.getLatestRemovedVariables();
         this.satisfiedLiterals = builder.getSatisfiedLiterals();
         this.inactiveConstraints = builder.getInactiveConstraints();
         this.variables = builder.getVariables();
@@ -201,6 +207,17 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula, Hypergrapha
                 .build();
     }
 
+    /* 
+     * (non-Javadoc)
+     * 
+     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#requirePartitioning()
+     */
+    @Override
+    public boolean requirePartitioning() {
+        // A partition is recomputed when more than 10% of the variables have been assigned.
+        return (10 * latestRemovedVariables) >= (latestRemovedVariables + numberOfVariables());
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -251,6 +268,7 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula, Hypergrapha
         // Creating the sub-formula.
         return SubPseudoBooleanFormulaBuilder.of(decorated)
                 .initialAssumptions(assumptions)
+                .previousRemovedVariables(latestRemovedVariables)
                 .satisfiedLiterals((BitSet) satisfiedLiterals.clone())
                 .inactiveConstraints(subInactiveConstraints)
                 .possibleVariable(variables)

@@ -179,6 +179,16 @@ final class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
                 .build();
     }
 
+    /* 
+     * (non-Javadoc)
+     * 
+     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#requirePartitioning()
+     */
+    @Override
+    public boolean requirePartitioning() {
+        throw new UnsupportedOperationException("This method is only available for sub-formulae!");
+    }
+
     /*
      * (non-Javadoc)
      * 

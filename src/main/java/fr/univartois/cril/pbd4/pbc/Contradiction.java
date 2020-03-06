@@ -119,6 +119,16 @@ public final class Contradiction implements PseudoBooleanFormula {
         return this;
     }
 
+    /* 
+     * (non-Javadoc)
+     * 
+     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#requirePartitioning()
+     */
+    @Override
+    public boolean requirePartitioning() {
+        return false;
+    }
+
     /*
      * (non-Javadoc)
      * 
