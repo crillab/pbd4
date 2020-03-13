@@ -43,9 +43,9 @@ public abstract class AbstractTestPseudoBooleanSolving {
      *
      * @throws UncheckedIOException If an I/O error occurs while reading.
      */
-    protected PseudoBooleanFormula readCnf(String filename) {
+    protected OriginalPseudoBooleanFormula readCnf(String filename) {
         try (var input = getClass().getResourceAsStream("/cnf/" + filename)) {
-            return PseudoBooleanFormulaReader.readCnf(input);
+            return (OriginalPseudoBooleanFormula) PseudoBooleanFormulaReader.readCnf(input);
 
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -62,9 +62,9 @@ public abstract class AbstractTestPseudoBooleanSolving {
      *
      * @throws UncheckedIOException If an I/O error occurs while reading.
      */
-    protected PseudoBooleanFormula readOpb(String filename) {
+    protected OriginalPseudoBooleanFormula readOpb(String filename) {
         try (var input = getClass().getResourceAsStream("/opb/" + filename)) {
-            return PseudoBooleanFormulaReader.readOpb(input);
+            return (OriginalPseudoBooleanFormula) PseudoBooleanFormulaReader.readOpb(input);
 
         } catch (IOException e) {
             throw new UncheckedIOException(e);
