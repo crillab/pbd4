@@ -20,21 +20,24 @@
 
 package fr.univartois.cril.pbd4.pbc;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.sat4j.core.LiteralsUtils;
 
 /**
- * The TestReadFormula is a JUnit test case testing the reading of input pseudo-Boolean
- * formulae with {@link PseudoBooleanFormulaReader}.
+ * The TestReadCnfFormula is a JUnit test case testing the reading of input pseudo-Boolean
+ * formulae in Conjunctive Normal Form (CNF) using {@link PseudoBooleanFormulaReader}.
  *
  * @author Romain WALLON
  *
  * @version 0.1.0
  */
-public final class TestReadFormula extends AbstractTestPseudoBooleanSolving {
+@DisplayName("Pseudo-Boolean formulae are properly read from a CNF input stream.")
+public final class TestReadCnfFormula extends AbstractTestPseudoBooleanSolving {
 
     /**
      * Tests that the CNF formula is properly read from the file {@code example-1.cnf}.
@@ -47,7 +50,7 @@ public final class TestReadFormula extends AbstractTestPseudoBooleanSolving {
         // Checking the variables of the formula.
         assertEquals(4, formula.numberOfVariables());
 
-        // The selectors must not appear.
+        // The selectors must not appear in the variables.
         var variables = formula.variables();
         assertEquals(4, variables.size());
         assertTrue(variables.contains(1));
