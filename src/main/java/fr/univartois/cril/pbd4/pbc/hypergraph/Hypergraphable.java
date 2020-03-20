@@ -18,7 +18,7 @@
  * If not, see {@link http://www.gnu.org/licenses}.
  */
 
-package fr.univartois.cril.pbd4.hypergraph;
+package fr.univartois.cril.pbd4.pbc.hypergraph;
 
 import org.sat4j.specs.IVecInt;
 

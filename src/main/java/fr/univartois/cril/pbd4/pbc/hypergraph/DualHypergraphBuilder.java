@@ -18,7 +18,7 @@
  * If not, see {@link http://www.gnu.org/licenses}.
  */
 
-package fr.univartois.cril.pbd4.hypergraph;
+package fr.univartois.cril.pbd4.pbc.hypergraph;
 
 import static fr.univartois.cril.jkahypar.hypergraph.HypergraphBuilder.createHypergraph;
 import static fr.univartois.cril.jkahypar.hypergraph.UnweightedHyperedge.joining;
