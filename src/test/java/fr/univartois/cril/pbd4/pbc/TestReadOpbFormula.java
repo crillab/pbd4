@@ -379,4 +379,174 @@ public final class TestReadOpbFormula extends AbstractTestPseudoBooleanSolving {
         assertEquals(BigInteger.valueOf(3), constraint4.getDegree());
     }
 
+    /**
+     * Tests that the OPB formula is properly read from the file {@code example-3.opb}.
+     */
+    @Test
+    @DisplayName("The OPB formula 'example-3.opb' is properly read.")
+    public void testExample3() {
+        var formula = readOpb("example-3.opb");
+        
+        // Checking the variables of the formula.
+        assertEquals(11, formula.numberOfVariables());
+
+        // The selectors must not appear in the variables.
+        var variables = formula.variables();
+        assertEquals(11, variables.size());
+        assertTrue(variables.contains(1));
+        assertTrue(variables.contains(2));
+        assertTrue(variables.contains(3));
+        assertTrue(variables.contains(4));
+        assertTrue(variables.contains(5));
+        assertTrue(variables.contains(6));
+        assertTrue(variables.contains(7));
+        assertTrue(variables.contains(8));
+        assertTrue(variables.contains(9));
+        assertTrue(variables.contains(10));
+        assertTrue(variables.contains(11));
+
+        // Checking the constraints containing the variable 1.
+        var constraintsContaining1 = formula.getConstraintsContaining(1);
+        assertEquals(2, constraintsContaining1.size());
+        assertTrue(constraintsContaining1.contains(0));
+        assertTrue(constraintsContaining1.contains(1));
+
+        // Checking the constraints containing the variable 2.
+        var constraintsContaining2 = formula.getConstraintsContaining(2);
+        assertEquals(3, constraintsContaining2.size());
+        assertTrue(constraintsContaining2.contains(0));
+        assertTrue(constraintsContaining2.contains(2));
+        assertTrue(constraintsContaining2.contains(3));
+
+        // Checking the constraints containing the variable 3.
+        var constraintsContaining3 = formula.getConstraintsContaining(3);
+        assertEquals(3, constraintsContaining3.size());
+        assertTrue(constraintsContaining3.contains(1));
+        assertTrue(constraintsContaining3.contains(4));
+        assertTrue(constraintsContaining3.contains(5));
+
+        // Checking the constraints containing the variable 4.
+        var constraintsContaining4 = formula.getConstraintsContaining(4);
+        assertEquals(1, constraintsContaining4.size());
+        assertTrue(constraintsContaining4.contains(2));
+
+        // Checking the constraints containing the variable 5.
+        var constraintsContaining5 = formula.getConstraintsContaining(5);
+        assertEquals(1, constraintsContaining5.size());
+        assertTrue(constraintsContaining5.contains(2));
+
+        // Checking the constraints containing the variable 6.
+        var constraintsContaining6 = formula.getConstraintsContaining(6);
+        assertEquals(1, constraintsContaining6.size());
+        assertTrue(constraintsContaining6.contains(3));
+
+        // Checking the constraints containing the variable 7.
+        var constraintsContaining7 = formula.getConstraintsContaining(7);
+        assertEquals(1, constraintsContaining7.size());
+        assertTrue(constraintsContaining7.contains(3));
+
+        // Checking the constraints containing the variable 8.
+        var constraintsContaining8 = formula.getConstraintsContaining(8);
+        assertEquals(1, constraintsContaining8.size());
+        assertTrue(constraintsContaining8.contains(4));
+
+        // Checking the constraints containing the variable 9.
+        var constraintsContaining9 = formula.getConstraintsContaining(9);
+        assertEquals(1, constraintsContaining9.size());
+        assertTrue(constraintsContaining9.contains(4));
+
+        // Checking the constraints containing the variable 10.
+        var constraintsContaining10 = formula.getConstraintsContaining(10);
+        assertEquals(1, constraintsContaining10.size());
+        assertTrue(constraintsContaining10.contains(5));
+
+        // Checking the constraints containing the variable 11.
+        var constraintsContaining11 = formula.getConstraintsContaining(11);
+        assertEquals(1, constraintsContaining11.size());
+        assertTrue(constraintsContaining11.contains(5));
+        
+        // Checking the constraints.
+        assertEquals(6, formula.numberOfConstraints());
+
+        // Checking the first constraint.
+        var constraint0 = formula.getConstraint(0);
+        assertEquals(3, constraint0.size());
+        assertEquals(1, LiteralsUtils.toDimacs(constraint0.get(0)));
+        assertEquals(BigInteger.valueOf(1), constraint0.getCoef(0));
+        assertEquals(-2, LiteralsUtils.toDimacs(constraint0.get(1)));
+        assertEquals(BigInteger.valueOf(1), constraint0.getCoef(1));
+        // The remaining literal is a fresh variable, used as a selector.
+        assertEquals(12, LiteralsUtils.toDimacs(constraint0.get(2)));
+        assertEquals(BigInteger.valueOf(1), constraint0.getCoef(2));
+        assertEquals(BigInteger.valueOf(1), constraint0.getDegree());
+
+        // Checking the second constraint.
+        var constraint1 = formula.getConstraint(1);
+        assertEquals(3, constraint1.size());
+        assertEquals(-1, LiteralsUtils.toDimacs(constraint1.get(0)));
+        assertEquals(BigInteger.valueOf(1), constraint1.getCoef(0));
+        assertEquals(3, LiteralsUtils.toDimacs(constraint1.get(1)));
+        assertEquals(BigInteger.valueOf(1), constraint1.getCoef(1));
+        // The remaining literal is a fresh variable, used as a selector.
+        assertEquals(13, LiteralsUtils.toDimacs(constraint1.get(2)));
+        assertEquals(BigInteger.valueOf(1), constraint1.getCoef(2));
+        assertEquals(BigInteger.valueOf(1), constraint1.getDegree());
+
+        // Checking the third constraint.
+        var constraint2 = formula.getConstraint(2);
+        assertEquals(4, constraint2.size());
+        assertEquals(2, LiteralsUtils.toDimacs(constraint2.get(1)));
+        assertEquals(BigInteger.valueOf(1), constraint2.getCoef(1));
+        assertEquals(4, LiteralsUtils.toDimacs(constraint2.get(2)));
+        assertEquals(BigInteger.valueOf(1), constraint2.getCoef(2));
+        assertEquals(-5, LiteralsUtils.toDimacs(constraint2.get(3)));
+        assertEquals(BigInteger.valueOf(1), constraint2.getCoef(3));
+        // The remaining literal is a fresh variable, used as a selector.
+        assertEquals(14, LiteralsUtils.toDimacs(constraint2.get(0)));
+        assertEquals(BigInteger.valueOf(2), constraint2.getCoef(0));
+        assertEquals(BigInteger.valueOf(2), constraint2.getDegree());
+
+        // Checking the fourth constraint.
+        var constraint3 = formula.getConstraint(3);
+        assertEquals(4, constraint3.size());
+        assertEquals(-2, LiteralsUtils.toDimacs(constraint3.get(0)));
+        assertEquals(BigInteger.valueOf(3), constraint3.getCoef(0));
+        assertEquals(-6, LiteralsUtils.toDimacs(constraint3.get(2)));
+        assertEquals(BigInteger.valueOf(2), constraint3.getCoef(2));
+        assertEquals(7, LiteralsUtils.toDimacs(constraint3.get(3)));
+        assertEquals(BigInteger.valueOf(1), constraint3.getCoef(3));
+        // The remaining literal is a fresh variable, used as a selector.
+        assertEquals(15, LiteralsUtils.toDimacs(constraint3.get(1)));
+        assertEquals(BigInteger.valueOf(3), constraint3.getCoef(1));
+        assertEquals(BigInteger.valueOf(3), constraint3.getDegree());
+
+        // Checking the fifth constraint.
+        var constraint4 = formula.getConstraint(4);
+        assertEquals(4, constraint4.size());
+        assertEquals(3, LiteralsUtils.toDimacs(constraint4.get(1)));
+        assertEquals(BigInteger.valueOf(2), constraint4.getCoef(1));
+        assertEquals(8, LiteralsUtils.toDimacs(constraint4.get(2)));
+        assertEquals(BigInteger.valueOf(2), constraint4.getCoef(2));
+        assertEquals(9, LiteralsUtils.toDimacs(constraint4.get(3)));
+        assertEquals(BigInteger.valueOf(1), constraint4.getCoef(3));
+        // The remaining literal is a fresh variable, used as a selector.
+        assertEquals(16, LiteralsUtils.toDimacs(constraint4.get(0)));
+        assertEquals(BigInteger.valueOf(3), constraint4.getCoef(0));
+        assertEquals(BigInteger.valueOf(3), constraint4.getDegree());
+
+        // Checking the sixth constraint.
+        var constraint5 = formula.getConstraint(5);
+        assertEquals(4, constraint5.size());
+        assertEquals(-3, LiteralsUtils.toDimacs(constraint5.get(0)));
+        assertEquals(BigInteger.valueOf(1), constraint5.getCoef(0));
+        assertEquals(10, LiteralsUtils.toDimacs(constraint5.get(1)));
+        assertEquals(BigInteger.valueOf(1), constraint5.getCoef(1));
+        assertEquals(-11, LiteralsUtils.toDimacs(constraint5.get(2)));
+        assertEquals(BigInteger.valueOf(1), constraint5.getCoef(2));
+        // The remaining literal is a fresh variable, used as a selector.
+        assertEquals(17, LiteralsUtils.toDimacs(constraint5.get(3)));
+        assertEquals(BigInteger.valueOf(1), constraint5.getCoef(3));
+        assertEquals(BigInteger.valueOf(1), constraint5.getDegree());
+    }
+
 }
