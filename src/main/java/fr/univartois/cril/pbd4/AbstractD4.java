@@ -113,7 +113,7 @@ public abstract class AbstractD4<T, R> {
         for (var component : simplifiedFormula.connectedComponents()) {
             // Updating the variables to consider.
             var componentVariables = restrict(variables, component.variables());
-            if (componentVariables.isEmpty()) {
+            if (componentVariables.isEmpty() || component.requirePartitioning()) {
                 componentVariables = component.cutset();
             }
 
@@ -128,6 +128,7 @@ public abstract class AbstractD4<T, R> {
         // Computing the result of the conjunction, and caching the result.
         T result = conjunction(nbFreeVariables, propagatedLiterals, conjuncts);
         cache.put(simplifiedFormula, result);
+        simplifiedFormula.onCaching();
         return result;
     }
 

@@ -20,12 +20,16 @@
 
 package fr.univartois.cril.pbd4.pbc;
 
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.OptionalInt;
 
 import org.sat4j.core.VecInt;
 import org.sat4j.specs.IVecInt;
+
+import fr.univartois.cril.pbd4.hypergraph.DualHypergraph;
+import fr.univartois.cril.pbd4.hypergraph.Hypergraphable;
 
 /**
  * The SubPseudoBooleanFormula represents a sub-part of a pseudo-Boolean formula that is
@@ -35,7 +39,7 @@ import org.sat4j.specs.IVecInt;
  *
  * @version 0.1.0
  */
-final class SubPseudoBooleanFormula implements PseudoBooleanFormula {
+final class SubPseudoBooleanFormula implements PseudoBooleanFormula, Hypergraphable {
 
     /**
      * The original formula, from which this sub-formula has been extracted.
@@ -46,12 +50,22 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula {
      * The literal on which a decision has been made (if any).
      */
     private final OptionalInt decision;
+    
+    /**
+     * The dual hypergraph associated to this sub-formula.
+     */
+    private DualHypergraph hypergraph;
 
     /**
      * The assumptions that have been made to create this sub-formula.
      */
     private final IVecInt assumptions;
-
+    
+    /**
+     * The number of variables that have been removed at the current step.
+     */
+    private int latestRemovedVariables;
+    
     /**
      * The literals that have been satisfied.
      */
@@ -68,10 +82,11 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula {
     private final IVecInt variables;
 
     /**
-     * The DLCS scores of the variables, updated w.r.t. the constraints in this sub-formula.
+     * The DLCS scores of the variables, updated w.r.t. the constraints in this
+     * sub-formula.
      */
     private final int[] updatedDlcsScores;
-    
+
     /**
      * Creates a new SubPseudoBooleanFormula.
      *
@@ -81,6 +96,7 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula {
         this.decorated = builder.getOriginalFormula();
         this.decision = builder.getDecision();
         this.assumptions = builder.getAssumptions();
+        this.latestRemovedVariables = builder.getLatestRemovedVariables();
         this.satisfiedLiterals = builder.getSatisfiedLiterals();
         this.inactiveConstraints = builder.getInactiveConstraints();
         this.variables = builder.getVariables();
@@ -120,6 +136,38 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula {
     /*
      * (non-Javadoc)
      * 
+     * @see fr.univartois.cril.pbd4.hypergraph.Hypergraphable#isActive(int)
+     */
+    @Override
+    public boolean isActive(int constraint) {
+        return !inactiveConstraints.get(constraint);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * fr.univartois.cril.pbd4.hypergraph.Hypergraphable#numberOfConstraintsContaining(
+     * int)
+     */
+    @Override
+    public int numberOfConstraintsContaining(int variable) {
+        return updatedDlcsScores[variable];
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see fr.univartois.cril.pbd4.hypergraph.Hypergraphable#constraintsContaining(int)
+     */
+    @Override
+    public IVecInt constraintsContaining(int variable) {
+        return decorated.getConstraintsContaining(variable);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#score()
      */
     @Override
@@ -153,10 +201,21 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula {
         return SubPseudoBooleanFormulaBuilder.of(decorated)
                 .initialAssumptions(assumptions)
                 .satisfiedLiterals((BitSet) satisfiedLiterals.clone())
-                .inactiveConstraints((BitSet) inactiveConstraints.clone()) 
+                .inactiveConstraints((BitSet) inactiveConstraints.clone())
                 .possibleVariable(variables)
                 .newAssumptions(literals)
                 .build();
+    }
+
+    /* 
+     * (non-Javadoc)
+     * 
+     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#requirePartitioning()
+     */
+    @Override
+    public boolean requirePartitioning() {
+        // A partition is recomputed when more than 10% of the variables have been assigned.
+        return (10 * latestRemovedVariables) >= (latestRemovedVariables + numberOfVariables());
     }
 
     /*
@@ -166,7 +225,9 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula {
      */
     @Override
     public IVecInt cutset() {
-        throw new UnsupportedOperationException();
+        var cutset = hypergraph().cutset();
+        cutset.sort((x, y) -> Double.compare(score(x), score(y)));
+        return cutset;
     }
 
     /*
@@ -176,7 +237,55 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula {
      */
     @Override
     public Collection<PseudoBooleanFormula> connectedComponents() {
-        throw new UnsupportedOperationException();
+        var rawComponents = hypergraph.connectedComponents();
+        var components = new ArrayList<PseudoBooleanFormula>(rawComponents.size());
+        
+        // Computing the actual sub-formulae.
+        for (var it = rawComponents.iterator(); it.hasNext();) {
+            var component = it.next();
+            components.add(computeSubFormula(component));
+        }
+        
+        return components;
+    }
+    
+    /**
+     * Computes the sub-formula containing only the given constraints.
+     *
+     * @param constraints The indices of the constraints appearing in the sub-formula.
+     *
+     * @return The computed sub-formula.
+     */
+    private PseudoBooleanFormula computeSubFormula(IVecInt constraints) {
+        // Computing the constraints that are active in the component.
+        var subInactiveConstraints = new BitSet(decorated.numberOfConstraints());
+        subInactiveConstraints.set(0, decorated.numberOfConstraints());
+        for (var it = constraints.iterator(); it.hasNext();) {
+            var constr = it.next();
+            subInactiveConstraints.set(constr, false);
+        }
+        
+        // Creating the sub-formula.
+        return SubPseudoBooleanFormulaBuilder.of(decorated)
+                .initialAssumptions(assumptions)
+                .previousRemovedVariables(latestRemovedVariables)
+                .satisfiedLiterals((BitSet) satisfiedLiterals.clone())
+                .inactiveConstraints(subInactiveConstraints)
+                .possibleVariable(variables)
+                .build();
+    }
+
+    /**
+     * Computes the dual hypergraph of this sub-formula (unless it has already been computed), and returns it.
+     *
+     * @return The dual hypergraph of this sub-formula.
+     */
+    private DualHypergraph hypergraph() {
+        if (hypergraph == null) {
+            hypergraph = DualHypergraph.of(this);
+        }
+        
+        return hypergraph;
     }
 
     /*
@@ -214,20 +323,31 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula {
         // Copying the true literal assumptions.
         var effectiveAssumptions = new VecInt(assumptions.size() + decorated.numberOfConstraints());
         assumptions.copyTo(effectiveAssumptions);
-        
+
         // Computing the assumptions for the constraint selectors.
         for (int i = 0; i < decorated.numberOfConstraints(); i++) {
             if (inactiveConstraints.get(i)) {
                 // This constraint must be ignored.
-                effectiveAssumptions.push(numberOfVariables() + i + 1);
+                effectiveAssumptions.push(decorated.numberOfVariables() + i + 1);
 
             } else {
                 // This constraint must be considered.
-                effectiveAssumptions.push(-numberOfVariables() - i - 1);
+                effectiveAssumptions.push(-decorated.numberOfVariables() - i - 1);
             }
         }
 
         return effectiveAssumptions;
     }
 
+    /* 
+     * (non-Javadoc)
+     * 
+     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#onCaching()
+     */
+    @Override
+    public void onCaching() {
+        // The hypergraph will not be reused, so we do not keep it.
+        hypergraph = null;
+    }
+    
 }

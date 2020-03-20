@@ -23,6 +23,7 @@ package fr.univartois.cril.pbd4.pbc;
 import java.io.Serializable;
 
 import org.sat4j.core.VecInt;
+import org.sat4j.specs.IConstr;
 import org.sat4j.specs.ISolverService;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.SearchListenerAdapter;
@@ -65,14 +66,14 @@ final class UnitPropagationListener extends SearchListenerAdapter<ISolverService
     	}
     }
 
-    /*
+    /* 
      * (non-Javadoc)
      * 
-     * @see org.sat4j.specs.SearchListenerAdapter#propagating(int)
+     * @see org.sat4j.specs.SearchListenerAdapter#enqueueing(int, org.sat4j.specs.IConstr)
      */
     @Override
-    public void propagating(int p) {
-        if (Math.abs(p) <= numberOfVariables) {
+    public void enqueueing(int p, IConstr reason) {
+        if ((reason != null) && (Math.abs(p) <= numberOfVariables)) {
             propagatedLiterals.push(p);
         }
     }

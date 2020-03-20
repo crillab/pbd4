@@ -1,6 +1,6 @@
 /**
  * PBD4, a pseudo-Boolean based implementation of the D4 compiler.
- * Copyright (c) 2020 - Romain WALLON.
+ * Copyright (c) 2020 - Univ Artois & CNRS.
  * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -20,27 +20,23 @@
 
 package fr.univartois.cril.pbd4.hypergraph;
 
-import org.sat4j.specs.IConstr;
+import java.util.Map;
+
 import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
 
 import fr.univartois.cril.jkahypar.hypergraph.Hypergraph;
 
 /**
- * The DualHypergraph represents the dual hypergraph of a pseudo-Boolean formula, i.e. the
- * hypergraph in which the vertices are the constraints of the formula and a hyperedge
- * represents a variable shared between the constraints joined by this hyperedge.
+ * The DualHypergraph represents the dual hypergraph of a {@link Hypergraphable}, i.e.,
+ * the hypergraph in which the vertices are constraints and a hyperedge represents a
+ * variable shared between the constraints joined by this hyperedge.
  *
  * @author Romain WALLON
  *
  * @version 0.1.0
  */
-public final class DualHypergraph implements PseudoBooleanFormulaHypergraph {
-
-    /**
-     * The constraints of the formula.
-     */
-    private final IConstr[] constraints;
+public final class DualHypergraph {
 
     /**
      * The JKaHyPar representation of the hypergraph.
@@ -48,48 +44,91 @@ public final class DualHypergraph implements PseudoBooleanFormulaHypergraph {
     private final Hypergraph hypergraph;
 
     /**
-     * The array storing, for each constraint, the identifiers of the hyperedges in which
-     * it appears.
+     * The identifiers of the variables appearing in each constraint.
      */
-    private final IVecInt[] hyperedgesContainingConstraint;
+    private final IVecInt[] variablesAppearingInConstraint;
+
+    /**
+     * The map associating a hyperedge identifier to the variable it represents.
+     */
+    private final Map<Integer, Integer> identifierToVariable;
+
+    /**
+     * The map associating a vertex identifier to the constraint it represents.
+     */
+    private final Map<Integer, Integer> identifierToConstraint;
 
     /**
      * Creates a new DualHypergraph.
-     * 
-     * @param constraints The constraints of the formula.
+     *
      * @param hypergraph The JKaHyPar representation of the hypergraph.
-     * @param hyperedgesContainingConstraint The array storing, for each constraint, the
-     *        identifiers of the hyperedges in which it appears.
+     * @param variablesAppearingInConstraint The identifiers of the variables appearing in each constraint.
+     * @param identifierToConstraint The map associating a hyperedge identifier to the variable it represents.
+     * @param identifierToVariable The map associating a vertex identifier to the constraint it represents.
      */
-    public DualHypergraph(IConstr[] constraints, Hypergraph hypergraph,
-            IVecInt[] hyperedgesContainingConstraint) {
-        this.constraints = constraints;
+    DualHypergraph(Hypergraph hypergraph, IVecInt[] variablesAppearingInConstraint,
+            Map<Integer, Integer> identifierToVariable, Map<Integer, Integer> identifierToConstraint) {
         this.hypergraph = hypergraph;
-        this.hyperedgesContainingConstraint = hyperedgesContainingConstraint;
+        this.variablesAppearingInConstraint = variablesAppearingInConstraint;
+        this.identifierToVariable = identifierToVariable;
+        this.identifierToConstraint = identifierToConstraint;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * fr.univartois.cril.pbd4.input.graph.PseudoBooleanFormulaGraph#connectedComponents()
+    /**
+     * Creates a new DualHypergraph.
+     *
+     * @param hypergraphable The {@link Hypergraphable} to create the dual hypergraph of.
+     *
+     * @return The created dual hypergraph.
      */
-    @Override
-    public IVec<IVec<IConstr>> connectedComponents() {
-        var finder = new DualHypergraphConnectedComponentFinder(
-                constraints, hyperedgesContainingConstraint);
-        return null;
+    public static DualHypergraph of(Hypergraphable hypergraphable) {
+        var builder = new DualHypergraphBuilder(hypergraphable);
+        return builder.build();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * fr.univartois.cril.pbd4.input.hypergraph.PseudoBooleanFormulaHypergraph#cutset()
+    /**
+     * Computes the connected components of this hypergraph.
+     * The components are expressed in terms of constraint indices.
+     *
+     * @return The computed components.
      */
-    @Override
+    public IVec<IVecInt> connectedComponents() {
+        var finder = new DualHypergraphConnectedComponentFinder(variablesAppearingInConstraint);
+        var components = finder.connectedComponents();
+
+        for (var it = components.iterator(); it.hasNext();) {
+            var component = it.next();
+            translateForHypergraphable(component, identifierToConstraint);
+        }
+
+        return components;
+    }
+
+    /**
+     * Computes a cutset of this hypergraph.
+     * The cutset is expressed in terms of variables.
+     *
+     * @return The computed cutset.
+     */
     public IVecInt cutset() {
-        return DualHypergraphPartitionFinder.instance().cutsetOf(hypergraph);
+        var cutset = DualHypergraphPartitionFinder.instance().cutsetOf(hypergraph);
+        translateForHypergraphable(cutset, identifierToVariable);
+        return cutset;
+    }
+
+    /**
+     * Translates the content of the given vector into values that can be understood by the
+     * {@link Hypergraphable} for which this dual hypergraph is a representation.
+     *
+     * @param vec The vector to translate.
+     * @param identifiers The map used to retrieve the value associated to an identifier.
+     */
+    private void translateForHypergraphable(IVecInt vec, Map<Integer, Integer> identifiers) {
+        for (int i = 0; i < vec.size(); i++) {
+            int identifier = vec.get(i);
+            int realValue = identifiers.get(identifier);
+            vec.set(i, realValue);
+        }
     }
 
 }

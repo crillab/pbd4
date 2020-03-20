@@ -63,11 +63,6 @@ final class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
     private final IVecInt variables;
 
     /**
-     * The scores of the VSIDS heuristic for each variable.
-     */
-    private final double[] vsidsScores;
-
-    /**
      * The scores of the DLCS heuristic for each variable (i.e., the number of occurrences
      * of each variable in the formula).
      */
@@ -84,7 +79,6 @@ final class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
         this.engine = (ISolverService) solver.getSolvingEngine();
         this.listener = new UnitPropagationListener();
         this.variables = range(1, numberOfVariables() + 1);
-        this.vsidsScores = engine.getVariableHeuristics();
         this.dlcsScores = new int[solver.nVars() + 1];
         init();
     }
@@ -100,7 +94,7 @@ final class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
         ((ICDCL<?>) engine).setOrder(new SubsetVarOrder(new int[0]));
 
         // Computing the DLCS scores.
-        for (int v = 1; v < numberOfVariables(); v++) {
+        for (int v = 1; v <= numberOfVariables(); v++) {
             dlcsScores[v] = solver.getConstraintsContaining(v).size();
         }
     }
@@ -154,7 +148,7 @@ final class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
      * @return The score of the variable.
      */
     double score(int variable, int dlcs) {
-        return vsidsScores[variable] + 0.5 * dlcs;
+        return engine.getVariableHeuristics()[variable] + 0.5 * dlcs;
     }
 
     /*
@@ -177,6 +171,16 @@ final class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
         return SubPseudoBooleanFormulaBuilder.of(this)
                 .newAssumptions(literals)
                 .build();
+    }
+
+    /* 
+     * (non-Javadoc)
+     * 
+     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#requirePartitioning()
+     */
+    @Override
+    public boolean requirePartitioning() {
+        throw new UnsupportedOperationException("This method is only available for sub-formulae!");
     }
 
     /*
@@ -260,7 +264,7 @@ final class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
     }
 
     /**
-     * Gives the indices of the constraint containing the given variable.
+     * Gives the indices of the constraints containing the given variable.
      *
      * @param variable The variable to consider.
      *

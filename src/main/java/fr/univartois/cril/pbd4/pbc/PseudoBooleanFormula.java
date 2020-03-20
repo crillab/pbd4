@@ -87,6 +87,16 @@ public interface PseudoBooleanFormula {
      */
     PseudoBooleanFormula assume(IVecInt literals);
 
+    /**
+     * Checks whether this formula requires a computation of a partition of its
+     * hypergraph.
+     * Such a partitioning is needed when the formula has changed a lot compared to
+     * its parent formula.
+     *
+     * @return Whether this formula requires a partitioning.
+     */
+    boolean requirePartitioning();
+    
 	/**
 	 * Gives a cutset of this formula, i.e., a set of variables to assign so as to
 	 * get a formula that have at least two connected components.
@@ -110,5 +120,14 @@ public interface PseudoBooleanFormula {
 	 * @return The output of the propagation.
 	 */
 	PropagationOutput propagate();
+	
+	/**
+	 * Performs some operations when this formula is being cached, so as to clean up memory.
+	 *
+	 * @implSpec The default implementation does nothing.
+	 */
+	default void onCaching() {
+	    // Nothing to do by default.
+	}
 
 }

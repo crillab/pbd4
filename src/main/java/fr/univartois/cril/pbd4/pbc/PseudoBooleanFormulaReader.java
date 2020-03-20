@@ -60,7 +60,7 @@ public final class PseudoBooleanFormulaReader {
      */
     public static PseudoBooleanFormula read(String path) throws IOException {
         try {
-            var solver = new PBSelectorSolver(SolverFactory.newDefault());
+            var solver = new PBSelectorSolver(SolverFactory.newCuttingPlanes());
             var reader = new PBInstanceReader(solver);
             reader.parseInstance(path);
             return new OriginalPseudoBooleanFormula(solver);
@@ -86,7 +86,7 @@ public final class PseudoBooleanFormulaReader {
      */
     public static PseudoBooleanFormula readCnf(InputStream inputStream) throws IOException {
         try {
-            var solver = new PBSelectorSolver(SolverFactory.newDefault());
+            var solver = new PBSelectorSolver(SolverFactory.newCuttingPlanes());
             var reader = new LecteurDimacs(solver);
             reader.parseInstance(inputStream);
             return new OriginalPseudoBooleanFormula(solver);
@@ -112,7 +112,7 @@ public final class PseudoBooleanFormulaReader {
      */
     public static PseudoBooleanFormula readOpb(InputStream inputStream) throws IOException {
         try {
-            var solver = new PBSelectorSolver(SolverFactory.newDefault());
+            var solver = new PBSelectorSolver(SolverFactory.newCuttingPlanes());
             var reader = new PBInstanceReader(solver);
             reader.parseInstance(inputStream);
             return new OriginalPseudoBooleanFormula(solver);

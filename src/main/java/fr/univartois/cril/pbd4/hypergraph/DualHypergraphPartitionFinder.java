@@ -27,7 +27,7 @@ import fr.univartois.cril.jkahypar.KahyparContext;
 import fr.univartois.cril.jkahypar.hypergraph.Hypergraph;
 
 /**
- * The DualHypergraphPartitionFinder allows to compute a partition of a hypergraph.
+ * The DualHypergraphPartitionFinder allows to compute a partition of a dual hypergraph.
  * 
  * The system property {@code kahypar.config} must have been set to a INI file containing
  * the configuration for JKaHyPar to be able to compute partitions.
@@ -84,15 +84,18 @@ final class DualHypergraphPartitionFinder {
         int[] vertices = hypergraph.getHyperedgeVertices();
         var cutset = new VecInt();
 
+        // Looking for hyperedges in the cutset.
         for (int i = 0; i < hypergraph.getNumberOfHyperedges(); i++) {
             long[] hyperedgeIndices = hypergraph.getHyperedgeIndices();
             int begin = (int) hyperedgeIndices[i];
             int end = (int) hyperedgeIndices[i + 1];
 
-            // Copying the vertices, considering that vertices are currently shifted.
+            // Comparing the block of the different vertices.
             int first = partition.blockOf(vertices[begin]);
             for (int j = begin + 1; j < end; j++) {
                 if (partition.blockOf(vertices[j]) != first) {
+                    // The hyperedge joins two vertices that are in different blocks.
+                    // It is thus in the cutset.
                     cutset.push(i + 1);
                     break;
                 }

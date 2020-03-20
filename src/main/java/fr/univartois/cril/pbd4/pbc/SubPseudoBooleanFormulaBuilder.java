@@ -56,7 +56,17 @@ final class SubPseudoBooleanFormulaBuilder {
      * The assumptions that have been added to create the new sub-formula.
      */
     private IVecInt newAssumptions;
-
+    
+    /**
+     * The number of variables that have been removed at the previous step.
+     */
+    private int previousRemovedVariables;
+    
+    /**
+     * The number of variables that have been removed at the current step.
+     */
+    private int latestRemovedVariables;
+    
     /**
      * The whole set of assumptions, characterizing the new sub-formula.
      */
@@ -95,7 +105,6 @@ final class SubPseudoBooleanFormulaBuilder {
      */
     private SubPseudoBooleanFormulaBuilder(OriginalPseudoBooleanFormula original) {
         this.original = original;
-        this.decision = OptionalInt.empty();
         this.initialAssumptions = VecInt.EMPTY;
         this.newAssumptions = VecInt.EMPTY;
         this.possibleVariables = original.variables();
@@ -132,6 +141,7 @@ final class SubPseudoBooleanFormulaBuilder {
     SubPseudoBooleanFormulaBuilder decision(int literal) {
         this.decision = OptionalInt.of(literal);
         this.newAssumptions = VecInt.of(literal);
+        this.latestRemovedVariables = 1;
         return this;
     }
 
@@ -165,7 +175,29 @@ final class SubPseudoBooleanFormulaBuilder {
      */
     SubPseudoBooleanFormulaBuilder newAssumptions(IVecInt assumptions) {
         this.newAssumptions = assumptions;
+        this.latestRemovedVariables = assumptions.size();
         return this;
+    }
+
+    /**
+     * Sets the number of variables that have been removed at the previous step.
+     *
+     * @param previousRemovedVariables The number of variables that have been removed at the previous step.
+     *
+     * @return This builder.
+     */
+    public SubPseudoBooleanFormulaBuilder previousRemovedVariables(int previousRemovedVariables) {
+        this.previousRemovedVariables = previousRemovedVariables;
+        return this;
+    }
+
+    /**
+     * Gives the number of variables that have been removed at the current step.
+     *
+     * @return The number of variables that have been removed at the current step.
+     */
+    public int getLatestRemovedVariables() {
+        return latestRemovedVariables;
     }
 
     /**
@@ -326,45 +358,69 @@ final class SubPseudoBooleanFormulaBuilder {
     }
 
     /**
-     * Computes the variables appearing in the sub-formula.
+     * Computes the variables appearing in the sub-formula, and thos that have been removed
      */
     private void updateVariables() {
-        variables = new VecInt(possibleVariables.size());
+        // Counting the number of variables that have been removed at the previous step.
+        for (int i = initialAssumptions.size() - previousRemovedVariables; i < initialAssumptions.size(); i++) {
+            var variable = Math.abs(initialAssumptions.get(i));
+            if (countOccurrences(variable) > 0) {
+                latestRemovedVariables++;
+            }
+        }
 
+        // Collecting the variables that remain in this formula.
+        variables = new VecInt(possibleVariables.size());
         for (var it = possibleVariables.iterator(); it.hasNext();) {
             var variable = it.next();
-            if (variableAppears(variable)) {
+
+            if (isAssigned(variable)) {
+                // This variable does not appear anymore in the formula.
+                continue;
+            }
+
+            // Counting the occurrences of the variable in the remaining constraints.
+            var occurrences = countOccurrences(variable);
+            if (occurrences > 0) {
+                updatedDlcsScores[variable] = occurrences;
                 variables.push(variable);
             }
         }
     }
 
     /**
-     * Checks whether a variable appears in the sub-formula.
+     * Checks whether {@code variable} is assigned.
      *
      * @param variable The variable to check.
      *
-     * @return Whether {@code variable} appears in the sub-formula.
+     * @return Whether {@code variable} is assigned.
      */
-    private boolean variableAppears(int variable) {
+    private boolean isAssigned(int variable) {
         var posLit = LiteralsUtils.posLit(variable);
-        var negLit = LiteralsUtils.posLit(variable);
+        var negLit = LiteralsUtils.negLit(variable);
+        return getSatisfiedLiterals().get(posLit) || getSatisfiedLiterals().get(negLit);
+    }
 
-        if (getSatisfiedLiterals().get(posLit) ||getSatisfiedLiterals().get(negLit)) {
-            // This variable is assigned, so it does not appear in the formula anymore.
-            return false;
-        }
+    /**
+     * Counts how many times a variable appears in the sub-formula.
+     *
+     * @param variable The variable to count the occurrences of.
+     *
+     * @return The number of occurrences of {@code variable} in the sub-formula.
+     */
+    private int countOccurrences(int variable) {
+        int occurrences = 0;
 
         // Looking for the constraints containing the variable.
         for (var it = original.getConstraintsContaining(variable).iterator(); it.hasNext();) {
             var constr = it.next();
             if (!getInactiveConstraints().get(constr)) {
-                updatedDlcsScores[variable]++;
+                occurrences++;
             }
         }
 
         // The variable is present if it appears in at least one active constraint.
-        return updatedDlcsScores[variable] >= 1;
+        return occurrences;
     }
 
 }

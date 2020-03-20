@@ -22,14 +22,12 @@ package fr.univartois.cril.pbd4.hypergraph;
 
 import org.sat4j.core.Vec;
 import org.sat4j.core.VecInt;
-import org.sat4j.specs.IConstr;
 import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
 
-import fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula;
-
 /**
- * The DualHypergraphConnectedComponentFinder finds the connected components of a hypergraph.
+ * The DualHypergraphConnectedComponentFinder allows to find the connected components of a
+ * dual hypergraph.
  *
  * @author Romain WALLON
  *
@@ -38,18 +36,12 @@ import fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula;
 final class DualHypergraphConnectedComponentFinder {
 
     /**
-     * The constraints of the formula.
+     * The identifiers of the variables appearing in each constraint.
      */
-    private final IConstr[] constraints;
+    private final IVecInt[] variablesAppearingInConstraint;
 
     /**
-     * The array storing, for each constraint, the identifiers of the hyperedges in which
-     * it appears.
-     */
-    private final IVecInt[] hyperedgesContainingConstraint;
-    
-    /**
-     * The array storing, for each constraint, whether it has already been visited.
+     * Whether each constraint has already been visited.
      */
     private final boolean[] visited;
 
@@ -57,14 +49,12 @@ final class DualHypergraphConnectedComponentFinder {
      * Creates a new DualHypergraphConnectedComponentFinder.
      * 
      * @param constraints The constraints of the formula.
-     * @param hyperedgesContainingConstraint The array storing, for each constraint, the
-     *        identifiers of the hyperedges in which it appears.
+     * @param variablesAppearingInConstraint The identifiers of the variables appearing in
+     *        each constraint.
      */
-    public DualHypergraphConnectedComponentFinder(IConstr[] constraints,
-            IVecInt[] hyperedgesContainingConstraint) {
-        this.constraints = constraints;
-        this.hyperedgesContainingConstraint = hyperedgesContainingConstraint;
-        this.visited = new boolean[hyperedgesContainingConstraint.length];
+    public DualHypergraphConnectedComponentFinder(IVecInt[] variablesAppearingInConstraint) {
+        this.variablesAppearingInConstraint = variablesAppearingInConstraint;
+        this.visited = new boolean[variablesAppearingInConstraint.length];
     }
 
     /**
@@ -72,16 +62,16 @@ final class DualHypergraphConnectedComponentFinder {
      *
      * @return The vector of connected components.
      */
-    public IVec<PseudoBooleanFormula> connectedComponents() {
-        var components = new Vec<IVec<IConstr>>();
+    public IVec<IVecInt> connectedComponents() {
+        var components = new Vec<IVecInt>();
 
-        for (int constraint = 0; constraint < hyperedgesContainingConstraint.length; constraint++) {
+        for (int constraint = 1; constraint < variablesAppearingInConstraint.length; constraint++) {
             if (!visited[constraint]) {
                 components.push(componentOf(constraint));
             }
         }
 
-        return null;
+        return components;
     }
 
     /**
@@ -92,30 +82,29 @@ final class DualHypergraphConnectedComponentFinder {
      *
      * @return The connected component of the graph containing the given constraint.
      */
-    private IVec<IConstr> componentOf(int constraint) {
+    private IVecInt componentOf(int constraint) {
         // Initializing the exploration.
         var toExplore = new VecInt();
         toExplore.push(constraint);
-        var explored = new Vec<IConstr>();
+        var explored = new VecInt();
 
         while (!toExplore.isEmpty()) {
             // Visiting the next constraint.
-            int c = toExplore.last();
-            explored.push(constraints[c]);
+            int constr = toExplore.last();
             toExplore.pop();
-            visited[c] = true;
+            explored.push(constr);
+            visited[constr] = true;
 
             // Adding the neighbors of the constraint to the ones to explore.
-            for (var it = hyperedgesContainingConstraint[c].iterator(); it.hasNext();) {
-                var n = it.next();
-                if (!visited[n]) {
-                    toExplore.push(n);
+            for (var it = variablesAppearingInConstraint[constr].iterator(); it.hasNext();) {
+                var next = it.next();
+                if (!visited[next]) {
+                    toExplore.push(next);
                 }
             }
         }
 
         return explored;
     }
-    
-}
 
+}
