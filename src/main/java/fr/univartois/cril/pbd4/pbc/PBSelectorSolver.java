@@ -161,9 +161,23 @@ final class PBSelectorSolver extends GroupPBSelectorSolver {
     @Override
     public IConstr addExactly(IVecInt literals, IVec<BigInteger> coeffs, BigInteger weight)
             throws ContradictionException {
-        var constr = addExactly(literals, coeffs, weight, currentIdentifier++);
-        keepConstraint(literals, constr);
-        return constr;
+        var group = new ConstrGroup();
+
+        // Adding the at-least constraint.
+        var atLeast = addAtLeast(literals, coeffs, weight, currentIdentifier++);
+        keepConstraint(literals, atLeast);
+        group.add(atLeast);
+
+        // Removing the selector that has been added when adding the at-least constraint.
+        literals.pop();
+        coeffs.pop();
+
+        // Adding the at-most constraint.
+        var atMost = addAtMost(literals, coeffs, weight, currentIdentifier++);
+        keepConstraint(literals, atMost);
+        group.add(atMost);
+
+        return group;
     }
 
     /*
@@ -175,9 +189,13 @@ final class PBSelectorSolver extends GroupPBSelectorSolver {
     @Override
     public IConstr addExactly(IVecInt literals, IVecInt coeffs, int weight)
             throws ContradictionException {
-        var constr = addExactly(literals, coeffs, weight, currentIdentifier++);
-        keepConstraint(literals, constr);
-        return constr;
+        // Converting the coefficients to big integers.
+        var bigCoeffs = new Vec<BigInteger>(coeffs.size());
+        for (var it = coeffs.iterator(); it.hasNext();) {
+            bigCoeffs.push(BigInteger.valueOf(it.next()));
+        }
+
+        return addExactly(literals, bigCoeffs, BigInteger.valueOf(weight));
     }
 
     /*
