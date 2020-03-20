@@ -345,6 +345,12 @@ final class SubPseudoBooleanFormulaBuilder {
             var constrValue = BigInteger.ZERO;
             for (int i = 0; i < constr.size(); i++) {
                 int lit = constr.get(i);
+                
+                if (LiteralsUtils.var(lit) > original.numberOfVariables()) {
+                    // This literal is used as a selector, and must be ignored.
+                    continue;
+                }
+                
                 if (satisfiedLiterals.get(lit)) {
                     constrValue = constrValue.add(constr.getCoef(i));
                 }

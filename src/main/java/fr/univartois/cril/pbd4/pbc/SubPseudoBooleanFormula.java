@@ -28,8 +28,8 @@ import java.util.OptionalInt;
 import org.sat4j.core.VecInt;
 import org.sat4j.specs.IVecInt;
 
-import fr.univartois.cril.pbd4.hypergraph.DualHypergraph;
-import fr.univartois.cril.pbd4.hypergraph.Hypergraphable;
+import fr.univartois.cril.pbd4.pbc.hypergraph.DualHypergraph;
+import fr.univartois.cril.pbd4.pbc.hypergraph.Hypergraphable;
 
 /**
  * The SubPseudoBooleanFormula represents a sub-part of a pseudo-Boolean formula that is

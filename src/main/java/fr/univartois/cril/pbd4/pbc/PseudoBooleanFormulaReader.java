@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.sat4j.pb.SolverFactory;
+import org.sat4j.pb.reader.OPBReader2010;
 import org.sat4j.pb.reader.PBInstanceReader;
 import org.sat4j.reader.LecteurDimacs;
 import org.sat4j.reader.ParseFormatException;
@@ -113,7 +114,7 @@ public final class PseudoBooleanFormulaReader {
     public static PseudoBooleanFormula readOpb(InputStream inputStream) throws IOException {
         try {
             var solver = new PBSelectorSolver(SolverFactory.newCuttingPlanes());
-            var reader = new PBInstanceReader(solver);
+            var reader = new OPBReader2010(solver);
             reader.parseInstance(inputStream);
             return new OriginalPseudoBooleanFormula(solver);
 
