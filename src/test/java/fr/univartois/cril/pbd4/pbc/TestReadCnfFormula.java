@@ -24,6 +24,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.math.BigInteger;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.sat4j.core.LiteralsUtils;
@@ -101,36 +103,55 @@ public final class TestReadCnfFormula extends AbstractTestPseudoBooleanSolving {
         var clause0 = formula.getConstraint(0);
         assertEquals(4, clause0.size());
         assertEquals(1, LiteralsUtils.toDimacs(clause0.get(0)));
+        assertEquals(BigInteger.ONE, clause0.getCoef(0));
         assertEquals(2, LiteralsUtils.toDimacs(clause0.get(1)));
+        assertEquals(BigInteger.ONE, clause0.getCoef(1));
         assertEquals(3, LiteralsUtils.toDimacs(clause0.get(2)));
+        assertEquals(BigInteger.ONE, clause0.getCoef(2));
         // The last literal is a fresh variable, used as a selector.
         assertEquals(5, LiteralsUtils.toDimacs(clause0.get(3)));
+        assertEquals(BigInteger.ONE, clause0.getCoef(3));
+        assertEquals(BigInteger.ONE, clause0.getDegree());
 
         // Checking the second clause.
         var clause1 = formula.getConstraint(1);
         assertEquals(4, clause1.size());
         assertEquals(-2, LiteralsUtils.toDimacs(clause1.get(0)));
+        assertEquals(BigInteger.ONE, clause1.getCoef(0));
         assertEquals(3, LiteralsUtils.toDimacs(clause1.get(1)));
+        assertEquals(BigInteger.ONE, clause1.getCoef(1));
         assertEquals(4, LiteralsUtils.toDimacs(clause1.get(2)));
+        assertEquals(BigInteger.ONE, clause1.getCoef(2));
         // The last literal is a fresh variable, used as a selector.
         assertEquals(6, LiteralsUtils.toDimacs(clause1.get(3)));
+        assertEquals(BigInteger.ONE, clause1.getCoef(3));
+        assertEquals(BigInteger.ONE, clause1.getDegree());
 
         // Checking the third clause.
         var clause2 = formula.getConstraint(2);
         assertEquals(3, clause2.size());
         assertEquals(1, LiteralsUtils.toDimacs(clause2.get(0)));
+        assertEquals(BigInteger.ONE, clause2.getCoef(0));
         assertEquals(-4, LiteralsUtils.toDimacs(clause2.get(1)));
+        assertEquals(BigInteger.ONE, clause2.getCoef(1));
         // The last literal is a fresh variable, used as a selector.
         assertEquals(7, LiteralsUtils.toDimacs(clause2.get(2)));
+        assertEquals(BigInteger.ONE, clause2.getCoef(2));
+        assertEquals(BigInteger.ONE, clause2.getDegree());
 
         // Checking the fourth clause.
         var clause3 = formula.getConstraint(3);
         assertEquals(4, clause3.size());
         assertEquals(2, LiteralsUtils.toDimacs(clause3.get(0)));
+        assertEquals(BigInteger.ONE, clause3.getCoef(0));
         assertEquals(3, LiteralsUtils.toDimacs(clause3.get(1)));
+        assertEquals(BigInteger.ONE, clause3.getCoef(1));
         assertEquals(-4, LiteralsUtils.toDimacs(clause3.get(2)));
+        assertEquals(BigInteger.ONE, clause3.getCoef(2));
         // The last literal is a fresh variable, used as a selector.
         assertEquals(8, LiteralsUtils.toDimacs(clause3.get(3)));
+        assertEquals(BigInteger.ONE, clause3.getCoef(3));
+        assertEquals(BigInteger.ONE, clause3.getDegree());
     }
 
     /**
@@ -182,26 +203,39 @@ public final class TestReadCnfFormula extends AbstractTestPseudoBooleanSolving {
         var clause0 = formula.getConstraint(0);
         assertEquals(4, clause0.size());
         assertEquals(1, LiteralsUtils.toDimacs(clause0.get(0)));
+        assertEquals(BigInteger.ONE, clause0.getCoef(0));
         assertEquals(2, LiteralsUtils.toDimacs(clause0.get(1)));
+        assertEquals(BigInteger.ONE, clause0.getCoef(1));
         assertEquals(3, LiteralsUtils.toDimacs(clause0.get(2)));
+        assertEquals(BigInteger.ONE, clause0.getCoef(2));
         // The last literal is a fresh variable, used as a selector.
         assertEquals(4, LiteralsUtils.toDimacs(clause0.get(3)));
+        assertEquals(BigInteger.ONE, clause0.getCoef(3));
+        assertEquals(BigInteger.ONE, clause0.getDegree());
 
         // Checking the second clause.
         var clause1 = formula.getConstraint(1);
         assertEquals(3, clause1.size());
         assertEquals(-1, LiteralsUtils.toDimacs(clause1.get(0)));
+        assertEquals(BigInteger.ONE, clause1.getCoef(0));
         assertEquals(-2, LiteralsUtils.toDimacs(clause1.get(1)));
+        assertEquals(BigInteger.ONE, clause1.getCoef(1));
         // The last literal is a fresh variable, used as a selector.
         assertEquals(5, LiteralsUtils.toDimacs(clause1.get(2)));
+        assertEquals(BigInteger.ONE, clause1.getCoef(2));
+        assertEquals(BigInteger.ONE, clause1.getDegree());
 
         // Checking the third clause.
         var clause2 = formula.getConstraint(2);
         assertEquals(3, clause2.size());
         assertEquals(-2, LiteralsUtils.toDimacs(clause2.get(0)));
+        assertEquals(BigInteger.ONE, clause2.getCoef(0));
         assertEquals(-3, LiteralsUtils.toDimacs(clause2.get(1)));
+        assertEquals(BigInteger.ONE, clause2.getCoef(1));
         // The last literal is a fresh variable, used as a selector.
         assertEquals(6, LiteralsUtils.toDimacs(clause2.get(2)));
+        assertEquals(BigInteger.ONE, clause2.getCoef(2));
+        assertEquals(BigInteger.ONE, clause2.getDegree());
     }
 
 }
