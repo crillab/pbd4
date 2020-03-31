@@ -105,6 +105,7 @@ final class SubPseudoBooleanFormulaBuilder {
      */
     private SubPseudoBooleanFormulaBuilder(OriginalPseudoBooleanFormula original) {
         this.original = original;
+        this.decision = OptionalInt.empty();
         this.initialAssumptions = VecInt.EMPTY;
         this.newAssumptions = VecInt.EMPTY;
         this.possibleVariables = original.variables();

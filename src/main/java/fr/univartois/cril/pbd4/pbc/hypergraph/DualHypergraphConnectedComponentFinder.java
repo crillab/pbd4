@@ -25,6 +25,8 @@ import org.sat4j.core.VecInt;
 import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
 
+import fr.univartois.cril.jkahypar.hypergraph.Hypergraph;
+
 /**
  * The DualHypergraphConnectedComponentFinder allows to find the connected components of a
  * dual hypergraph.
@@ -34,6 +36,11 @@ import org.sat4j.specs.IVecInt;
  * @version 0.1.0
  */
 final class DualHypergraphConnectedComponentFinder {
+    
+    /**
+     * The representation of the hypergraph to compute the connected components of.
+     */
+    private final Hypergraph hypergraph;
 
     /**
      * The identifiers of the variables appearing in each constraint.
@@ -52,7 +59,9 @@ final class DualHypergraphConnectedComponentFinder {
      * @param variablesAppearingInConstraint The identifiers of the variables appearing in
      *        each constraint.
      */
-    public DualHypergraphConnectedComponentFinder(IVecInt[] variablesAppearingInConstraint) {
+    public DualHypergraphConnectedComponentFinder(Hypergraph hypergraph, 
+            IVecInt[] variablesAppearingInConstraint) {
+        this.hypergraph = hypergraph;
         this.variablesAppearingInConstraint = variablesAppearingInConstraint;
         this.visited = new boolean[variablesAppearingInConstraint.length];
     }
@@ -97,14 +106,29 @@ final class DualHypergraphConnectedComponentFinder {
 
             // Adding the neighbors of the constraint to the ones to explore.
             for (var it = variablesAppearingInConstraint[constr].iterator(); it.hasNext();) {
-                var next = it.next();
-                if (!visited[next]) {
-                    toExplore.push(next);
-                }
+                addConstraintsContaining(toExplore, it.next());
             }
         }
 
         return explored;
+    }
+
+    /**
+     * Adds the constraints containing the given variable to the given vector.
+     *
+     * @param toExplore The vector of constraints to explore.
+     * @param variable The variable shared between the constraints.
+     */
+    private void addConstraintsContaining(IVecInt toExplore, int variable) {
+        var limits = hypergraph.getHyperedgeIndices();
+        var constraints = hypergraph.getHyperedgeVertices();
+        
+        for (int i = (int) limits[variable - 1]; i < limits[variable]; i++) {
+            int constraint = constraints[i] + 1;
+            if (!visited[constraint]) {
+                toExplore.push(constraint);
+            }
+        }
     }
 
 }

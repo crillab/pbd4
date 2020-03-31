@@ -237,7 +237,7 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula, Hypergrapha
      */
     @Override
     public Collection<PseudoBooleanFormula> connectedComponents() {
-        var rawComponents = hypergraph.connectedComponents();
+        var rawComponents = hypergraph().connectedComponents();
         var components = new ArrayList<PseudoBooleanFormula>(rawComponents.size());
         
         // Computing the actual sub-formulae.

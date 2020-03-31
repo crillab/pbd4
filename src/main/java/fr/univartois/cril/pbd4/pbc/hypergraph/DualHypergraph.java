@@ -93,7 +93,7 @@ public final class DualHypergraph {
      * @return The computed components.
      */
     public IVec<IVecInt> connectedComponents() {
-        var finder = new DualHypergraphConnectedComponentFinder(variablesAppearingInConstraint);
+        var finder = new DualHypergraphConnectedComponentFinder(hypergraph, variablesAppearingInConstraint);
         var components = finder.connectedComponents();
 
         for (var it = components.iterator(); it.hasNext();) {
