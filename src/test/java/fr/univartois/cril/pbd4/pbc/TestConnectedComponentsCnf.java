@@ -20,8 +20,9 @@
 
 package fr.univartois.cril.pbd4.pbc;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
@@ -69,38 +70,64 @@ public final class TestConnectedComponentsCnf extends AbstractTestConnectedCompo
         
         var subComponents1 = connectedComponentsOf(component0.assume(1));
         assertEquals(1, subComponents1.size());
+        
         var subComponent10 = subComponents1.get(0);
         assertEquals(3, subComponent10.numberOfVariables());
         assertTrue(subComponent10.variables().contains(2));
         assertTrue(subComponent10.variables().contains(3));
         assertTrue(subComponent10.variables().contains(4));
         assertEquals(2, subComponent10.numberOfConstraints());
+        var subComponent10BCP = bcp(subComponent10);
+        assertEquals(3, subComponent10BCP.numberOfVariables());
+        assertTrue(subComponent10BCP.variables().contains(2));
+        assertTrue(subComponent10BCP.variables().contains(3));
+        assertTrue(subComponent10BCP.variables().contains(4));
+        assertEquals(2, subComponent10BCP.numberOfConstraints());
         
         var subComponents2 = connectedComponentsOf(component0.assume(2));
         assertEquals(1, subComponents2.size());
+        
         var subComponent20 = subComponents2.get(0);
         assertEquals(3, subComponent20.numberOfVariables());
         assertTrue(subComponent20.variables().contains(1));
         assertTrue(subComponent20.variables().contains(3));
         assertTrue(subComponent20.variables().contains(4));
         assertEquals(2, subComponent20.numberOfConstraints());
+        var subComponent20BCP = bcp(subComponent20);
+        assertEquals(3, subComponent20BCP.numberOfVariables());
+        assertTrue(subComponent20BCP.variables().contains(1));
+        assertTrue(subComponent20BCP.variables().contains(3));
+        assertTrue(subComponent20BCP.variables().contains(4));
+        assertEquals(2, subComponent20BCP.numberOfConstraints());
         
         var subComponents3 = connectedComponentsOf(component0.assume(3));
         assertEquals(1, subComponents3.size());
+        
         var subComponent30 = subComponents3.get(0);
         assertEquals(2, subComponent30.numberOfVariables());
         assertTrue(subComponent30.variables().contains(1));
         assertTrue(subComponent30.variables().contains(4));
         assertEquals(1, subComponent30.numberOfConstraints());
+        var subComponent30BCP = bcp(subComponent30);
+        assertEquals(2, subComponent30BCP.numberOfVariables());
+        assertTrue(subComponent30BCP.variables().contains(1));
+        assertTrue(subComponent30BCP.variables().contains(4));
+        assertEquals(1, subComponent30BCP.numberOfConstraints());
         
         var subComponents4 = connectedComponentsOf(component0.assume(4));
         assertEquals(1, subComponents4.size());
+        
         var subComponent40 = subComponents4.get(0);
         assertEquals(3, subComponent40.numberOfVariables());
         assertTrue(subComponent40.variables().contains(1));
         assertTrue(subComponent40.variables().contains(2));
         assertTrue(subComponent40.variables().contains(3));
         assertEquals(3, subComponent40.numberOfConstraints());
+        var subComponent40BCP = bcp(subComponent40, 1);
+        assertEquals(2, subComponent40BCP.numberOfVariables());
+        assertTrue(subComponent40BCP.variables().contains(2));
+        assertTrue(subComponent40BCP.variables().contains(3));
+        assertEquals(1, subComponent40BCP.numberOfConstraints());
     }
 
     /**
@@ -121,30 +148,42 @@ public final class TestConnectedComponentsCnf extends AbstractTestConnectedCompo
         
         var subComponents1 = connectedComponentsOf(component0.assume(1));
         assertEquals(1, subComponents1.size());
+        
         var subComponent10 = subComponents1.get(0);
         assertEquals(2, subComponent10.numberOfVariables());
         assertTrue(subComponent10.variables().contains(2));
         assertTrue(subComponent10.variables().contains(3));
         assertEquals(2, subComponent10.numberOfConstraints());
+        var subComponent10BCP = bcp(subComponent10, -2);
+        assertNull(subComponent10BCP);
         
         var subComponents2 = connectedComponentsOf(component0.assume(2));
         assertEquals(2, subComponents2.size());
+        
         var subComponent20 = subComponents2.get(0);
         assertEquals(1, subComponent20.numberOfVariables());
         assertTrue(subComponent20.variables().contains(1));
         assertEquals(1, subComponent20.numberOfConstraints());
+        var subComponent20BCP = bcp(subComponent20, -1);
+        assertNull(subComponent20BCP);
+        
         var subComponent21 = subComponents2.get(1);
         assertEquals(1, subComponent21.numberOfVariables());
         assertTrue(subComponent21.variables().contains(3));
         assertEquals(1, subComponent21.numberOfConstraints());
+        var subComponent21BCP = bcp(subComponent21, -3);
+        assertNull(subComponent21BCP);
         
         var subComponents3 = connectedComponentsOf(component0.assume(3));
         assertEquals(1, subComponents3.size());
+        
         var subComponent30 = subComponents3.get(0);
         assertEquals(2, subComponent30.numberOfVariables());
         assertTrue(subComponent30.variables().contains(1));
         assertTrue(subComponent30.variables().contains(2));
         assertEquals(2, subComponent30.numberOfConstraints());
+        var subComponent30BCP = bcp(subComponent30, -2);
+        assertNull(subComponent30BCP);
     }
 
     /**
@@ -173,6 +212,7 @@ public final class TestConnectedComponentsCnf extends AbstractTestConnectedCompo
 
         var subComponents1 = connectedComponentsOf(component0.assume(1));
         assertEquals(2, subComponents1.size());
+        
         var subComponent10 = subComponents1.get(0);
         assertEquals(5, subComponent10.numberOfVariables());
         assertTrue(subComponent10.variables().contains(2));
@@ -181,6 +221,15 @@ public final class TestConnectedComponentsCnf extends AbstractTestConnectedCompo
         assertTrue(subComponent10.variables().contains(6));
         assertTrue(subComponent10.variables().contains(7));
         assertEquals(2, subComponent10.numberOfConstraints());
+        var subComponent10BCP = bcp(subComponent10);
+        assertEquals(5, subComponent10BCP.numberOfVariables());
+        assertTrue(subComponent10BCP.variables().contains(2));
+        assertTrue(subComponent10BCP.variables().contains(4));
+        assertTrue(subComponent10BCP.variables().contains(5));
+        assertTrue(subComponent10BCP.variables().contains(6));
+        assertTrue(subComponent10BCP.variables().contains(7));
+        assertEquals(2, subComponent10BCP.numberOfConstraints());
+        
         var subComponent11 = subComponents1.get(1);
         assertEquals(5, subComponent11.numberOfVariables());
         assertTrue(subComponent11.variables().contains(3));
@@ -189,9 +238,15 @@ public final class TestConnectedComponentsCnf extends AbstractTestConnectedCompo
         assertTrue(subComponent11.variables().contains(10));
         assertTrue(subComponent11.variables().contains(11));
         assertEquals(3, subComponent11.numberOfConstraints());
+        var subComponent11BCP = bcp(subComponent11, 3);
+        assertEquals(2, subComponent11BCP.numberOfVariables());
+        assertTrue(subComponent11BCP.variables().contains(10));
+        assertTrue(subComponent11BCP.variables().contains(11));
+        assertEquals(1, subComponent11BCP.numberOfConstraints());
 
         var subComponents2 = connectedComponentsOf(component0.assume(2));
         assertEquals(2, subComponents2.size());
+        
         var subComponent20 = subComponents2.get(0);
         assertEquals(6, subComponent20.numberOfVariables());
         assertTrue(subComponent20.variables().contains(1));
@@ -201,14 +256,26 @@ public final class TestConnectedComponentsCnf extends AbstractTestConnectedCompo
         assertTrue(subComponent20.variables().contains(10));
         assertTrue(subComponent20.variables().contains(11));
         assertEquals(4, subComponent20.numberOfConstraints());
+        var subComponent20BCP = bcp(subComponent20, 1, 3);
+        assertEquals(2, subComponent20BCP.numberOfVariables());
+        assertTrue(subComponent20BCP.variables().contains(10));
+        assertTrue(subComponent20BCP.variables().contains(11));
+        assertEquals(1, subComponent20BCP.numberOfConstraints());
+        
         var subComponent21 = subComponents2.get(1);
         assertEquals(2, subComponent21.numberOfVariables());
         assertTrue(subComponent21.variables().contains(6));
         assertTrue(subComponent21.variables().contains(7));
         assertEquals(1, subComponent21.numberOfConstraints());
+        var subComponent21BCP = bcp(subComponent21);
+        assertEquals(2, subComponent21BCP.numberOfVariables());
+        assertTrue(subComponent21BCP.variables().contains(6));
+        assertTrue(subComponent21BCP.variables().contains(7));
+        assertEquals(1, subComponent21BCP.numberOfConstraints());
 
         var subComponents3 = connectedComponentsOf(component0.assume(3));
         assertEquals(2, subComponents3.size());
+        
         var subComponent30 = subComponents3.get(0);
         assertEquals(6, subComponent30.numberOfVariables());
         assertTrue(subComponent30.variables().contains(1));
@@ -218,11 +285,26 @@ public final class TestConnectedComponentsCnf extends AbstractTestConnectedCompo
         assertTrue(subComponent30.variables().contains(6));
         assertTrue(subComponent30.variables().contains(7));
         assertEquals(3, subComponent30.numberOfConstraints());
+        var subComponent30BCP = bcp(subComponent30);
+        assertEquals(6, subComponent30BCP.numberOfVariables());
+        assertTrue(subComponent30BCP.variables().contains(1));
+        assertTrue(subComponent30BCP.variables().contains(2));
+        assertTrue(subComponent30BCP.variables().contains(4));
+        assertTrue(subComponent30BCP.variables().contains(5));
+        assertTrue(subComponent30BCP.variables().contains(6));
+        assertTrue(subComponent30BCP.variables().contains(7));
+        assertEquals(3, subComponent30BCP.numberOfConstraints());
+        
         var subComponent31 = subComponents3.get(1);
         assertEquals(2, subComponent31.numberOfVariables());
         assertTrue(subComponent31.variables().contains(10));
         assertTrue(subComponent31.variables().contains(11));
         assertEquals(1, subComponent31.numberOfConstraints());
+        var subComponent31BCP = bcp(subComponent31);
+        assertEquals(2, subComponent31BCP.numberOfVariables());
+        assertTrue(subComponent31BCP.variables().contains(10));
+        assertTrue(subComponent31BCP.variables().contains(11));
+        assertEquals(1, subComponent31BCP.numberOfConstraints());
     }
 
 }

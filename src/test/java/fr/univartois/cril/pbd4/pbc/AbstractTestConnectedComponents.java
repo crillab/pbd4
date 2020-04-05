@@ -20,6 +20,7 @@
 
 package fr.univartois.cril.pbd4.pbc;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -82,6 +83,27 @@ public abstract class AbstractTestConnectedComponents extends AbstractTestPseudo
      */
     protected static List<PseudoBooleanFormula> connectedComponentsOf(PseudoBooleanFormula formula) {
         return (List<PseudoBooleanFormula>) formula.connectedComponents();
+    }
+
+    /**
+     * Applies Boolean Constraint Propagation (BCP) to the given formula.
+     *
+     * @param formula The formula on which to apply BCP.
+     * @param propagatedLiterals The literals expected to be propagated.
+     *
+     * @return The (simplified) formula obtained by applying BCP to the given formula.
+     */
+    protected static PseudoBooleanFormula bcp(PseudoBooleanFormula formula, int... propagatedLiterals) {
+        var propagation = formula.propagate();
+        
+        // Checking the propagated literals.
+        var effectivePropagatedLiterals = propagation.getPropagatedLiterals();
+        assertEquals(propagatedLiterals.length, effectivePropagatedLiterals.size());
+        for (int literal : propagatedLiterals) {
+            assertTrue(effectivePropagatedLiterals.contains(literal));
+        }
+
+        return propagation.isUnknown() ? propagation.getSimplifiedFormula() : null;
     }
 
 }
