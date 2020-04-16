@@ -35,7 +35,7 @@ import fr.univartois.cril.jkahypar.hypergraph.Hypergraph;
  *
  * @version 0.1.0
  */
-final class DualHypergraphConnectedComponentFinder {
+public final class DualHypergraphConnectedComponentFinder {
     
     /**
      * The representation of the hypergraph to compute the connected components of.

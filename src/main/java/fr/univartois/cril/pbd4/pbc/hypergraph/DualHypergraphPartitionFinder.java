@@ -38,7 +38,7 @@ import fr.univartois.cril.jkahypar.hypergraph.Hypergraph;
  *
  * @version 1.0
  */
-final class DualHypergraphPartitionFinder {
+public final class DualHypergraphPartitionFinder {
 
     /**
      * The single instance of this class.
@@ -110,8 +110,10 @@ final class DualHypergraphPartitionFinder {
      * Do not forget to invoke this method to avoid memory leaks.
      */
     public static void clearInstance() {
-        instance.context.close();
-        instance = null;
+        if (instance != null) {
+            instance.context.close();
+            instance = null;
+        }
     }
 
 }

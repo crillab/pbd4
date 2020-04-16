@@ -20,31 +20,44 @@
 
 package fr.univartois.cril.pbd4.pbc;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.fail;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import fr.univartois.cril.pbd4.pbc.hypergraph.DualHypergraphPartitionFinder;
 
 /**
- * The TestDualHypergraphPartitioning
+ * The TestDualHypergraphPartitioning is a JUnit test case for testing the partitioning
+ * of the dual hypergraph of a formula, and especially the computation of a cutset. 
  *
  * @author Romain WALLON
  *
  * @version 0.1.0
  */
-class TestDualHypergraphPartitioning {
-
-    /**
-     * @throws java.lang.Exception
-     */
+@DisplayName("The cutset of the dual hypergraph of a formula is properly computed.")
+public final class TestDualHypergraphPartitioning extends AbstractTestPseudoBooleanSolving {
+    
     @BeforeEach
-    void setUp() throws Exception {
+    public void configureKahypar() {
+        System.setProperty("kahypar.config", "src/test/resources/config/km1_direct_kway_sea18.ini");
     }
 
+    /**
+     * Test that the cutset of ...
+     */
     @Test
-    void test() {
-        fail("Not yet implemented");
+    @DisplayName("The cutset of...")
+    public void test() {
+        var formula = readCnf("example-1.cnf").propagate().getSimplifiedFormula();
+        System.out.println(formula.cutset());
+    }
+    
+    @AfterEach
+    public void freeKahypar() {
+        DualHypergraphPartitionFinder.clearInstance();
     }
 
 }
