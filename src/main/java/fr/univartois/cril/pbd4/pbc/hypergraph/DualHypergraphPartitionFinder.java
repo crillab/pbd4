@@ -43,7 +43,7 @@ public final class DualHypergraphPartitionFinder {
     /**
      * The single instance of this class.
      */
-    private static DualHypergraphPartitionFinder instance = new DualHypergraphPartitionFinder();
+    private static DualHypergraphPartitionFinder instance = null;
 
     /**
      * The JKaHyPar context used to compute partitions.
@@ -56,7 +56,15 @@ public final class DualHypergraphPartitionFinder {
      */
     private DualHypergraphPartitionFinder() {
         this.context = new KahyparContext();
+    }
+
+    /**
+     * Initializes the configuration of JKaHyPar.
+     */
+    private void initKahypar() {
         this.context.configureFrom(System.getProperty("kahypar.config"));
+        this.context.setImbalance(0.03);
+        this.context.setNumberOfBlocks(2);
     }
 
     /**
@@ -67,6 +75,7 @@ public final class DualHypergraphPartitionFinder {
     public static DualHypergraphPartitionFinder instance() {
         if (instance == null) {
             instance = new DualHypergraphPartitionFinder();
+            instance.initKahypar();
         }
         return instance;
     }
@@ -79,21 +88,30 @@ public final class DualHypergraphPartitionFinder {
      * @return The computed cutset.
      */
     public IVecInt cutsetOf(Hypergraph hypergraph) {
+        if (hypergraph.getNumberOfVertices() == 1) {
+            var cutset = new VecInt();
+            for (int i = 1; i <= hypergraph.getNumberOfHyperedges(); i++) {
+                cutset.push(i);
+            }
+            return cutset;
+        }
+        
+        
         var partitioner = context.createPartitionerFor(hypergraph);
-        var partition = partitioner.computePartition();
         int[] vertices = hypergraph.getHyperedgeVertices();
+        long[] hyperedgeIndices = hypergraph.getHyperedgeIndices();
+        var partition = partitioner.computePartition();
         var cutset = new VecInt();
 
         // Looking for hyperedges in the cutset.
         for (int i = 0; i < hypergraph.getNumberOfHyperedges(); i++) {
-            long[] hyperedgeIndices = hypergraph.getHyperedgeIndices();
             int begin = (int) hyperedgeIndices[i];
             int end = (int) hyperedgeIndices[i + 1];
 
             // Comparing the block of the different vertices.
-            int first = partition.blockOf(vertices[begin]);
+            int first = partition.blockOf(vertices[begin] + 1);
             for (int j = begin + 1; j < end; j++) {
-                if (partition.blockOf(vertices[j]) != first) {
+                if (partition.blockOf(vertices[j] + 1) != first) {
                     // The hyperedge joins two vertices that are in different blocks.
                     // It is thus in the cutset.
                     cutset.push(i + 1);
