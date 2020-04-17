@@ -105,7 +105,7 @@ public final class DualHypergraphBuilder {
     DualHypergraph build() {
         for (var it = hypergraphable.variables().iterator(); it.hasNext();) {
             var variable = it.next();
-            identifierToVariable.put(variable, ++currentHyperedgeIdentifier);
+            identifierToVariable.put(++currentHyperedgeIdentifier, variable);
             addHyperedge(variable);
         }
         

@@ -63,8 +63,8 @@ public final class DualHypergraph {
      *
      * @param hypergraph The JKaHyPar representation of the hypergraph.
      * @param variablesAppearingInConstraint The identifiers of the variables appearing in each constraint.
-     * @param identifierToConstraint The map associating a hyperedge identifier to the variable it represents.
-     * @param identifierToVariable The map associating a vertex identifier to the constraint it represents.
+     * @param identifierToConstraint The map associating a vertex identifier to the constraint it represents.
+     * @param identifierToVariable The map associating a hyperedge identifier to the variable it represents.
      */
     DualHypergraph(Hypergraph hypergraph, IVecInt[] variablesAppearingInConstraint,
             Map<Integer, Integer> identifierToVariable, Map<Integer, Integer> identifierToConstraint) {
