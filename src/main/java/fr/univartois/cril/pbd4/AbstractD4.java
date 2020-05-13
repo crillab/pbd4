@@ -68,7 +68,7 @@ public abstract class AbstractD4<T, R> {
      * @return The output of the algorithm on the input formula.
      */
     public final R compute() {
-        T intermediateResult = compute(formula, VecInt.EMPTY);
+        T intermediateResult = compute(formula.numberOfVariables(), formula, VecInt.EMPTY);
         return toFinalResult(intermediateResult);
     }
 
@@ -81,7 +81,7 @@ public abstract class AbstractD4<T, R> {
      *
      * @return The intermediate result of the computation on the given formula.
      */
-    private T compute(PseudoBooleanFormula subFormula, IVecInt variables) {
+    private T compute(int nbVar, PseudoBooleanFormula subFormula, IVecInt variables) {
         // Applying BCP to the formula.
         var output = subFormula.propagate();
 
@@ -92,8 +92,7 @@ public abstract class AbstractD4<T, R> {
 
         // Retrieving the literals that have been propagated.
         var propagatedLiterals = output.getPropagatedLiterals();
-        int nbFreeVariables = subFormula.numberOfVariables() - propagatedLiterals.size();
-        
+        int nbFreeVariables = nbVar - propagatedLiterals.size();
         if (output.isSatisfiable()) {
             // A solution has been found while propagating.
             // The propagated literals form an implicant of the sub-formula.
@@ -121,8 +120,8 @@ public abstract class AbstractD4<T, R> {
             var v = componentVariables.last();
             componentVariables = componentVariables.pop();
             conjuncts.add(decision(v,
-                    compute(component.assume(v), componentVariables),
-                    compute(component.assume(-v), componentVariables)));
+                    compute(component.numberOfVariables(), component.assume(v), componentVariables),
+                    compute(component.numberOfVariables(), component.assume(-v), componentVariables)));
         }
 
         // Computing the result of the conjunction, and caching the result.
