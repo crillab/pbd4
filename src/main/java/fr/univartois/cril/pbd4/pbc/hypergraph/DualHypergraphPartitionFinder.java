@@ -20,6 +20,8 @@
 
 package fr.univartois.cril.pbd4.pbc.hypergraph;
 
+import static java.util.Objects.requireNonNull;
+
 import org.sat4j.core.VecInt;
 import org.sat4j.specs.IVecInt;
 
@@ -62,7 +64,7 @@ public final class DualHypergraphPartitionFinder {
      * Initializes the configuration of JKaHyPar.
      */
     private void initKahypar() {
-        this.context.configureFrom(System.getProperty("kahypar.config"));
+        this.context.configureFrom(requireNonNull(System.getProperty("kahypar.config")));
         this.context.setImbalance(0.03);
         this.context.setNumberOfBlocks(2);
     }

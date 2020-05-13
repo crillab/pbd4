@@ -380,7 +380,11 @@ final class PBSelectorSolver extends GroupPBSelectorSolver {
      * @return The indices of the constraints containing {@code variable}.
      */
     public IVecInt getConstraintsContaining(int variable) {
-        return constraintsContainingVariable[variable];
+        var constraintsContaining = constraintsContainingVariable[variable];
+        if (constraintsContaining == null) {
+            return VecInt.EMPTY;
+        }
+        return constraintsContaining;
     }
 
 }
