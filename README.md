@@ -1,12 +1,11 @@
 # PBD4, A Pseudo-Boolean-Based Implementation of the D4 Compiler
 
-[![pipeline status](https://gitlab.univ-artois.fr/wallon-phd/softwares/pbd4/badges/master/pipeline.svg)](https://gitlab.univ-artois.fr/wallon-phd/softwares/pbd4/commits/master)
-
 `PBD4` is a pseudo-Boolean based implementation of the D4 compiler and model
 counter written in Java that is made to be easily extensible and reusable.
 
-You can download PBD4 with its dependencies
-[here](/../builds/artifacts/master/raw/dist/pbd4.tgz?job=build).
+This is an experimental software, and not all features are available for the
+moment.
+Missing features will be added in a near future.
 
 ## Editing the source
 
@@ -27,7 +26,7 @@ the project, and then to tell Gradle to generate Eclipse's configuration files
 downloaded).
 
 ```bash
-$ git clone https://gitlab.univ-artois.fr/wallon-phd/softwares/pbd4.git
+$ git clone https://github.com/crillab/pbd4.git
 $ cd pbd4
 $ ./gradlew eclipse
 ```
