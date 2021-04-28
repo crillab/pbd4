@@ -23,12 +23,12 @@ package fr.univartois.cril.pbd4.pbc.hypergraph;
 import org.sat4j.specs.IVecInt;
 
 /**
- * The Hypergraphable defines the interface for classes which can be represented with
- * a hypergraph.
+ * The Hypergraphable defines the interface for objects that can be represented
+ * with a hypergraph.
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
 public interface Hypergraphable {
 
@@ -54,9 +54,9 @@ public interface Hypergraphable {
     int numberOfConstraints();
 
     /**
-     * Checks whether a given constraint is active.
+     * Checks whether a given constraint is active in this Hypergraphable.
      *
-     * @param constraint The constraint to check.
+     * @param constraint The index of the constraint to check.
      *
      * @return Whether the constraint is active.
      */
@@ -73,12 +73,12 @@ public interface Hypergraphable {
     int numberOfConstraintsContaining(int variable);
 
     /**
-     * Gives the indices of the constraints containing a given variable.
+     * Gives the identifiers of the constraints containing a given variable.
      * Any constraint (including inactive constraints) may be present.
      *
      * @param variable The variable to consider.
      *
-     * @return The indices of the constraints containing {@code variable}.
+     * @return The identifiers of the constraints containing {@code variable}.
      */
     IVecInt constraintsContaining(int variable);
 

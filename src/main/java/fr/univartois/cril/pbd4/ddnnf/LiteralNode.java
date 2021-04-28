@@ -26,9 +26,9 @@ package fr.univartois.cril.pbd4.ddnnf;
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
-public final class LiteralNode implements DecisionDnnfNode {
+public final class LiteralNode extends NonConstantDecisionDnnfNode {
 
     /**
      * The DIMACS identifier of the literal represented by this node.
@@ -57,10 +57,10 @@ public final class LiteralNode implements DecisionDnnfNode {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
-     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfNode#depthFirstAccept(fr.univartois.cril.
-     * pbd4.ddnnf.DecisionDnnfVisitor)
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfNode#depthFirstAccept(fr.univartois
+     * .cril. pbd4.ddnnf.DecisionDnnfVisitor)
      */
     @Override
     public void depthFirstAccept(DecisionDnnfVisitor visitor) {
@@ -69,10 +69,9 @@ public final class LiteralNode implements DecisionDnnfNode {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfNode#breadthFirstAccept(fr.univartois.
-     * cril.pbd4.ddnnf.DecisionDnnfVisitor)
+     *
+     * @see fr.univartois.cril.pbd4.ddnnf.DecisionDnnfNode#breadthFirstAccept(fr.
+     * univartois. cril.pbd4.ddnnf.DecisionDnnfVisitor)
      */
     @Override
     public void breadthFirstAccept(DecisionDnnfVisitor visitor) {
@@ -86,9 +85,10 @@ public final class LiteralNode implements DecisionDnnfNode {
      * @param visitor The visitor to accept.
      */
     private void accept(DecisionDnnfVisitor visitor) {
-        visitor.enter(this);
-        visitor.visit(this);
-        visitor.exit(this);
+        if (visitor.enter(this)) {
+            visitor.visit(this);
+            visitor.exit(this);
+        }
     }
 
     /**

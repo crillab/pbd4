@@ -21,41 +21,27 @@
 package fr.univartois.cril.pbd4.ddnnf;
 
 /**
- * The ConstantNode represents a Boolean constant.
+ * The ConstantNode represents Boolean constants as nodes of a decision-DNNF.
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
 public enum ConstantNode implements DecisionDnnfNode {
 
     /**
      * The FALSE Boolean constant.
      */
-    FALSE("O 0 0"),
+    FALSE,
 
     /**
      * The TRUE Boolean constant.
      */
-    TRUE("A 0");
-
-    /**
-     * The NNF representation of this constant.
-     */
-    private final String nnfString;
-
-    /**
-     * Creates a new ConstantNode.
-     *
-     * @param nnfString The NNF representation of the constant.
-     */
-    private ConstantNode(String nnfString) {
-        this.nnfString = nnfString;
-    }
+    TRUE;
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfNode#depthFirstAccept(fr.univartois.cril.
      * pbd4.ddnnf.DecisionDnnfVisitor)
@@ -67,7 +53,7 @@ public enum ConstantNode implements DecisionDnnfNode {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfNode#breadthFirstAccept(fr.univartois.
      * cril.pbd4.ddnnf.DecisionDnnfVisitor)
@@ -80,22 +66,14 @@ public enum ConstantNode implements DecisionDnnfNode {
     /**
      * Accepts a visitor, in either depth-first or breadth-first manner (there is no
      * difference for a constant node).
-     * 
+     *
      * @param visitor The visitor to accept.
      */
     private void accept(DecisionDnnfVisitor visitor) {
-        visitor.enter(this);
-        visitor.visit(this);
-        visitor.exit(this);
-    }
-
-    /**
-     * Gives The NNF representation of this constant.
-     *
-     * @return The NNF representation of this constant.
-     */
-    public String toNNF() {
-        return nnfString;
+        if (visitor.enter(this)) {
+            visitor.visit(this);
+            visitor.exit(this);
+        }
     }
 
 }

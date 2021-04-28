@@ -54,7 +54,7 @@ You can browse these reports by opening the following files in your browser:
 
 ## Static analysis with SonarQube
 
-This project contains a file `sonar-project.properties` which allows to execute
+This project contains a file `sonar-project.properties` which allows to use
 [SonarQube](http://www.sonarqube.org/) to analyze the source code of PBD4.
 
 After having executed the JUnit tests, type in the following command to
@@ -78,7 +78,8 @@ $ ./gradlew pbd4
 This will create a directory `dist/jars` containing the jars of PBD4 and
 its dependencies.
 It will also produce a gzipped-tarball `dist/pbd4.tgz`, containing
-all these jars, bundled with a script for executing PBD4.
+all these jars, bundled with a script for executing PBD4, the default
+configuration for KaHyPar (internally used by PBD4) and this README.
 
 ## Executing PBD4
 
@@ -88,10 +89,10 @@ PBD4 provides a *wrapper* bash script `pbd4.sh` (available in the `exec`
 directory) to make easier its execution from its jar and required modules.
 
 By default, this script considers that the jars of PBD4 are stored in their
-output directory, that is `dist/jars`.
+output directory, that is `dist/home`.
 
 If you have moved them, or if you do not want to execute the script from
-PBD4's directory, you will need to export a variable `PBD4_HOME` set with the
+PBD4's repository, you will need to export a variable `PBD4_HOME` set with the
 path of the directory containing the jars (you may put this export into your
 `.bashrc` to stop worrying about it).
 You may also edit the script to alter its default behavior.

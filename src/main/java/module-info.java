@@ -1,11 +1,11 @@
 /**
  * The {@code fr.univartois.cril.pbd4} module provides a pseudo-Boolean-based
  * implementation of the D4 algorithm, to compile pseudo-Boolean formulae into
- * decision-DNNF, or to count their models.
+ * decision-DNNFs, or to count their models.
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
 
 module fr.univartois.cril.pbd4 {
@@ -14,9 +14,19 @@ module fr.univartois.cril.pbd4 {
 
     exports fr.univartois.cril.pbd4;
 
+    exports fr.univartois.cril.pbd4.caching;
+
     exports fr.univartois.cril.pbd4.ddnnf;
 
+    exports fr.univartois.cril.pbd4.listener;
+
+    exports fr.univartois.cril.pbd4.partitioning;
+
     exports fr.univartois.cril.pbd4.pbc;
+
+    exports fr.univartois.cril.pbd4.pbc.hypergraph;
+
+    exports fr.univartois.cril.pbd4.pbc.solver;
 
     // Required Java modules.
 
@@ -26,6 +36,8 @@ module fr.univartois.cril.pbd4 {
 
     requires fr.cril.cli;
 
+    opens fr.univartois.cril.pbd4 to fr.cril.cli;
+
     // Modules required for dealing with pseudo-Boolean formulae.
 
     requires transitive org.ow2.sat4j.core;
@@ -34,6 +46,6 @@ module fr.univartois.cril.pbd4 {
 
     // Module required for hypergraph partitioning.
 
-    requires fr.univartois.cril.jkahypar;
+    requires transitive fr.univartois.cril.jkahypar;
 
 }

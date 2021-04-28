@@ -34,12 +34,12 @@ import fr.univartois.cril.jkahypar.hypergraph.Hypergraph;
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
 public final class DualHypergraph {
 
     /**
-     * The JKaHyPar representation of the hypergraph.
+     * The KaHyPar representation of the hypergraph.
      */
     private final Hypergraph hypergraph;
 
@@ -61,10 +61,13 @@ public final class DualHypergraph {
     /**
      * Creates a new DualHypergraph.
      *
-     * @param hypergraph The JKaHyPar representation of the hypergraph.
-     * @param variablesAppearingInConstraint The identifiers of the variables appearing in each constraint.
-     * @param identifierToConstraint The map associating a vertex identifier to the constraint it represents.
-     * @param identifierToVariable The map associating a hyperedge identifier to the variable it represents.
+     * @param hypergraph The KaHyPar representation of the hypergraph.
+     * @param variablesAppearingInConstraint The identifiers of the variables appearing in
+     *        each constraint.
+     * @param identifierToVariable The map associating a hyperedge identifier to the
+     *        variable it represents.
+     * @param identifierToConstraint The map associating a vertex identifier to the
+     *        constraint it represents.
      */
     DualHypergraph(Hypergraph hypergraph, IVecInt[] variablesAppearingInConstraint,
             Map<Integer, Integer> identifierToVariable, Map<Integer, Integer> identifierToConstraint) {
@@ -98,32 +101,49 @@ public final class DualHypergraph {
 
         for (var it = components.iterator(); it.hasNext();) {
             var component = it.next();
-            translateForHypergraphable(component, identifierToConstraint);
+            translateAsConstraints(component);
         }
 
         return components;
     }
 
     /**
-     * Computes a cutset of this hypergraph.
-     * The cutset is expressed in terms of variables.
+     * Gives the KaHyPar representation of this dual hypergraph.
      *
-     * @return The computed cutset.
+     * @return The KaHyPar representation of this dual hypergraph.
      */
-    public IVecInt cutset() {
-        var cutset = DualHypergraphPartitionFinder.instance().cutsetOf(hypergraph);
-        translateForHypergraphable(cutset, identifierToVariable);
-        return cutset;
+    public Hypergraph asKahyparHypergraph() {
+        return hypergraph;
     }
 
     /**
-     * Translates the content of the given vector into values that can be understood by the
-     * {@link Hypergraphable} for which this dual hypergraph is a representation.
+     * Translates the hyperedge identifiers in the given vector into the identifiers
+     * of the corresponding variables.
      *
      * @param vec The vector to translate.
-     * @param identifiers The map used to retrieve the value associated to an identifier.
      */
-    private void translateForHypergraphable(IVecInt vec, Map<Integer, Integer> identifiers) {
+    public void translateAsVariables(IVecInt vec) {
+        translate(vec, identifierToVariable);
+    }
+
+    /**
+     * Translates the hypervertex identifiers in the given vector into the identifiers
+     * of the corresponding constraints.
+     *
+     * @param vec The vector to translate.
+     */
+    public void translateAsConstraints(IVecInt vec) {
+        translate(vec, identifierToConstraint);
+    }
+
+    /**
+     * Translates the identifiers in the given vector into the corresponding identifiers
+     * in the original {@link Hypergraphable}.
+     *
+     * @param vec The vector to translate.
+     * @param identifiers The map providing the correspondence between identifiers.
+     */
+    private void translate(IVecInt vec, Map<Integer, Integer> identifiers) {
         for (int i = 0; i < vec.size(); i++) {
             int identifier = vec.get(i);
             int realValue = identifiers.get(identifier);

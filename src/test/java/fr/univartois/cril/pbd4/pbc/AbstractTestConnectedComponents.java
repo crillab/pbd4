@@ -35,7 +35,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
 public abstract class AbstractTestConnectedComponents extends AbstractTestPseudoBooleanSolving {
 

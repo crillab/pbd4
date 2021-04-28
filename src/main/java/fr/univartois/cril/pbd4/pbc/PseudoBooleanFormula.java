@@ -24,58 +24,60 @@ import java.util.Collection;
 
 import org.sat4j.specs.IVecInt;
 
+import fr.univartois.cril.pbd4.pbc.hypergraph.DualHypergraph;
+
 /**
  * The PseudoBooleanFormula defines the interface for the formulae considered by
  * the compiler or model counter.
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
 public interface PseudoBooleanFormula {
 
-	/**
-	 * Gives the number of variables in this formula.
-	 * Only variables that are not assigned yet are counted.
-	 *
-	 * @return The number of variables in this formula.
-	 */
-	int numberOfVariables();
+    /**
+     * Gives the number of variables in this formula.
+     * Only variables that are not assigned yet are counted.
+     *
+     * @return The number of variables in this formula.
+     */
+    int numberOfVariables();
 
-	/**
-	 * Gives the number of constraints in this formula.
-	 * Only constraints that are not satisfied yet are counted.
-	 *
-	 * @return The number of constraints in this formula.
-	 */
-	int numberOfConstraints();
+    /**
+     * Gives the number of constraints in this formula.
+     * Only constraints that are not satisfied yet are counted.
+     *
+     * @return The number of constraints in this formula.
+     */
+    int numberOfConstraints();
 
-	/**
-	 * Gives the variables appearing in this formula.
-	 * Only variables that are not assigned yet are present.
-	 *
-	 * @return The variables in this formula.
-	 */
-	IVecInt variables();
-	
-	/**
-	 * Gives the VSADS score of a variable in this formula.
-	 *
-	 * @param variable The variable to get the score of.
-	 *
-	 * @return The score of the variable.
-	 */
-	double score(int variable);
+    /**
+     * Gives the variables appearing in this formula.
+     * Only variables that are not assigned yet are present.
+     *
+     * @return The variables in this formula.
+     */
+    IVecInt variables();
 
-	/**
-	 * Gives the pseudo-Boolean formula obtained from this formula by assuming the
-	 * given literal.
-	 *
-	 * @param literal The literal to assume.
-	 *
-	 * @return The formula obtained by satisfying {@code literal}.
-	 */
-	PseudoBooleanFormula assume(int literal);
+    /**
+     * Gives the VSADS score of a variable in this formula.
+     *
+     * @param variable The variable to get the score of.
+     *
+     * @return The score of the variable.
+     */
+    double score(int variable);
+
+    /**
+     * Gives the pseudo-Boolean formula obtained from this formula by assuming the
+     * given literal.
+     *
+     * @param literal The literal to assume.
+     *
+     * @return The formula obtained by satisfying {@code literal}.
+     */
+    PseudoBooleanFormula assume(int literal);
 
     /**
      * Gives the pseudo-Boolean formula obtained from this formula by assuming the
@@ -88,46 +90,37 @@ public interface PseudoBooleanFormula {
     PseudoBooleanFormula assume(IVecInt literals);
 
     /**
-     * Checks whether this formula requires a computation of a partition of its
-     * hypergraph.
-     * Such a partitioning is needed when the formula has changed a lot compared to
-     * its parent formula.
+     * Gives the connected components of this formula, i.e., a collection of
+     * pseudo-Boolean formulae that are sub-formulae of this formula that do not
+     * share any variable.
      *
-     * @return Whether this formula requires a partitioning.
+     * @return The connected components of this formula.
      */
-    boolean requirePartitioning();
-    
-	/**
-	 * Gives a cutset of this formula, i.e., a set of variables to assign so as to
-	 * get a formula that have at least two connected components.
-	 *
-	 * @return The variables in the cutset.
-	 */
-	IVecInt cutset();
+    Collection<PseudoBooleanFormula> connectedComponents();
 
-	/**
-	 * Gives the connected components of this formula, i.e., a collection of
-	 * pseudo-Boolean formulae that are sub-formulae of this formula that do not
-	 * share any variable.
-	 *
-	 * @return The connected components of this formula.
-	 */
-	Collection<PseudoBooleanFormula> connectedComponents();
+    /**
+     * Applies Boolean Constraint Propagation (BCP) on this formula.
+     *
+     * @return The output of the propagation.
+     */
+    PropagationOutput propagate();
 
-	/**
-	 * Applies Boolean Constraint Propagation (BCP) on this formula.
-	 *
-	 * @return The output of the propagation.
-	 */
-	PropagationOutput propagate();
-	
-	/**
-	 * Performs some operations when this formula is being cached, so as to clean up memory.
-	 *
-	 * @implSpec The default implementation does nothing.
-	 */
-	default void onCaching() {
-	    // Nothing to do by default.
-	}
+    /**
+     * Computes the dual hypergraph of this sub-formula (unless it has already been
+     * computed), and returns it.
+     *
+     * @return The dual hypergraph of this sub-formula.
+     */
+    DualHypergraph hypergraph();
+
+    /**
+     * Performs some operations when this formula is being cached, so as to clean up
+     * memory.
+     *
+     * @implSpec The default implementation does nothing.
+     */
+    default void onCaching() {
+        // Nothing to do by default.
+    }
 
 }

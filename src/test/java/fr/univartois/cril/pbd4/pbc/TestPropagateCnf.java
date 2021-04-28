@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
 @DisplayName("BCP on CNF formulae behaves as expected.")
 public final class TestPropagateCnf extends AbstractTestPseudoBooleanSolving {
@@ -167,33 +167,14 @@ public final class TestPropagateCnf extends AbstractTestPseudoBooleanSolving {
         assertEquals(4, formula0.numberOfConstraints());
         
         // Assuming the literal -1.
+        // NB: The formula is detected as SATISFIABLE because a learned clause propagates 3.
         var propagateNot1 = formula0.assume(-1).propagate();
-        assertTrue(propagateNot1.isUnknown());
+        assertTrue(propagateNot1.isSatisfiable());
         var propagatedLiteralsNot1 = propagateNot1.getPropagatedLiterals();
-        assertEquals(2, propagatedLiteralsNot1.size());
+        assertEquals(3, propagatedLiteralsNot1.size());
         assertTrue(propagatedLiteralsNot1.contains(-1));
         assertTrue(propagatedLiteralsNot1.contains(-4));
-        var formulaNot1 = propagateNot1.getSimplifiedFormula();
-        assertEquals(2, formulaNot1.numberOfVariables());
-        assertTrue(formulaNot1.variables().contains(2));
-        assertTrue(formulaNot1.variables().contains(3));
-        assertEquals(2, formulaNot1.numberOfConstraints());
-
-        // Assuming the literal -2 on the obtained formula.
-        var propagateNot2 = formulaNot1.assume(-2).propagate();
-        assertTrue(propagateNot2.isSatisfiable());
-        var propagatedLiteralsNot2 = propagateNot2.getPropagatedLiterals();
-        assertEquals(2, propagatedLiteralsNot2.size());
-        assertTrue(propagatedLiteralsNot2.contains(-2));
-        assertTrue(propagatedLiteralsNot2.contains(3));
-
-        // Assuming now the literal 2.
-        var propagate2 = formulaNot1.assume(2).propagate();
-        assertTrue(propagate2.isSatisfiable());
-        var propagatedLiterals2 = propagate2.getPropagatedLiterals();
-        assertEquals(2, propagatedLiterals2.size());
-        assertTrue(propagatedLiterals2.contains(2));
-        assertTrue(propagatedLiterals2.contains(3));
+        assertTrue(propagatedLiteralsNot1.contains(3));
 
         // Assuming now the literal 1 on the original formula.
         var propagate1 = formula0.assume(1).propagate();
@@ -235,13 +216,6 @@ public final class TestPropagateCnf extends AbstractTestPseudoBooleanSolving {
         assertEquals(2, propagatedLiteralsNot32.size());
         assertTrue(propagatedLiteralsNot32.contains(2));
         assertTrue(propagatedLiteralsNot32.contains(4));
-
-        // Assuming now the literal 3.
-        var propagate3 = formulaNot1.assume(3).propagate();
-        assertTrue(propagate3.isSatisfiable());
-        var propagatedLiterals3 = propagate3.getPropagatedLiterals();
-        assertEquals(1, propagatedLiterals3.size());
-        assertTrue(propagatedLiterals3.contains(3));
     }
 
     /**

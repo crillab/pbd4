@@ -30,9 +30,9 @@ import java.util.List;
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
-public final class ConjunctionNode implements DecisionDnnfNode {
+public final class ConjunctionNode extends NonConstantDecisionDnnfNode {
 
     /**
      * The decision-DNNF nodes for which this node is a representation of the conjunction.
@@ -75,32 +75,34 @@ public final class ConjunctionNode implements DecisionDnnfNode {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfNode#depthFirstAccept(fr.univartois.cril.
      * pbd4.ddnnf.DecisionDnnfVisitor)
      */
     @Override
     public void depthFirstAccept(DecisionDnnfVisitor visitor) {
-        visitor.enter(this);
-        conjuncts.forEach(c -> c.depthFirstAccept(visitor));
-        visitor.visit(this);
-        visitor.exit(this);
+        if (visitor.enter(this)) {
+	        conjuncts.forEach(c -> c.depthFirstAccept(visitor));
+	        visitor.visit(this);
+	        visitor.exit(this);
+        }
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfNode#breadthFirstAccept(fr.univartois.
      * cril.pbd4.ddnnf.DecisionDnnfVisitor)
      */
     @Override
     public void breadthFirstAccept(DecisionDnnfVisitor visitor) {
-        visitor.enter(this);
-        visitor.visit(this);
-        conjuncts.forEach(c -> c.breadthFirstAccept(visitor));
-        visitor.exit(this);
+        if (visitor.enter(this)) {
+	        visitor.visit(this);
+	        conjuncts.forEach(c -> c.breadthFirstAccept(visitor));
+	        visitor.exit(this);
+        }
     }
 
 }

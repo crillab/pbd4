@@ -15,7 +15,7 @@ apply plugin: "jacoco"
  **********************/
 
 def outDir = "${rootDir}/dist"
-def jarDir = "${outDir}/jars"
+def jarDir = "${outDir}/home"
 
 ext.moduleName = "fr.univartois.cril.pbd4"
 
@@ -24,15 +24,15 @@ ext.moduleName = "fr.univartois.cril.pbd4"
  ****************/
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 dependencies {
     implementation files("lib/fr.cril.cli-1.0.1-SNAPSHOT.jar")
-    implementation files("lib/jkahypar-module-0.1.0.jar")
+    implementation files("lib/jkahypar-module-0.2.0.jar")
     implementation files("lib/jna-5.5.0.jar")
-    implementation files("lib/org.sat4j.core.jar")
-    implementation files("lib/org.sat4j.pb.jar")
+    implementation files("lib/org.ow2.sat4j.core-2.3.6.jar")
+    implementation files("lib/org.ow2.sat4j.pb-2.3.6.jar")
 
     testImplementation group: "org.junit.jupiter", name: "junit-jupiter-engine", version: "5.6.0"
     testImplementation group: "org.junit.jupiter", name: "junit-jupiter-params", version: "5.6.0"
@@ -117,7 +117,7 @@ task pbd4(type: Tar) {
     dependsOn jar
     dependsOn gather
 
-    from file("${jarDir}"), file("exec/pbd4.sh")
+    from file("${jarDir}"), file("src/test/resources/config/kahypar.ini"), file("exec/pbd4.sh"), file("README.md")
     destinationDirectory = file("${outDir}")
     archiveBaseName = "pbd4"
     archiveExtension = "tgz"

@@ -35,7 +35,7 @@ import java.util.Set;
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
 public final class DecisionDnnf {
 
@@ -73,6 +73,42 @@ public final class DecisionDnnf {
         this.numberOfNodes = numberOfNodes;
         this.numberOfEdges = numberOfEdges;
         this.rootNode = rootNode;
+    }
+
+    /**
+     * Gives the number of variables in this decision-DNNF.
+     *
+     * @return The number of variables in this decision-DNNF.
+     */
+    public int getNumberOfVariables() {
+        return numberOfVariables;
+    }
+
+    /**
+     * Gives the number of nodes in this decision-DNNF.
+     *
+     * @return The number of nodes in this decision-DNNF.
+     */
+    public int getNumberOfNodes() {
+        return numberOfNodes;
+    }
+
+    /**
+     * Gives the number of edges in this decision-DNNF.
+     *
+     * @return The number of edges in this decision-DNNF.
+     */
+    public int getNumberOfEdges() {
+        return numberOfEdges;
+    }
+
+    /**
+     * Gives the root node of this decision-DNNF.
+     *
+     * @return The root node of this decision-DNNF.
+     */
+    public DecisionDnnfNode getRootNode() {
+        return rootNode;
     }
 
     /**
@@ -115,8 +151,7 @@ public final class DecisionDnnf {
 
     /**
      * Evaluates this decision-DNNF on the given assignment.
-     * An assignment is given by the array of literals it satisfies, given in DIMACS
-     * format.
+     * An assignment is given by the array of literals it satisfies, given in DIMACS format.
      *
      * @param assignment The assignment on which to evaluate this decision-DNNF.
      *
@@ -145,54 +180,18 @@ public final class DecisionDnnf {
     }
 
     /**
-     * Gives the number of variables in this decision-DNNF.
+     * Writes this decision-DNNF to the given output stream, using the NNF format.
      *
-     * @return The number of variables in this decision-DNNF.
-     */
-    public int getNumberOfVariables() {
-        return numberOfVariables;
-    }
-
-    /**
-     * Gives the number of nodes in this decision-DNNF.
-     *
-     * @return The number of nodes in this decision-DNNF.
-     */
-    public int getNumberOfNodes() {
-        return numberOfNodes;
-    }
-
-    /**
-     * Gives the number of edges in this decision-DNNF.
-     *
-     * @return The number of edges in this decision-DNNF.
-     */
-    public int getNumberOfEdges() {
-        return numberOfEdges;
-    }
-
-    /**
-     * Gives the root node of this decision-DNNF.
-     *
-     * @return The root node of this decision-DNNF.
-     */
-    public DecisionDnnfNode getRootNode() {
-        return rootNode;
-    }
-
-    /**
-     * Writes this decision-DNNF node to the given output stream, using the NNF format.
-     *
-     * @param outputStream The output stream in which to write this decision-DNNF node.
+     * @param outputStream The output stream in which to write this decision-DNNF.
      */
     public void writeTo(OutputStream outputStream) {
         depthFirstAccept(new DecisionDnnfWriter(outputStream));
     }
 
     /**
-     * Computes a String representation of this decision-DNNF node, using the NNF format.
+     * Computes a String representation of this decision-DNNF, using the NNF format.
      *
-     * @return A String representation of this decision-DNNF node.
+     * @return A String representation of this decision-DNNF.
      */
     @Override
     public String toString() {

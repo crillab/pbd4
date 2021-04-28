@@ -20,29 +20,38 @@
 
 package fr.univartois.cril.pbd4.pbc;
 
+import static fr.univartois.cril.pbd4.pbc.PropagationOutput.satisfiable;
+import static fr.univartois.cril.pbd4.pbc.PropagationOutput.unknown;
+import static fr.univartois.cril.pbd4.pbc.PropagationOutput.unsatisfiable;
 import static fr.univartois.cril.pbd4.pbc.RangeVecInt.range;
+
 import java.util.Collection;
 
 import org.sat4j.core.VecInt;
 import org.sat4j.minisat.core.ICDCL;
-import org.sat4j.minisat.orders.SubsetVarOrder;
 import org.sat4j.pb.constraints.pb.PBConstr;
 import org.sat4j.specs.ISolverService;
 import org.sat4j.specs.IVecInt;
+import org.sat4j.specs.SearchListener;
 import org.sat4j.specs.TimeoutException;
 
+import fr.univartois.cril.pbd4.pbc.hypergraph.DualHypergraph;
+import fr.univartois.cril.pbd4.pbc.solver.PBSelectorSolver;
+import fr.univartois.cril.pbd4.pbc.solver.SwitchableOrder;
+import fr.univartois.cril.pbd4.pbc.solver.UnitPropagationListener;
+
 /**
- * The OriginalPseudoBooleanFormula represents the original pseudo-Boolean formula, used
- * as input for the compiler or model counter.
+ * The OriginalPseudoBooleanFormula represents the original pseudo-Boolean
+ * formula used as input for the compiler or model counter.
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
 final class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
 
     /**
-     * The decorator for the solver, used to retrieve the informations about the formula.
+     * The solver that actually manages the formula.
      */
     private final PBSelectorSolver solver;
 
@@ -52,10 +61,20 @@ final class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
     private final ISolverService engine;
 
     /**
-     * The unit-propagation listener used to record the propagations performed during the
-     * execution of the solver.
+     * The order used by the solver as branching heuristic.
      */
-    private final UnitPropagationListener listener;
+    private final SwitchableOrder order;
+
+    /**
+     * The original listener used in the solver.
+     */
+    private final SearchListener<?> originalListener;
+
+    /**
+     * The unit-propagation listener used to record the propagations performed
+     * during the execution of the solver.
+     */
+    private final UnitPropagationListener unitPropagationListener;
 
     /**
      * The variables of this formula.
@@ -63,35 +82,35 @@ final class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
     private final IVecInt variables;
 
     /**
-     * The scores of the DLCS heuristic for each variable (i.e., the number of occurrences
-     * of each variable in the formula).
+     * The score of the DLCS heuristic for each variable (i.e., the number of
+     * occurrences of each variable in the formula).
      */
     private final int[] dlcsScores;
 
     /**
      * Creates a new OriginalPseudoBooleanFormula.
      *
-     * @param solver The decorator for the solver, used to retrieve the informations about
-     *        the formula.
+     * @param solver The solver that actually manages the formula.
      */
     OriginalPseudoBooleanFormula(PBSelectorSolver solver) {
         this.solver = solver;
         this.engine = (ISolverService) solver.getSolvingEngine();
-        this.listener = new UnitPropagationListener();
+        this.order = new SwitchableOrder();
+        this.originalListener = ((ICDCL<?>) engine).getSearchListener();
+        this.unitPropagationListener = new UnitPropagationListener();
         this.variables = range(1, numberOfVariables() + 1);
         this.dlcsScores = new int[solver.nVars() + 1];
         init();
     }
 
     /**
-     * Initializes this formula, by retrieving the information from the solver, and sets
-     * up the solver for the future calls.
+     * Initializes this formula, by retrieving the information from the solver,
+     * and setting up the solver for future calls.
      */
     private void init() {
-        // Configuring the solver.
+        // Setting up the solver.
+        ((ICDCL<?>) engine).setOrder(order);
         solver.setKeepSolverHot(true);
-        solver.setSearchListener(listener);
-        ((ICDCL<?>) engine).setOrder(new SubsetVarOrder(new int[0]));
 
         // Computing the DLCS scores.
         for (int v = 1; v <= numberOfVariables(); v++) {
@@ -101,7 +120,7 @@ final class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#numberOfVariables()
      */
     @Override
@@ -111,8 +130,9 @@ final class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#numberOfConstraints()
+     *
+     * @see
+     * fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#numberOfConstraints()
      */
     @Override
     public int numberOfConstraints() {
@@ -121,7 +141,7 @@ final class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#variables()
      */
     @Override
@@ -131,7 +151,7 @@ final class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#score(int)
      */
     @Override
@@ -153,59 +173,40 @@ final class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#assume(int)
      */
     @Override
     public PseudoBooleanFormula assume(int literal) {
-        throw new UnsupportedOperationException("This method is only available for sub-formulae!");
+        throw new UnsupportedOperationException("Cannot assume a literal on the original formula!");
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#assume(IVecInt)
      */
     @Override
     public PseudoBooleanFormula assume(IVecInt literals) {
         return SubPseudoBooleanFormulaBuilder.of(this)
-                .newAssumptions(literals)
-                .build();
-    }
-
-    /* 
-     * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#requirePartitioning()
-     */
-    @Override
-    public boolean requirePartitioning() {
-        throw new UnsupportedOperationException("This method is only available for sub-formulae!");
+            .newAssumptions(literals)
+            .build();
     }
 
     /*
      * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#cutset()
-     */
-    @Override
-    public IVecInt cutset() {
-        throw new UnsupportedOperationException("This method is only available for sub-formulae!");
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#connectedComponents()
+     *
+     * @see
+     * fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#connectedComponents()
      */
     @Override
     public Collection<PseudoBooleanFormula> connectedComponents() {
-        throw new UnsupportedOperationException("This method is only available for sub-formulae!");
+        throw new UnsupportedOperationException("Cannot compute the connected components of the original formula!");
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#propagate()
      */
     @Override
@@ -228,33 +229,63 @@ final class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
 
     /**
      * Applies Boolean Constraint Propagation (BCP) on this formula.
+     * If the result is unknown, the solver is then completely run to check whether the
+     * formula is satisfiable.
      *
      * @param assumptions The assumptions to make when propagating.
      *
      * @return The output of the propagation.
      */
     private PropagationOutput internalPropagate(IVecInt assumptions) {
-        listener.reset();
+        unitPropagationListener.reset();
 
+        // Trying to solve the formula using BCP.
+        order.switchToBCP();
+        solver.setSearchListener(unitPropagationListener);
+        var bcpOutput = solve(assumptions);
+
+        if (bcpOutput.isUnknown()) {
+            // Solving completely the formula
+            order.switchToComplete();
+            solver.setSearchListener(originalListener);
+            var completeOutput = solve(assumptions);
+
+            // Only unsatisfiable outputs are considered as is:
+            // satisfiable outputs require further exploration.
+            if (completeOutput.isUnsatisfiable()) {
+                return completeOutput;
+            }
+        }
+
+        return bcpOutput;
+    }
+
+    /**
+     * Solves this formula under the given assumptions.
+     *
+     * @param assumptions The assumptions to make when solving.
+     *
+     * @return The output of the solver.
+     */
+    private PropagationOutput solve(IVecInt assumptions) {
         try {
             if (solver.isSatisfiable(assumptions)) {
                 // The solver has found a solution.
-                return PropagationOutput.satisfiable(listener.getPropagatedLiterals());
+                return satisfiable(unitPropagationListener.getPropagatedLiterals());
             }
 
-            // The formula is necessarily unsatisfiable.
-            // Otherwise, an exception would have been thrown.
-            return PropagationOutput.unsatisfiable();
+            // The formula is unsatisfiable.
+            return unsatisfiable();
 
         } catch (TimeoutException e) {
             // The solver could not determine whether the formula was satisfiable.
-            return PropagationOutput.unknown(listener.getPropagatedLiterals(), this);
+            return unknown(unitPropagationListener.getPropagatedLiterals(), this);
         }
     }
 
     /**
      * Gives the {@code i}-th constraint in this formula.
-     * 
+     *
      * @param i The index of the constraint to get.
      *
      * @return The {@code i}-th constraint.
@@ -272,6 +303,16 @@ final class OriginalPseudoBooleanFormula implements PseudoBooleanFormula {
      */
     IVecInt getConstraintsContaining(int v) {
         return solver.getConstraintsContaining(v);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#hypergraph()
+     */
+    @Override
+    public DualHypergraph hypergraph() {
+        throw new UnsupportedOperationException("No DualHypergraph for original formula!");
     }
 
 }

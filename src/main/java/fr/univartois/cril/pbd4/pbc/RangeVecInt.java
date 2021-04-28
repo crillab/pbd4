@@ -33,9 +33,9 @@ import org.sat4j.specs.IteratorInt;
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
-public final class RangeVecInt implements IVecInt {
+final class RangeVecInt implements IVecInt {
 
     /**
      * The {@code serialVersionUID} of this {@link Serializable} class.
@@ -88,7 +88,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#clear()
      */
     @Override
@@ -98,7 +98,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#clone()
      */
     @Override
@@ -109,7 +109,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#contains(int)
      */
     @Override
@@ -119,7 +119,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#containsAt(int)
      */
     @Override
@@ -129,7 +129,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#containsAt(int, int)
      */
     @Override
@@ -140,11 +140,12 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#copyTo(org.sat4j.specs.IVecInt)
      */
     @Override
     public void copyTo(IVecInt vec) {
+        vec.ensure(vec.size() + size());
         for (int i = lowerBound; i < upperBound; i++) {
             vec.push(i);
         }
@@ -152,7 +153,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#copyTo(int[])
      */
     @Override
@@ -164,7 +165,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#delete(int)
      */
     @Override
@@ -174,7 +175,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#ensure(int)
      */
     @Override
@@ -184,7 +185,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#get(int)
      */
     @Override
@@ -194,7 +195,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#growTo(int, int)
      */
     @Override
@@ -204,7 +205,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#indexOf(int)
      */
     @Override
@@ -214,7 +215,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#insertFirst(int)
      */
     @Override
@@ -224,7 +225,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#isEmpty()
      */
     @Override
@@ -234,7 +235,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#iterator()
      */
     @Override
@@ -244,20 +245,21 @@ public final class RangeVecInt implements IVecInt {
             private int current = lowerBound;
 
             @Override
+            public boolean hasNext() {
+                return current < upperBound;
+            }
+
+            @Override
             public int next() {
                 return current++;
             }
 
-            @Override
-            public boolean hasNext() {
-                return current < upperBound;
-            }
         };
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#last()
      */
     @Override
@@ -267,7 +269,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#moveTo(org.sat4j.specs.IVecInt)
      */
     @Override
@@ -277,7 +279,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#moveTo(int[])
      */
     @Override
@@ -287,7 +289,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#moveTo(int, int[])
      */
     @Override
@@ -297,7 +299,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#moveTo(int, int)
      */
     @Override
@@ -307,7 +309,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#moveTo2(org.sat4j.specs.IVecInt)
      */
     @Override
@@ -317,7 +319,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#pop()
      */
     @Override
@@ -327,7 +329,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#push(int)
      */
     @Override
@@ -337,7 +339,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#remove(int)
      */
     @Override
@@ -347,7 +349,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#set(int, int)
      */
     @Override
@@ -357,7 +359,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#shrink(int)
      */
     @Override
@@ -367,7 +369,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#shrinkTo(int)
      */
     @Override
@@ -377,7 +379,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#size()
      */
     @Override
@@ -387,7 +389,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#sort()
      */
     @Override
@@ -397,7 +399,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#sort(java.util.Comparator)
      */
     @Override
@@ -407,7 +409,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#sortUnique()
      */
     @Override
@@ -417,7 +419,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#subset(int)
      */
     @Override
@@ -427,7 +429,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#toArray()
      */
     @Override
@@ -439,7 +441,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#unsafeGet(int)
      */
     @Override
@@ -449,7 +451,7 @@ public final class RangeVecInt implements IVecInt {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.sat4j.specs.IVecInt#unsafePush(int)
      */
     @Override

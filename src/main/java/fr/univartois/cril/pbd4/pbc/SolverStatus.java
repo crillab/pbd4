@@ -26,9 +26,9 @@ package fr.univartois.cril.pbd4.pbc;
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
-public enum SolverStatus {
+enum SolverStatus {
 
     /**
      * The UNSATISFIABLE status, meaning that the considered pseudo-Boolean formula does
@@ -39,6 +39,8 @@ public enum SolverStatus {
     /**
      * The SATISFIABLE status, meaning that the considered pseudo-Boolean formula has at
      * least one model, that the solver has found.
+     * An input is only considered as SATISFIABLE when Boolean constraint propagation is
+     * enough to find a model (in the context of the compiler, of course).
      */
     SATISFIABLE,
 

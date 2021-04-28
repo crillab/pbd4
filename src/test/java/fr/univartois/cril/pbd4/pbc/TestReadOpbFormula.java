@@ -36,7 +36,7 @@ import org.sat4j.core.LiteralsUtils;
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
 @DisplayName("Pseudo-Boolean formulae are properly read from an OPB input stream.")
 public final class TestReadOpbFormula extends AbstractTestPseudoBooleanSolving {

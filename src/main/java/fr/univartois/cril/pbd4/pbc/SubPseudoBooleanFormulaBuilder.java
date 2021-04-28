@@ -17,7 +17,7 @@
  * with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 package fr.univartois.cril.pbd4.pbc;
 
 import java.math.BigInteger;
@@ -33,7 +33,7 @@ import org.sat4j.specs.IVecInt;
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
 final class SubPseudoBooleanFormulaBuilder {
 
@@ -56,17 +56,7 @@ final class SubPseudoBooleanFormulaBuilder {
      * The assumptions that have been added to create the new sub-formula.
      */
     private IVecInt newAssumptions;
-    
-    /**
-     * The number of variables that have been removed at the previous step.
-     */
-    private int previousRemovedVariables;
-    
-    /**
-     * The number of variables that have been removed at the current step.
-     */
-    private int latestRemovedVariables;
-    
+
     /**
      * The whole set of assumptions, characterizing the new sub-formula.
      */
@@ -142,7 +132,6 @@ final class SubPseudoBooleanFormulaBuilder {
     SubPseudoBooleanFormulaBuilder decision(int literal) {
         this.decision = OptionalInt.of(literal);
         this.newAssumptions = VecInt.of(literal);
-        this.latestRemovedVariables = 1;
         return this;
     }
 
@@ -176,29 +165,7 @@ final class SubPseudoBooleanFormulaBuilder {
      */
     SubPseudoBooleanFormulaBuilder newAssumptions(IVecInt assumptions) {
         this.newAssumptions = assumptions;
-        this.latestRemovedVariables = assumptions.size();
         return this;
-    }
-
-    /**
-     * Sets the number of variables that have been removed at the previous step.
-     *
-     * @param previousRemovedVariables The number of variables that have been removed at the previous step.
-     *
-     * @return This builder.
-     */
-    public SubPseudoBooleanFormulaBuilder previousRemovedVariables(int previousRemovedVariables) {
-        this.previousRemovedVariables = previousRemovedVariables;
-        return this;
-    }
-
-    /**
-     * Gives the number of variables that have been removed at the current step.
-     *
-     * @return The number of variables that have been removed at the current step.
-     */
-    public int getLatestRemovedVariables() {
-        return latestRemovedVariables;
     }
 
     /**
@@ -229,7 +196,7 @@ final class SubPseudoBooleanFormulaBuilder {
      */
     BitSet getSatisfiedLiterals() {
         if (satisfiedLiterals == null) {
-            satisfiedLiterals = new BitSet(1 + (original.numberOfVariables() << 1));
+            satisfiedLiterals = new BitSet(2 + (original.numberOfVariables() << 1));
         }
 
         return satisfiedLiterals;
@@ -267,7 +234,7 @@ final class SubPseudoBooleanFormulaBuilder {
      *
      * @return This builder.
      */
-    SubPseudoBooleanFormulaBuilder possibleVariable(IVecInt variables) {
+    SubPseudoBooleanFormulaBuilder possibleVariables(IVecInt variables) {
         this.possibleVariables = variables;
         return this;
     }
@@ -282,7 +249,7 @@ final class SubPseudoBooleanFormulaBuilder {
     }
 
     /**
-     * Gives the DLCS scores of the variables, updated w.r.t. the constraint in the
+     * Gives the DLCS scores of the variables, updated w.r.t. the constraints in the
      * sub-formula.
      *
      * @return The DLCS scores of the variables.
@@ -302,7 +269,7 @@ final class SubPseudoBooleanFormulaBuilder {
         initialAssumptions.copyTo(allAssumptions);
         updateAssumptions();
 
-        // Updating the internal structure w.r.t. the remaining variable
+        // Updating the internal structure w.r.t. the remaining variables.
         updateVariables();
 
         // Creating the sub-formula.
@@ -314,7 +281,7 @@ final class SubPseudoBooleanFormulaBuilder {
      */
     private void updateAssumptions() {
         for (var it = newAssumptions.iterator(); it.hasNext();) {
-            var dimacs = it.next();
+            int dimacs = it.next();
             updateAssumption(dimacs);
         }
     }
@@ -325,8 +292,8 @@ final class SubPseudoBooleanFormulaBuilder {
      * @param dim The assumed literal to consider.
      */
     private void updateAssumption(int dimacs) {
-        var variable = Math.abs(dimacs);
-        var literal = LiteralsUtils.toInternal(dimacs);
+        int variable = Math.abs(dimacs);
+        int literal = LiteralsUtils.toInternal(dimacs);
 
         // Updating the literal data structure.
         allAssumptions.push(dimacs);
@@ -334,7 +301,7 @@ final class SubPseudoBooleanFormulaBuilder {
 
         // Updating the constraint data structure.
         for (var it = original.getConstraintsContaining(variable).iterator(); it.hasNext();) {
-            var constrIndex = it.next();
+            int constrIndex = it.next();
 
             if (getInactiveConstraints().get(constrIndex)) {
                 // This constraint is inactive, and is thus ignored.
@@ -346,12 +313,12 @@ final class SubPseudoBooleanFormulaBuilder {
             var constrValue = BigInteger.ZERO;
             for (int i = 0; i < constr.size(); i++) {
                 int lit = constr.get(i);
-                
+
                 if (LiteralsUtils.var(lit) > original.numberOfVariables()) {
                     // This literal is used as a selector, and must be ignored.
                     continue;
                 }
-                
+
                 if (satisfiedLiterals.get(lit)) {
                     constrValue = constrValue.add(constr.getCoef(i));
                 }
@@ -365,21 +332,13 @@ final class SubPseudoBooleanFormulaBuilder {
     }
 
     /**
-     * Computes the variables appearing in the sub-formula, and thos that have been removed
+     * Computes the variables appearing in the sub-formula, and those that have been removed.
      */
     private void updateVariables() {
-        // Counting the number of variables that have been removed at the previous step.
-        for (int i = initialAssumptions.size() - previousRemovedVariables; i < initialAssumptions.size(); i++) {
-            var variable = Math.abs(initialAssumptions.get(i));
-            if (countOccurrences(variable) > 0) {
-                latestRemovedVariables++;
-            }
-        }
-
         // Collecting the variables that remain in this formula.
         variables = new VecInt(possibleVariables.size());
         for (var it = possibleVariables.iterator(); it.hasNext();) {
-            var variable = it.next();
+            int variable = it.next();
 
             if (isAssigned(variable)) {
                 // This variable does not appear anymore in the formula.
@@ -387,7 +346,7 @@ final class SubPseudoBooleanFormulaBuilder {
             }
 
             // Counting the occurrences of the variable in the remaining constraints.
-            var occurrences = countOccurrences(variable);
+            int occurrences = countOccurrences(variable);
             if (occurrences > 0) {
                 updatedDlcsScores[variable] = occurrences;
                 variables.push(variable);
@@ -403,8 +362,8 @@ final class SubPseudoBooleanFormulaBuilder {
      * @return Whether {@code variable} is assigned.
      */
     private boolean isAssigned(int variable) {
-        var posLit = LiteralsUtils.posLit(variable);
-        var negLit = LiteralsUtils.negLit(variable);
+        int posLit = LiteralsUtils.posLit(variable);
+        int negLit = LiteralsUtils.negLit(variable);
         return getSatisfiedLiterals().get(posLit) || getSatisfiedLiterals().get(negLit);
     }
 
@@ -417,16 +376,12 @@ final class SubPseudoBooleanFormulaBuilder {
      */
     private int countOccurrences(int variable) {
         int occurrences = 0;
-
-        // Looking for the constraints containing the variable.
         for (var it = original.getConstraintsContaining(variable).iterator(); it.hasNext();) {
-            var constr = it.next();
+            int constr = it.next();
             if (!getInactiveConstraints().get(constr)) {
                 occurrences++;
             }
         }
-
-        // The variable is present if it appears in at least one active constraint.
         return occurrences;
     }
 

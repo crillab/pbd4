@@ -37,7 +37,7 @@ import fr.univartois.cril.jkahypar.hypergraph.HypergraphBuilder;
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
 public final class DualHypergraphBuilder {
 
@@ -47,9 +47,9 @@ public final class DualHypergraphBuilder {
     private final Hypergraphable hypergraphable;
 
     /**
-     * The current hyperedge identifier.
+     * The identifier of the hyperedge that is currently being added.
      */
-    private int currentHyperedgeIdentifier = 0;
+    private int currentHyperedgeIdentifier;
 
     /**
      * The map associating a hyperedge identifier to the variable it represents.
@@ -57,7 +57,7 @@ public final class DualHypergraphBuilder {
     private final Map<Integer, Integer> identifierToVariable;
 
     /**
-     * The current vertex identifier.
+     * The identifier of the vertex that is currently being added.
      */
     private int currentVertexIdentifier;
 
@@ -77,7 +77,7 @@ public final class DualHypergraphBuilder {
     private final IVecInt[] variablesAppearingInConstraint;
 
     /**
-     * The builder used to build the hypergraph.
+     * The builder used to build the KaHyPar representation of the hypergraph.
      */
     private final HypergraphBuilder builder;
 
@@ -98,7 +98,7 @@ public final class DualHypergraphBuilder {
     }
 
     /**
-     * Builds the dual hypergraph representing the associate {@link Hypergraphable}.
+     * Builds the dual hypergraph representing the associated {@link Hypergraphable}.
      *
      * @return The built hypergraph.
      */
@@ -108,8 +108,8 @@ public final class DualHypergraphBuilder {
             identifierToVariable.put(++currentHyperedgeIdentifier, variable);
             addHyperedge(variable);
         }
-        
-        return new DualHypergraph(builder.build(), variablesAppearingInConstraint, 
+
+        return new DualHypergraph(builder.build(), variablesAppearingInConstraint,
                 identifierToVariable, identifierToConstraint);
     }
 

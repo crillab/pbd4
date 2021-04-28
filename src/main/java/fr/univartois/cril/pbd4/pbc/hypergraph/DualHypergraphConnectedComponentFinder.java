@@ -33,10 +33,10 @@ import fr.univartois.cril.jkahypar.hypergraph.Hypergraph;
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
 public final class DualHypergraphConnectedComponentFinder {
-    
+
     /**
      * The representation of the hypergraph to compute the connected components of.
      */
@@ -48,18 +48,19 @@ public final class DualHypergraphConnectedComponentFinder {
     private final IVecInt[] variablesAppearingInConstraint;
 
     /**
-     * Whether each constraint has already been visited.
+     * The array storing which constraints have already been visited and which have not.
      */
     private final boolean[] visited;
 
     /**
      * Creates a new DualHypergraphConnectedComponentFinder.
-     * 
-     * @param constraints The constraints of the formula.
-     * @param variablesAppearingInConstraint The identifiers of the variables appearing in
-     *        each constraint.
+     *
+     * @param hypergraph The representation of the hypergraph to compute the connected
+     *        components of.
+     * @param variablesAppearingInConstraint The identifiers of the variables
+     *        appearing in each constraint.
      */
-    public DualHypergraphConnectedComponentFinder(Hypergraph hypergraph, 
+    DualHypergraphConnectedComponentFinder(Hypergraph hypergraph,
             IVecInt[] variablesAppearingInConstraint) {
         this.hypergraph = hypergraph;
         this.variablesAppearingInConstraint = variablesAppearingInConstraint;
@@ -69,9 +70,11 @@ public final class DualHypergraphConnectedComponentFinder {
     /**
      * Computes the connected components of the hypergraph.
      *
-     * @return The vector of connected components.
+     * @return The vector of connected components, where each component is represented
+     *         by the vector of (the identifiers of) the constraints appearing
+     *         in the component.
      */
-    public IVec<IVecInt> connectedComponents() {
+    IVec<IVecInt> connectedComponents() {
         var components = new Vec<IVecInt>();
 
         for (int constraint = 1; constraint < variablesAppearingInConstraint.length; constraint++) {
@@ -84,12 +87,13 @@ public final class DualHypergraphConnectedComponentFinder {
     }
 
     /**
-     * Finds the connected component of the graph containing the given constraint.
+     * Finds the connected component that contains the given constraint.
      * It is assumed that this constraint has never been visited before.
      *
-     * @param constraint The identifier of the constraint to start the exploration from.
+     * @param constraint The identifier of the constraint to start the
+     *        exploration from.
      *
-     * @return The connected component of the graph containing the given constraint.
+     * @return The connected component containing the given constraint.
      */
     private IVecInt componentOf(int constraint) {
         // Initializing the exploration.
@@ -98,9 +102,14 @@ public final class DualHypergraphConnectedComponentFinder {
         var explored = new VecInt();
 
         while (!toExplore.isEmpty()) {
-            // Visiting the next constraint.
+            // Visiting the next constraint, only if it has not been visited yet.
             int constr = toExplore.last();
             toExplore.pop();
+            if (visited[constr]) {
+                continue;
+            }
+
+            // Marking the constraint as visited.
             explored.push(constr);
             visited[constr] = true;
 
@@ -122,12 +131,9 @@ public final class DualHypergraphConnectedComponentFinder {
     private void addConstraintsContaining(IVecInt toExplore, int variable) {
         var limits = hypergraph.getHyperedgeIndices();
         var constraints = hypergraph.getHyperedgeVertices();
-        
+
         for (int i = (int) limits[variable - 1]; i < limits[variable]; i++) {
-            int constraint = constraints[i] + 1;
-            if (!visited[constraint]) {
-                toExplore.push(constraint);
-            }
+            toExplore.push(constraints[i] + 1);
         }
     }
 

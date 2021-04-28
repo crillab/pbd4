@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
 @DisplayName("BCP on pseudo-Boolean formulae behaves as expected.")
 public final class TestPropagateOpb extends AbstractTestPseudoBooleanSolving {

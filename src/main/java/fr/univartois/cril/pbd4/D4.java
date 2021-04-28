@@ -22,42 +22,92 @@ package fr.univartois.cril.pbd4;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
+import org.sat4j.pb.SolverFactory;
+
+import fr.univartois.cril.pbd4.caching.CachingStrategy;
+import fr.univartois.cril.pbd4.caching.NoCache;
 import fr.univartois.cril.pbd4.ddnnf.DecisionDnnf;
+import fr.univartois.cril.pbd4.listener.CompositeListener;
+import fr.univartois.cril.pbd4.listener.D4Listener;
+import fr.univartois.cril.pbd4.partitioning.CutsetComputationStrategy;
+import fr.univartois.cril.pbd4.partitioning.CutsetUpdateStrategy;
+import fr.univartois.cril.pbd4.partitioning.KahyparCutsetComputationStrategy;
+import fr.univartois.cril.pbd4.partitioning.LargeChangeCutsetUpdateStrategy;
 import fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula;
 import fr.univartois.cril.pbd4.pbc.PseudoBooleanFormulaReader;
+import fr.univartois.cril.pbd4.pbc.solver.SolverProvider;
 
 /**
- * The D4 class makes easier the configuration and use of D4-based compilers or model
- * counters.
+ * The D4 class makes easier the configuration and use of D4-based compilers or
+ * model counters.
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
 public final class D4 {
 
     /**
-     * The pseudo-Boolean formula to consider in the algorithm.
+     * The supplier for the input formula.
      */
-    private PseudoBooleanFormula formula;
+    private Supplier<PseudoBooleanFormula> formulaSupplier;
 
     /**
-     * The caching strategy to use in the algorithm.
+     * The provider for the solver to use as a SAT oracle.
+     */
+    private SolverProvider solverProvider;
+
+    /**
+     * The name of the solver to use as a SAT oracle.
+     */
+    private String solverName;
+
+    /**
+     * The path of KaHyPar's configuration file.
+     */
+    private String kahyparConfig;
+
+    /**
+     * The imbalance setting for KaHyPar.
+     */
+    private double imbalance;
+
+    /**
+     * The number of blocks in the partitions to find.
+     */
+    private int partitionSize;
+
+    /**
+     * The caching strategy to use.
      */
     private CachingStrategy<?> cache;
+
+    private CompositeListener listener = new CompositeListener();
+
+    private CutsetUpdateStrategy cutsetUpdateStrategy = LargeChangeCutsetUpdateStrategy.instance();
 
     /**
      * Creates a new D4 configurator.
      */
     private D4() {
+        this.imbalance = KahyparCutsetComputationStrategy.DEFAULT_IMBALANCE;
+        this.partitionSize = KahyparCutsetComputationStrategy.DEFAULT_NUMBER_OF_BLOCKS;
+        this.solverProvider = SolverProvider.defaultProvider();
+        this.solverName = solverProvider.toString();
+        this.formulaSupplier = () -> null;
         this.cache = NoCache.instance();
     }
 
     /**
      * Creates a new D4 configurator.
-     * 
+     *
      * @return The created configurator
      */
     public static D4 newInstance() {
@@ -65,55 +115,73 @@ public final class D4 {
     }
 
     /**
-     * Specifies the path of the file containing the input formula to compile.
+     * Specifies the path of the file containing the input formula.
      *
      * @param path The path of the input file.
      *
      * @return This configurator.
-     *
-     * @throws IOException If an I/O error occurs while reading the formula.
      */
-    public D4 whenCompiling(String path) throws IOException {
-        return whenCompiling(PseudoBooleanFormulaReader.read(path));
+    public D4 onInput(String path) {
+        this.formulaSupplier = () -> {
+            try {
+                var reader = new PseudoBooleanFormulaReader(solverProvider);
+                return reader.read(path);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        };
+        return this;
     }
 
     /**
-     * Specifies the stream from which to read the input formula to compile.
-     * The stream is supposed to use the CNF format.
+     * Specifies the stream from which to read the input formula. The stream is
+     * supposed to use the CNF format.
      *
      * @param stream The input stream to read the formula from.
-     * 
-     * @return This configurator.
      *
-     * @throws IOException If an I/O error occurs while reading the formula.
+     * @return This configurator.
      */
-    public D4 whenCompilingCnf(InputStream stream) throws IOException {
-        return whenCompiling(PseudoBooleanFormulaReader.readCnf(stream));
+    public D4 onCnfInput(InputStream stream) {
+        this.formulaSupplier = () -> {
+            try {
+                var reader = new PseudoBooleanFormulaReader(solverProvider);
+                return reader.readCnf(stream);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        };
+        return this;
     }
 
     /**
-     * Specifies the stream from which to read the input formula to compile.
-     * The stream is supposed to use the OPB format.
+     * Specifies the stream from which to read the input formula. The stream is
+     * supposed to use the OPB format.
      *
      * @param stream The input stream to read the formula from.
-     * 
-     * @return This configurator.
      *
-     * @throws IOException If an I/O error occurs while reading the formula.
+     * @return This configurator.
      */
-    public D4 whenCompilingOpb(InputStream stream) throws IOException {
-        return whenCompiling(PseudoBooleanFormulaReader.readOpb(stream));
+    public D4 onOpbInput(InputStream stream) {
+        this.formulaSupplier = () -> {
+            try {
+                var reader = new PseudoBooleanFormulaReader(solverProvider);
+                return reader.readOpb(stream);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        };
+        return this;
     }
 
     /**
      * Specifies the input formula to compile.
      *
      * @param formula The formula to compile.
-     * 
+     *
      * @return This configurator.
      */
-    public D4 whenCompiling(PseudoBooleanFormula formula) {
-        this.formula = formula;
+    public D4 onInput(PseudoBooleanFormula formula) {
+        this.formulaSupplier = () -> formula;
         return this;
     }
 
@@ -121,16 +189,82 @@ public final class D4 {
      * Gives the formula to compile.
      *
      * @return The formula to compile.
+     *
+     * @throws UncheckedIOException If the formula is to be read and an I/O
+     *         error
+     *         occurs while reading.
      */
     PseudoBooleanFormula getFormula() {
-        return formula;
+        return formulaSupplier.get();
     }
 
     /**
-     * Specifies the caching strategy to use during the compilation.
+     * Specifies the name of the solver to use as a SAT oracle during the
+     * execution
+     * of the D4 algorithm.
+     *
+     * @param solverName The name of the solver to use.
+     *
+     * @return This configurator.
+     *
+     * @see SolverFactory#createSolverByName(String)
+     */
+    public D4 useSolver(String solverName) {
+        this.solverProvider = SolverProvider.forSolver(solverName);
+        this.solverName = solverName;
+        return this;
+    }
+
+    /**
+     * Specifies the path of KaHyPar's configuration file.
+     *
+     * @param kahyparConfig The path of KaHyPar's configuration file.
+     *
+     * @return This configurator.
+     *
+     * @throws IllegalArgumentException If {@code kahyparConfig} is not the path
+     *         of
+     *         a readable file.
+     */
+    public D4 withConfiguration(String kahyparConfig) {
+        if (Files.isReadable(Paths.get(kahyparConfig))) {
+            this.kahyparConfig = kahyparConfig;
+            return this;
+        }
+
+        throw new IllegalArgumentException(kahyparConfig + " cannot be used as configuration file");
+    }
+
+    /**
+     * Specifies the imbalance setting used by KaHyPar.
+     *
+     * @param imbalance The imbalance setting for KaHyPar.
+     *
+     * @return This configurator.
+     */
+    public D4 withImbalance(double imbalance) {
+        this.imbalance = imbalance;
+        return this;
+    }
+
+    /**
+     * Specifies the size of the partitions of the formula to compute.
+     *
+     * @param partitionSize The size of the partitions to compute.
+     *
+     * @return This configurator.
+     */
+    public D4 ofSize(int partitionSize) {
+        this.partitionSize = partitionSize;
+        return this;
+    }
+
+    /**
+     * Specifies the caching strategy to use during the execution of the D4
+     * algorithm.
      *
      * @param cachingStrategy The caching strategy to use.
-     * 
+     *
      * @return This configurator.
      */
     public D4 useCachingStrategy(CachingStrategy<?> cachingStrategy) {
@@ -139,15 +273,41 @@ public final class D4 {
     }
 
     /**
-     * Gives the caching strategy to use during the compilation.
+     * Gives the caching strategy to use during the execution of the D4
+     * algorithm.
      *
-     * @param <T> The type of the elements to store in the cache.
+     * @param <T> The type of the values associated to the formulae in the
+     *        cache.
      *
      * @return The caching strategy to use.
      */
-    @SuppressWarnings("unchecked")
     <T> CachingStrategy<T> getCache() {
-        return (CachingStrategy<T>) cache;
+        @SuppressWarnings("unchecked")
+        var actualCache = (CachingStrategy<T>) cache;
+        return actualCache;
+    }
+
+    public D4 notifyListener(D4Listener listener) {
+        this.listener.addListener(listener);
+        return this;
+    }
+
+    D4Listener getListener() {
+        return listener;
+    }
+
+    CutsetComputationStrategy getCutsetComputationStrategy() {
+        return KahyparCutsetComputationStrategy.newInstance(kahyparConfig, imbalance,
+                partitionSize);
+    }
+
+    D4 useCutsetUpdateStrategy(CutsetUpdateStrategy cutsetUpdateStrategy) {
+        this.cutsetUpdateStrategy = cutsetUpdateStrategy;
+        return this;
+    }
+
+    CutsetUpdateStrategy getCutsetUpdateStrategy() {
+        return cutsetUpdateStrategy;
     }
 
     /**
@@ -156,8 +316,7 @@ public final class D4 {
      * @return The number of models.
      */
     public BigInteger countModels() {
-        var modelCounter = new D4ModelCounter(this);
-        return modelCounter.compute();
+        return compute(D4ModelCounter::new);
     }
 
     /**
@@ -166,8 +325,38 @@ public final class D4 {
      * @return A decision-DNNF representing the formula.
      */
     public DecisionDnnf compileToDecisionDnnf() {
-        var compiler = new D4DecisionDnnfCompiler(this);
-        return compiler.compute();
+        return compute(D4DecisionDnnfCompiler::new);
+    }
+
+    /**
+     * Computes the result of an implementation of D4 on the formula.
+     *
+     * @param <R> The type of the result to compute.
+     *
+     * @param factory The function used to instantiate the implementation of D4.
+     *
+     * @return The computed result.
+     */
+    public <R> R compute(Function<D4, AbstractD4<?, R>> factory) {
+        var d4Implementation = factory.apply(this);
+        return d4Implementation.compute();
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+        return "c ============================ PBD4 CONFIGURATION ============================\n"
+                + "c\n"
+                + "c Solver used as SAT oracle: " + solverName + "\n"
+                + "c Location of KaHyPar INI file: "
+                + kahyparConfig + "\n" + "c Imbalance value for KaHyPar: " + imbalance + "\n"
+                + "c Size of the partitions computed by KaHyPar: " + partitionSize + "\n"
+                + "c Caching strategy: "
+                + cache + "\n" + "c\n"
+                + "c ============================================================================";
     }
 
 }

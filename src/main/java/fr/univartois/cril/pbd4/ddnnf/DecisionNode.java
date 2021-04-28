@@ -26,9 +26,9 @@ package fr.univartois.cril.pbd4.ddnnf;
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
-public final class DecisionNode implements DecisionDnnfNode {
+public final class DecisionNode extends NonConstantDecisionDnnfNode {
 
     /**
      * The variable for which this node represents a decision on.
@@ -74,34 +74,36 @@ public final class DecisionNode implements DecisionDnnfNode {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfNode#depthFirstAccept(fr.univartois.cril.
      * pbd4.ddnnf.DecisionDnnfVisitor)
      */
     @Override
     public void depthFirstAccept(DecisionDnnfVisitor visitor) {
-        visitor.enter(this);
-        leftChild.depthFirstAccept(visitor);
-        rightChild.depthFirstAccept(visitor);
-        visitor.visit(this);
-        visitor.exit(this);
+        if (visitor.enter(this)) {
+	        leftChild.depthFirstAccept(visitor);
+	        rightChild.depthFirstAccept(visitor);
+	        visitor.visit(this);
+	        visitor.exit(this);
+        }
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfNode#breadthFirstAccept(fr.univartois.
      * cril.pbd4.ddnnf.DecisionDnnfVisitor)
      */
     @Override
     public void breadthFirstAccept(DecisionDnnfVisitor visitor) {
-        visitor.enter(this);
-        visitor.visit(this);
-        leftChild.breadthFirstAccept(visitor);
-        rightChild.breadthFirstAccept(visitor);
-        visitor.exit(this);
+        if (visitor.enter(this)) {
+	        visitor.visit(this);
+	        leftChild.breadthFirstAccept(visitor);
+	        rightChild.breadthFirstAccept(visitor);
+	        visitor.exit(this);
+    	}
     }
 
     /**

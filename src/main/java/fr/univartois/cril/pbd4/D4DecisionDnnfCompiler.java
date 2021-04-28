@@ -34,12 +34,12 @@ import fr.univartois.cril.pbd4.ddnnf.DecisionNode;
 import fr.univartois.cril.pbd4.ddnnf.LiteralNode;
 
 /**
- * The D4DecisionDnnfCompiler specifies the D4 algorithm for compiling the input formula
- * into a decision-DNNF.
+ * The D4DecisionDnnfCompiler implements the D4 algorithm for compiling the
+ * input formula into a decision-DNNF.
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
 final class D4DecisionDnnfCompiler extends AbstractD4<DecisionDnnfNode, DecisionDnnf> {
 
@@ -59,6 +59,18 @@ final class D4DecisionDnnfCompiler extends AbstractD4<DecisionDnnfNode, Decision
     private int numberOfEdges;
 
     /**
+     * Whether the constant node {@link ConstantNode#FALSE} has already been produced
+     * during the compilation.
+     */
+    private boolean falseNodeProduced;
+
+    /**
+     * Whether the constant node {@link ConstantNode#TRUE} has already been produced
+     * during the compilation.
+     */
+    private boolean trueNodeProduced;
+
+    /**
      * The decision-DNNF nodes representing the literals.
      */
     private final DecisionDnnfNode[] literals;
@@ -71,8 +83,6 @@ final class D4DecisionDnnfCompiler extends AbstractD4<DecisionDnnfNode, Decision
     D4DecisionDnnfCompiler(D4 configuration) {
         super(configuration);
         this.numberOfVariables = configuration.getFormula().numberOfVariables();
-        this.numberOfNodes = 2;
-        this.numberOfEdges = 0;
         this.literals = new DecisionDnnfNode[2 + (numberOfVariables << 1)];
     }
 
@@ -83,28 +93,39 @@ final class D4DecisionDnnfCompiler extends AbstractD4<DecisionDnnfNode, Decision
      */
     @Override
     protected DecisionDnnfNode unsatisfiable() {
+        if (!falseNodeProduced) {
+            // The FALSE node is "created" now.
+            numberOfNodes++;
+            falseNodeProduced = true;
+        }
         return ConstantNode.FALSE;
     }
 
     /*
      * (non-Javadoc)
      *
-     * @see fr.univartois.cril.pbd4.AbstractD4#implicant(int, org.sat4j.specs.IVecInt)
+     * @see fr.univartois.cril.pbd4.AbstractD4#implicant(int,
+     * org.sat4j.specs.IVecInt)
      */
     @Override
     protected DecisionDnnfNode implicant(int nbFreeVariables, IVecInt implicant) {
+        if (!trueNodeProduced) {
+            // The TRUE node is "created" now.
+            numberOfNodes++;
+            trueNodeProduced = true;
+        }
         return cached(nbFreeVariables, implicant, ConstantNode.TRUE);
     }
 
     /*
      * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.AbstractD4#cached(int, org.sat4j.specs.IVecInt,
-     * java.lang.Object)
+     *
+     * @see fr.univartois.cril.pbd4.AbstractD4#cached(int,
+     * org.sat4j.specs.IVecInt, java.lang.Object)
      */
     @Override
-    protected DecisionDnnfNode cached(int nbFreeVariables, IVecInt propagatedLiterals,
-            DecisionDnnfNode cached) {
+    protected DecisionDnnfNode cached(int nbFreeVariables,
+            IVecInt propagatedLiterals, DecisionDnnfNode cached) {
         var list = new LinkedList<DecisionDnnfNode>();
         list.add(cached);
         return conjunction(nbFreeVariables, propagatedLiterals, list);
@@ -112,17 +133,17 @@ final class D4DecisionDnnfCompiler extends AbstractD4<DecisionDnnfNode, Decision
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.AbstractD4#decision(int, java.lang.Object,
      * java.lang.Object)
      */
     @Override
-    protected DecisionDnnfNode decision(int variable, DecisionDnnfNode ifTrue,
-            DecisionDnnfNode ifFalse) {
+    protected DecisionDnnfNode decision(int variable,
+            DecisionDnnfNode ifTrue, DecisionDnnfNode ifFalse) {
         // There is one more node: the created decision node.
         numberOfNodes++;
 
-        // There is an edge for each of two children.
+        // There is an edge for each of the two children.
         numberOfEdges += 2;
 
         // Creating the new node.
@@ -131,13 +152,13 @@ final class D4DecisionDnnfCompiler extends AbstractD4<DecisionDnnfNode, Decision
 
     /*
      * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.AbstractD4#conjunction(int, org.sat4j.specs.IVecInt,
-     * java.util.List)
+     *
+     * @see fr.univartois.cril.pbd4.AbstractD4#conjunction(int,
+     * org.sat4j.specs.IVecInt, java.util.List)
      */
     @Override
-    protected DecisionDnnfNode conjunction(int nbFreeVariables, IVecInt literals,
-            List<DecisionDnnfNode> conjuncts) {
+    protected DecisionDnnfNode conjunction(int nbFreeVariables,
+            IVecInt literals, List<DecisionDnnfNode> conjuncts) {
         // There is one more node: the created conjunction node.
         numberOfNodes++;
 
@@ -151,11 +172,12 @@ final class D4DecisionDnnfCompiler extends AbstractD4<DecisionDnnfNode, Decision
     }
 
     /**
-     * Creates, for each literal in the vector, a decision-DNNF representing this literal.
+     * Creates, for each literal in the vector, a decision-DNNF representing
+     * this literal.
      *
      * @param literals The literals to create decision-DNNFs for.
-     * @param output The list in which to store the decision-DNNFs representing the
-     *        literals.
+     * @param output The list in which to store the decision-DNNFs representing
+     *        the literals.
      */
     private void toDecisionDnnf(IVecInt literals, List<DecisionDnnfNode> output) {
         for (var it = literals.iterator(); it.hasNext();) {
@@ -181,7 +203,7 @@ final class D4DecisionDnnfCompiler extends AbstractD4<DecisionDnnfNode, Decision
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.AbstractD4#toFinalResult(java.lang.Object)
      */
     @Override

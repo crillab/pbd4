@@ -23,15 +23,29 @@ package fr.univartois.cril.pbd4.pbc;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 
+import fr.univartois.cril.pbd4.pbc.solver.SolverProvider;
+
 /**
  * The AbstractTestPseudoBooleanSolving is the parent class for the test cases of the
  * representation of pseudo-Boolean formulae.
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
 public abstract class AbstractTestPseudoBooleanSolving {
+
+    /**
+     * Creates the default PseudoBooleanFormulaReader.
+     * It is mainly designed to be used for test cases.
+     *
+     * @return The default reader, which uses {@link SolverProvider#defaultProvider()}
+     *         as provider for the solver to use to deal with the read pseudo-Boolean
+     *         formulae.
+     */
+    static PseudoBooleanFormulaReader defaultReader() {
+        return new PseudoBooleanFormulaReader(SolverProvider.defaultProvider());
+    }
 
     /**
      * Reads a pseudo-Boolean formula from a CNF resource file.
@@ -45,7 +59,7 @@ public abstract class AbstractTestPseudoBooleanSolving {
      */
     protected OriginalPseudoBooleanFormula readCnf(String filename) {
         try (var input = getClass().getResourceAsStream("/cnf/" + filename)) {
-            return (OriginalPseudoBooleanFormula) PseudoBooleanFormulaReader.readCnf(input);
+            return (OriginalPseudoBooleanFormula) defaultReader().readCnf(input);
 
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -64,7 +78,7 @@ public abstract class AbstractTestPseudoBooleanSolving {
      */
     protected OriginalPseudoBooleanFormula readOpb(String filename) {
         try (var input = getClass().getResourceAsStream("/opb/" + filename)) {
-            return (OriginalPseudoBooleanFormula) PseudoBooleanFormulaReader.readOpb(input);
+            return (OriginalPseudoBooleanFormula) defaultReader().readOpb(input);
 
         } catch (IOException e) {
             throw new UncheckedIOException(e);

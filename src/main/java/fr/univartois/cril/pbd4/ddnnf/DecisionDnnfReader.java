@@ -39,7 +39,7 @@ import java.util.List;
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
 public final class DecisionDnnfReader implements Closeable {
 
@@ -77,6 +77,8 @@ public final class DecisionDnnfReader implements Closeable {
      * Reads a decision-DNNF from the associated input.
      *
      * @return The read decision-DNNF.
+     *
+     * @throws IOException If an I/O error occurs while reading.
      */
     public DecisionDnnf read() throws IOException {
         // Reading the description of the decision-DNNF.
@@ -84,7 +86,7 @@ public final class DecisionDnnfReader implements Closeable {
         int nbNodes = Integer.parseInt(description[1]);
         int nbEdges = Integer.parseInt(description[2]);
         int nbVariables = Integer.parseInt(description[3]);
-        
+
         // Reading the nodes of the decision-DNNF.
         readNodes = new ArrayList<>(nbNodes);
         for (int i = 0; i < nbNodes; i++) {
@@ -102,27 +104,29 @@ public final class DecisionDnnfReader implements Closeable {
      * @return The read node.
      *
      * @throws IOException If an I/O error occurs while reading the file.
+     *
+     * @throws IOException If an I/O error occurs while reading.
      */
     private DecisionDnnfNode next() throws IOException {
         var line = input.readLine().split("\\s+");
 
-        if ("L".equals(line[0])) {
+        if ("L".equalsIgnoreCase(line[0])) {
             // The next node represents a literal.
             return nextLiteral(line);
         }
 
-        if ("A".equals(line[0])) {
+        if ("A".equalsIgnoreCase(line[0])) {
             // The next node represents a conjunction.
             return nextConjunctionNode(line);
         }
 
-        if ("O".equals(line[0])) {
+        if ("O".equalsIgnoreCase(line[0])) {
             // The next node represents a decision.
             return nextDecisionNode(line);
         }
 
-        // The node uses an unrecognized type.
-        throw new UnsupportedOperationException("Cannot add node type: " + line[0]);
+        // The node declares an unrecognized type.
+        throw new UnsupportedOperationException("Unrecognized node type: " + line[0]);
     }
 
     /**
@@ -183,7 +187,7 @@ public final class DecisionDnnfReader implements Closeable {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.io.Closeable#close()
      */
     @Override

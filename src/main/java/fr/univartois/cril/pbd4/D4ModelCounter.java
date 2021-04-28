@@ -26,12 +26,12 @@ import java.util.List;
 import org.sat4j.specs.IVecInt;
 
 /**
- * The D4ModelCounter specifies the D4 algorithm for counting the number of models of the
- * input formula.
+ * The D4ModelCounter implements the D4 algorithm for counting the number of
+ * models of the input formula.
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
 final class D4ModelCounter extends AbstractD4<BigInteger, BigInteger> {
 
@@ -46,7 +46,7 @@ final class D4ModelCounter extends AbstractD4<BigInteger, BigInteger> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.AbstractD4#unsatisfiable()
      */
     @Override
@@ -57,7 +57,8 @@ final class D4ModelCounter extends AbstractD4<BigInteger, BigInteger> {
     /*
      * (non-Javadoc)
      *
-     * @see fr.univartois.cril.pbd4.AbstractD4#implicant(int, org.sat4j.specs.IVecInt)
+     * @see fr.univartois.cril.pbd4.AbstractD4#implicant(int,
+     * org.sat4j.specs.IVecInt)
      */
     @Override
     protected BigInteger implicant(int nbFreeVariables, IVecInt implicant) {
@@ -66,9 +67,9 @@ final class D4ModelCounter extends AbstractD4<BigInteger, BigInteger> {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.AbstractD4#cached(int, org.sat4j.specs.IVecInt,
-     * java.lang.Object)
+     *
+     * @see fr.univartois.cril.pbd4.AbstractD4#cached(int,
+     * org.sat4j.specs.IVecInt, java.lang.Object)
      */
     @Override
     protected BigInteger cached(int nbFreeVariables, IVecInt propagatedLiterals, BigInteger cached) {
@@ -77,7 +78,7 @@ final class D4ModelCounter extends AbstractD4<BigInteger, BigInteger> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.AbstractD4#decision(int, java.lang.Object,
      * java.lang.Object)
      */
@@ -88,20 +89,19 @@ final class D4ModelCounter extends AbstractD4<BigInteger, BigInteger> {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.AbstractD4#conjunction(int, org.sat4j.specs.IVecInt,
-     * java.util.List)
+     *
+     * @see fr.univartois.cril.pbd4.AbstractD4#conjunction(int,
+     * org.sat4j.specs.IVecInt, java.util.List)
      */
     @Override
     protected BigInteger conjunction(int nbFreeVariables, IVecInt literals, List<BigInteger> conjuncts) {
         var conjunctsModels = conjuncts.stream().reduce(BigInteger.ONE, BigInteger::multiply);
-        var freeVariableAssignments = BigInteger.ONE.shiftLeft(nbFreeVariables);
-        return conjunctsModels.multiply(freeVariableAssignments);
+        return conjunctsModels.shiftLeft(nbFreeVariables);
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.AbstractD4#toFinalResult(java.lang.Object)
      */
     @Override

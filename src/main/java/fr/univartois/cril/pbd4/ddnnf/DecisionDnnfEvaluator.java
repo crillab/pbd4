@@ -17,7 +17,7 @@
  * with this program.
  * If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 package fr.univartois.cril.pbd4.ddnnf;
 
 import java.util.Deque;
@@ -26,14 +26,14 @@ import java.util.Set;
 import java.util.function.BinaryOperator;
 
 /**
- * The DecisionDnnfEvaluator is a {@link DecisionDnnfVisitor} which evaluates the truth
- * value of a decision-DNNF, given an assignment of its variables.
+ * The DecisionDnnfEvaluator is a {@link DecisionDnnfVisitor} which evaluates
+ * the truth value of a decision-DNNF, given an assignment of its variables.
  *
  * Visiting must be performed in a depth-first manner.
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
 final class DecisionDnnfEvaluator implements DecisionDnnfVisitor {
 
@@ -58,9 +58,14 @@ final class DecisionDnnfEvaluator implements DecisionDnnfVisitor {
     private final Deque<Boolean> partialEvaluations;
 
     /**
-     * The stack of the operation to perform.
+     * The stack of the operations to perform.
      */
     private final Deque<BinaryOperator<Boolean>> operations;
+
+    /**
+     * The time stamp at which visiting has started (in nano-seconds since the epoch).
+     */
+    private long startTime;
 
     /**
      * Creates a new DecisionDnnfEvaluator.
@@ -75,23 +80,42 @@ final class DecisionDnnfEvaluator implements DecisionDnnfVisitor {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
-     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#enter(fr.univartois.cril.pbd4.
-     * ddnnf.ConjunctionNode)
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#enter(fr.univartois.cril.
+     * pbd4.ddnnf.DecisionDnnf)
      */
     @Override
-    public void enter(ConjunctionNode node) {
-        partialEvaluations.push(true);
-        operations.push(AND);
+    public void enter(DecisionDnnf ddnnf) {
+        this.startTime = System.nanoTime();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
-     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#visit(fr.univartois.cril.pbd4.
-     * ddnnf.ConjunctionNode)
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#enter(fr.univartois.cril.
+     * pbd4.ddnnf.ConjunctionNode)
+     */
+    @Override
+    public boolean enter(ConjunctionNode node) {
+        if (pushCachedValue(node)) {
+            // No need to evaluate the conjuncts.
+            return false;
+        }
+
+        // The conjuncts must be evaluated.
+        partialEvaluations.push(true);
+        operations.push(AND);
+        return true;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#visit(fr.univartois.cril.
+     * pbd4.ddnnf.ConjunctionNode)
      */
     @Override
     public void visit(ConjunctionNode node) {
@@ -100,35 +124,42 @@ final class DecisionDnnfEvaluator implements DecisionDnnfVisitor {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
-     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#exit(fr.univartois.cril.pbd4.
-     * ddnnf.ConjunctionNode)
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#exit(fr.univartois.cril.
+     * pbd4.ddnnf.ConjunctionNode)
      */
     @Override
     public void exit(ConjunctionNode node) {
-        exitInternal();
+        exitInternal(node);
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
-     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#enter(fr.univartois.cril.pbd4.
-     * ddnnf.DecisionNode)
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#enter(fr.univartois.cril.
+     * pbd4.ddnnf.DecisionNode)
      */
     @Override
-    public void enter(DecisionNode node) {
+    public boolean enter(DecisionNode node) {
+        if (pushCachedValue(node)) {
+            // No need to evaluate the disjuncts.
+            return false;
+        }
+
+        // The disjuncts must be evaluated.
         partialEvaluations.push(false);
         operations.push(OR);
+        return true;
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
-     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#visit(fr.univartois.cril.pbd4.
-     * ddnnf.DecisionNode)
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#visit(fr.univartois.cril.
+     * pbd4.ddnnf.DecisionNode)
      */
     @Override
     public void visit(DecisionNode node) {
@@ -137,22 +168,22 @@ final class DecisionDnnfEvaluator implements DecisionDnnfVisitor {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
-     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#exit(fr.univartois.cril.pbd4.
-     * ddnnf.DecisionNode)
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#exit(fr.univartois.cril.
+     * pbd4.ddnnf.DecisionNode)
      */
     @Override
     public void exit(DecisionNode node) {
-        exitInternal();
+        exitInternal(node);
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
-     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#visit(fr.univartois.cril.pbd4.
-     * ddnnf.LiteralNode)
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#visit(fr.univartois.cril.
+     * pbd4.ddnnf.LiteralNode)
      */
     @Override
     public void visit(LiteralNode node) {
@@ -161,14 +192,30 @@ final class DecisionDnnfEvaluator implements DecisionDnnfVisitor {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
-     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#visit(fr.univartois.cril.pbd4.
-     * ddnnf.ConstantNode)
+     * fr.univartois.cril.pbd4.ddnnf.DecisionDnnfVisitor#visit(fr.univartois.cril.
+     * pbd4.ddnnf.ConstantNode)
      */
     @Override
     public void visit(ConstantNode node) {
         pushPartialEvaluation(node == ConstantNode.TRUE);
+    }
+
+    /**
+     * Checks whether the value for the given node has already been computed, and pushes
+     * the cached value on the stack of partial evaluations if this is the case.
+     *
+     * @param node The node to check the cached value of.
+     *
+     * @return Whether there is a cached value for the node.
+     */
+    private boolean pushCachedValue(NonConstantDecisionDnnfNode node) {
+        if (node.getVisitStamp() == this.startTime) {
+            pushPartialEvaluation(node.getCached());
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -178,21 +225,33 @@ final class DecisionDnnfEvaluator implements DecisionDnnfVisitor {
      * 
      * @param value The value to push.
      */
-    private void pushPartialEvaluation(boolean value) {
+    private boolean pushPartialEvaluation(boolean value) {
         boolean previous = partialEvaluations.pop();
-        partialEvaluations.push(operations.peek().apply(previous, value));
+        boolean result = operations.peek().apply(previous, value);
+        partialEvaluations.push(result);
+        return result;
     }
 
     /**
      * Exits an internal node.
-     * Unless if the node is the root node, the last pushed value is consumed.
+     * Unless the node is the root node, the last pushed value is consumed.
      */
-    private void exitInternal() {
+    private void exitInternal(NonConstantDecisionDnnfNode node) {
+        boolean value;
+
         if (operations.size() > 1) {
-            // The value of the exited node must be consummed.
+            // The value of the exited node must be consumed.
             operations.pop();
-            pushPartialEvaluation(partialEvaluations.pop());
+            value = pushPartialEvaluation(partialEvaluations.pop());
+
+        } else {
+            // The value is that on the top of the stack.
+            value = partialEvaluations.peek();
         }
+
+        // Caching the value computed for the node.
+        node.setVisitStamp(startTime);
+        node.cacheValue(value);
     }
 
     /**

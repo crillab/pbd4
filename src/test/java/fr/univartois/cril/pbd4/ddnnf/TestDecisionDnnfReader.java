@@ -22,92 +22,69 @@ package fr.univartois.cril.pbd4.ddnnf;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.jupiter.api.Test;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+
+import org.junit.jupiter.api.DisplayName;
 
 /**
- * The TestDecisionDnnfReader is a JUnit test case testing the implementation of the
- * {@link DecisionDnnfReader}.
+ * The TestDecisionDnnfReader is a JUnit test case testing the reading of a
+ * d-DNNF written in the NNF format.
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
-public final class TestDecisionDnnfReader extends AbstractTestDecisionDnnf {
+@DisplayName("Reading a d-DNNF produces the expected d-DNNF.")
+public final class TestDecisionDnnfReader extends AbstractTestDecisionDnnfEvaluation {
 
-    /**
-     * Tests that the decision-DNNF stored in the file {@code example-1.nnf} is properly
-     * read.
-     */
-    @Test
-    public void testEvaluateExample1() {
-        var ddnnf = read("example-1.nnf");
-        assertEquals(4, ddnnf.getNumberOfVariables());
-        assertEquals(15, ddnnf.getNumberOfNodes());
-        assertEquals(17, ddnnf.getNumberOfEdges());
-        assertEquals(nnfOfExample1(), ddnnf.toString());
-    }
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see fr.univartois.cril.pbd4.ddnnf.AbstractTestDecisionDnnfEvaluation#
+	 * createExample1()
+	 */
+	@Override
+	protected DecisionDnnf createExample1() {
+		var ddnnf = read("example-1.nnf");
+		assertEquals(4, ddnnf.getNumberOfVariables());
+		assertEquals(15, ddnnf.getNumberOfNodes());
+		assertEquals(17, ddnnf.getNumberOfEdges());
+		return ddnnf;
+	}
 
-    /**
-     * Gives the String representation of the decision-DNNF stored in the file
-     * {@code example-1.nnf}.
-     * 
-     * @return The String representation of the decision-DNNF.
-     */
-    static String nnfOfExample1() {
-        return "nnf 15 17 4" + System.lineSeparator() +
-                "L -3" + System.lineSeparator() +
-                "L -2" + System.lineSeparator() +
-                "L 1" + System.lineSeparator() +
-                "A 3 2 1 0" + System.lineSeparator() +
-                "L 3" + System.lineSeparator() +
-                "O 3 2 4 3" + System.lineSeparator() +
-                "L -4" + System.lineSeparator() +
-                "A 2 6 5" + System.lineSeparator() +
-                "L 4" + System.lineSeparator() +
-                "A 2 2 8" + System.lineSeparator() +
-                "A 2 1 4" + System.lineSeparator() +
-                "L 2" + System.lineSeparator() +
-                "O 2 2 11 10" + System.lineSeparator() +
-                "A 2 12 9" + System.lineSeparator() +
-                "O 4 2 13 7";
-    }
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see fr.univartois.cril.pbd4.ddnnf.AbstractTestDecisionDnnfEvaluation#
+	 * createExample2()
+	 */
+	@Override
+	protected DecisionDnnf createExample2() {
+		var ddnnf = read("example-2.nnf");
+		assertEquals(3, ddnnf.getNumberOfVariables());
+		assertEquals(14, ddnnf.getNumberOfNodes());
+		assertEquals(15, ddnnf.getNumberOfEdges());
+		return ddnnf;
+	}
 
-    /**
-     * Tests that the decision-DNNF stored in the file {@code example-2.nnf} is properly
-     * read.
-     */
-    @Test
-    public void testEvaluateExample2() {
-        var ddnnf = read("example-2.nnf");
-        assertEquals(3, ddnnf.getNumberOfVariables());
-        assertEquals(15, ddnnf.getNumberOfNodes());
-        assertEquals(15, ddnnf.getNumberOfEdges());
-        assertEquals(nnfOfExample2(), ddnnf.toString());
-    }
+	/**
+	 * Reads a d-DNNF from a resource file.
+	 *
+	 * @param filename The name of the file to read.
+	 *        This file is supposed to be located in the {@code ddnnf} resource folder.
+	 *
+	 * @return The read decision-DNNF.
+	 *
+	 * @throws UncheckedIOException If an I/O error occurs while reading.
+	 */
+	protected static DecisionDnnf read(String filename) {
+		try (var reader = new DecisionDnnfReader(TestDecisionDnnfReader.class.getResourceAsStream("/ddnnf/" + filename))) {
+			return reader.read();
 
-    /**
-     * Gives the String representation of the decision-DNNF stored in the file
-     * {@code example-2.nnf}.
-     * 
-     * @return The String representation of the decision-DNNF.
-     */
-    static String nnfOfExample2() {
-        return "nnf 15 15 3" + System.lineSeparator() +
-                "O 0 0" + System.lineSeparator() +
-                "A 0" + System.lineSeparator() +
-                "L -1" + System.lineSeparator() +
-                "L 3" + System.lineSeparator() +
-                "A 3 3 2 1" + System.lineSeparator() +
-                "L 1" + System.lineSeparator() +
-                "A 2 5 1" + System.lineSeparator() +
-                "O 1 2 6 4" + System.lineSeparator() +
-                "L -2" + System.lineSeparator() +
-                "A 2 8 7" + System.lineSeparator() +
-                "L -1" + System.lineSeparator() +
-                "L 2" + System.lineSeparator() +
-                "L -3" + System.lineSeparator() +
-                "A 4 12 11 10 1" + System.lineSeparator() +
-                "O 2 2 13 9";
-    }
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
 
 }

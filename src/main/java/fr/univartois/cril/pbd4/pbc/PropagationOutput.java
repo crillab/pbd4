@@ -24,12 +24,12 @@ import org.sat4j.core.VecInt;
 import org.sat4j.specs.IVecInt;
 
 /**
- * The PropagationOutput represents the result of Boolean Constraint Propagation on a
- * pseudo-Boolean formula.
+ * The PropagationOutput represents the result of Boolean Constraint Propagation (BCP)
+ * on a pseudo-Boolean formula.
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
 public final class PropagationOutput {
 
@@ -61,7 +61,7 @@ public final class PropagationOutput {
         this.propagatedLiterals = propagatedLiterals;
         this.formula = formula;
     }
-    
+
     /**
      * Creates a PropagationOutput for an unsatisfiable formula.
      *
@@ -105,7 +105,7 @@ public final class PropagationOutput {
     }
 
     /**
-     * Checks whether the propagation has proven that the formula is unsatisfiable.
+     * Checks whether the formula is unsatisfiable.
      *
      * @return Whether the formula is unsatisfiable.
      */
@@ -114,8 +114,9 @@ public final class PropagationOutput {
     }
 
     /**
-     * Checks whether the propagation has not been able to prove anything about the
-     * formula.
+     * Checks whether the status of the formula is unknown.
+     * This is the case when the formula is satisfiable, but the propagated literals are
+     * not enough to satisfy the formula.
      *
      * @return Whether the status of the formula is unknown.
      */
@@ -125,8 +126,7 @@ public final class PropagationOutput {
 
     /**
      * Gives the literals that have been propagated during BCP.
-     * The result of this method is undefined if the solver status was
-     * {@link SolverStatus#UNSATISFIABLE}.
+     * The result of this method is undefined if the formula is unsatisfiable.
      *
      * @return The literals that have been propagated during BCP.
      *
@@ -141,9 +141,9 @@ public final class PropagationOutput {
     /**
      * Gives the formula obtained after having simplified the formula with respect to the
      * literals that have been propagated.
-     * The result of this method is undefined if the solver status was not
-     * {@link SolverStatus#UNKNOWN}.
-     * 
+     * The result of this method is undefined if the formula is either satisfied or
+     * unsatisfiable.
+     *
      * @return The simplified pseudo-Boolean formula.
      *
      * @see #isSatisfiable()

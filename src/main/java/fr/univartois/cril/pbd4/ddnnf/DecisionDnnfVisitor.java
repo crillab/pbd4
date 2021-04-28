@@ -28,7 +28,7 @@ package fr.univartois.cril.pbd4.ddnnf;
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
 public interface DecisionDnnfVisitor {
 
@@ -69,11 +69,13 @@ public interface DecisionDnnfVisitor {
      * Enters a {@link ConjunctionNode}.
      *
      * @param node The node to enter.
+     * 
+     * @return Whether the visitor accepts to actually visit the node.
      *
-     * @implSpec The default implementation does nothing.
+     * @implSpec The default implementation always returns {@code true}.
      */
-    default void enter(ConjunctionNode node) {
-        // Nothing to do by default.
+    default boolean enter(ConjunctionNode node) {
+    	return true;
     }
 
     /**
@@ -98,11 +100,13 @@ public interface DecisionDnnfVisitor {
      * Enters a {@link DecisionNode}.
      *
      * @param node The node to enter.
+     * 
+     * @return Whether the visitor accepts to actually visit the node.
      *
-     * @implSpec The default implementation does nothing.
+     * @implSpec The default implementation always returns {@code true}.
      */
-    default void enter(DecisionNode node) {
-        // Nothing to do by default.
+    default boolean enter(DecisionNode node) {
+    	return true;
     }
 
     /**
@@ -127,11 +131,13 @@ public interface DecisionDnnfVisitor {
      * Enters a {@link LiteralNode}.
      *
      * @param node The node to enter.
+     * 
+     * @return Whether the visitor accepts to actually visit the node.
      *
-     * @implSpec The default implementation does nothing.
+     * @implSpec The default implementation always returns {@code true}.
      */
-    default void enter(LiteralNode node) {
-        // Nothing to do by default.
+    default boolean enter(LiteralNode node) {
+    	return true;
     }
 
     /**
@@ -156,11 +162,13 @@ public interface DecisionDnnfVisitor {
      * Enters a {@link ConstantNode}.
      *
      * @param node The node to enter.
+     * 
+     * @return Whether the visitor accepts to actually visit the node.
      *
-     * @implSpec The default implementation does nothing.
+     * @implSpec The default implementation always returns {@code true}.
      */
-    default void enter(ConstantNode node) {
-        // Nothing to do by default.
+    default boolean enter(ConstantNode node) {
+    	return true;
     }
 
     /**

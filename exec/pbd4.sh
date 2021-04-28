@@ -15,18 +15,19 @@
 if [ -z "$PBD4_HOME" ]
 then
     # Using the default directory for PBD4.
-    PBD4_HOME="dist/jars"
+    PBD4_HOME="dist/home"
 fi
 
 if [ ! -d "$PBD4_HOME" ]
 then
     # PBD4 directory does not exist.
-    echo "$0: $PBD4_HOME: No such file or directory"
+    echo "$0: $PBD4_HOME: No such directory or not a directory"
     exit 127
 fi
 
 # Running PBD4.
 java $JAVA_OPTS $JVM_ARGS \
     -p "$PBD4_HOME" \
+    -cp "$PBD4_HOME/jkahypar-module-0.2.0.jar" \
     -m fr.univartois.cril.pbd4/fr.univartois.cril.pbd4.D4Launcher \
     $@

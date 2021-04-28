@@ -26,6 +26,8 @@ import java.util.List;
 import org.sat4j.core.VecInt;
 import org.sat4j.specs.IVecInt;
 
+import fr.univartois.cril.pbd4.pbc.hypergraph.DualHypergraph;
+
 /**
  * The Contradiction represents a pseudo-Boolean formula that is unsatisfiable.
  * The methods it defines are mainly place-holders.
@@ -34,7 +36,7 @@ import org.sat4j.specs.IVecInt;
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
 public final class Contradiction implements PseudoBooleanFormula {
 
@@ -55,13 +57,13 @@ public final class Contradiction implements PseudoBooleanFormula {
      *
      * @return The single instance of this class.
      */
-    public static PseudoBooleanFormula getInstance() {
+    public static PseudoBooleanFormula instance() {
         return INSTANCE;
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#numberOfVariables()
      */
     @Override
@@ -71,7 +73,7 @@ public final class Contradiction implements PseudoBooleanFormula {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#numberOfConstraints()
      */
     @Override
@@ -81,7 +83,7 @@ public final class Contradiction implements PseudoBooleanFormula {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#variables()
      */
     @Override
@@ -91,7 +93,7 @@ public final class Contradiction implements PseudoBooleanFormula {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#score(int)
      */
     @Override
@@ -101,7 +103,7 @@ public final class Contradiction implements PseudoBooleanFormula {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#assume(int)
      */
     @Override
@@ -111,7 +113,7 @@ public final class Contradiction implements PseudoBooleanFormula {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#assume(IVecInt)
      */
     @Override
@@ -119,29 +121,9 @@ public final class Contradiction implements PseudoBooleanFormula {
         return this;
     }
 
-    /* 
-     * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#requirePartitioning()
-     */
-    @Override
-    public boolean requirePartitioning() {
-        return false;
-    }
-
     /*
      * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#cutset()
-     */
-    @Override
-    public IVecInt cutset() {
-        return VecInt.EMPTY;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#connectedComponents()
      */
     @Override
@@ -151,12 +133,22 @@ public final class Contradiction implements PseudoBooleanFormula {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#propagate()
      */
     @Override
     public PropagationOutput propagate() {
         return PropagationOutput.unsatisfiable();
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#hypergraph()
+     */
+    @Override
+    public DualHypergraph hypergraph() {
+        throw new UnsupportedOperationException("No DualHypergraph for contradictory formula!");
     }
 
 }

@@ -23,12 +23,14 @@ package fr.univartois.cril.pbd4.pbc;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.sat4j.pb.SolverFactory;
 import org.sat4j.pb.reader.OPBReader2010;
 import org.sat4j.pb.reader.PBInstanceReader;
 import org.sat4j.reader.LecteurDimacs;
 import org.sat4j.reader.ParseFormatException;
 import org.sat4j.specs.ContradictionException;
+
+import fr.univartois.cril.pbd4.pbc.solver.PBSolverSelectorProviderDecorator;
+import fr.univartois.cril.pbd4.pbc.solver.SolverProvider;
 
 /**
  * The PseudoBooleanFormulaReader is a utility class designed to make easier the
@@ -37,15 +39,23 @@ import org.sat4j.specs.ContradictionException;
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
 public final class PseudoBooleanFormulaReader {
 
     /**
-     * Disables instantiation.
+     * The provider for the solver to use to deal with the read pseudo-Boolean formulae.
      */
-    private PseudoBooleanFormulaReader() {
-        throw new AssertionError("No PseudoBooleanFormulaReader instances for you!");
+    private final PBSolverSelectorProviderDecorator solverProvider;
+
+    /**
+     * Creates a new PseudoBooleanFormulaReader.
+     *
+     * @param solverProvider The provider for the solver to use to deal with the read
+     *        pseudo-Boolean formulae.
+     */
+    public PseudoBooleanFormulaReader(SolverProvider solverProvider) {
+        this.solverProvider = PBSolverSelectorProviderDecorator.of(solverProvider);
     }
 
     /**
@@ -59,16 +69,16 @@ public final class PseudoBooleanFormulaReader {
      *
      * @throws IOException If an I/O error occurs while reading.
      */
-    public static PseudoBooleanFormula read(String path) throws IOException {
+    public PseudoBooleanFormula read(String path) throws IOException {
         try {
-            var solver = new PBSelectorSolver(SolverFactory.newCuttingPlanes());
+            var solver = solverProvider.createSolver();
             var reader = new PBInstanceReader(solver);
             reader.parseInstance(path);
             return new OriginalPseudoBooleanFormula(solver);
 
         } catch (ContradictionException e) {
             // The read formula is unsatisfiable.
-            return Contradiction.getInstance();
+            return Contradiction.instance();
 
         } catch (ParseFormatException e) {
             // The input format is incorrect.
@@ -85,16 +95,16 @@ public final class PseudoBooleanFormulaReader {
      *
      * @throws IOException If an I/O error occurs while reading.
      */
-    public static PseudoBooleanFormula readCnf(InputStream inputStream) throws IOException {
+    public PseudoBooleanFormula readCnf(InputStream inputStream) throws IOException {
         try {
-            var solver = new PBSelectorSolver(SolverFactory.newCuttingPlanes());
+            var solver = solverProvider.createSatSolver();
             var reader = new LecteurDimacs(solver);
             reader.parseInstance(inputStream);
             return new OriginalPseudoBooleanFormula(solver);
 
         } catch (ContradictionException e) {
             // The read formula is unsatisfiable.
-            return Contradiction.getInstance();
+            return Contradiction.instance();
 
         } catch (ParseFormatException e) {
             // The input format is incorrect.
@@ -111,16 +121,16 @@ public final class PseudoBooleanFormulaReader {
      *
      * @throws IOException If an I/O error occurs while reading.
      */
-    public static PseudoBooleanFormula readOpb(InputStream inputStream) throws IOException {
+    public PseudoBooleanFormula readOpb(InputStream inputStream) throws IOException {
         try {
-            var solver = new PBSelectorSolver(SolverFactory.newCuttingPlanes());
+            var solver = solverProvider.createPBSolver();
             var reader = new OPBReader2010(solver);
             reader.parseInstance(inputStream);
             return new OriginalPseudoBooleanFormula(solver);
 
         } catch (ContradictionException e) {
             // The read formula is unsatisfiable.
-            return Contradiction.getInstance();
+            return Contradiction.instance();
 
         } catch (ParseFormatException e) {
             // The input format is incorrect.

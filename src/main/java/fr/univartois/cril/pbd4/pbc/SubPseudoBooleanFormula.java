@@ -37,7 +37,7 @@ import fr.univartois.cril.pbd4.pbc.hypergraph.Hypergraphable;
  *
  * @author Romain WALLON
  *
- * @version 0.1.0
+ * @version 0.2.0
  */
 final class SubPseudoBooleanFormula implements PseudoBooleanFormula, Hypergraphable {
 
@@ -50,22 +50,12 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula, Hypergrapha
      * The literal on which a decision has been made (if any).
      */
     private final OptionalInt decision;
-    
-    /**
-     * The dual hypergraph associated to this sub-formula.
-     */
-    private DualHypergraph hypergraph;
 
     /**
      * The assumptions that have been made to create this sub-formula.
      */
     private final IVecInt assumptions;
-    
-    /**
-     * The number of variables that have been removed at the current step.
-     */
-    private int latestRemovedVariables;
-    
+
     /**
      * The literals that have been satisfied.
      */
@@ -88,6 +78,11 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula, Hypergrapha
     private final int[] updatedDlcsScores;
 
     /**
+     * The dual hypergraph associated to this sub-formula.
+     */
+    private DualHypergraph hypergraph;
+
+    /**
      * Creates a new SubPseudoBooleanFormula.
      *
      * @param builder The builder used to initialize the formula.
@@ -96,7 +91,6 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula, Hypergrapha
         this.decorated = builder.getOriginalFormula();
         this.decision = builder.getDecision();
         this.assumptions = builder.getAssumptions();
-        this.latestRemovedVariables = builder.getLatestRemovedVariables();
         this.satisfiedLiterals = builder.getSatisfiedLiterals();
         this.inactiveConstraints = builder.getInactiveConstraints();
         this.variables = builder.getVariables();
@@ -105,7 +99,7 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula, Hypergrapha
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#numberOfVariables()
      */
     @Override
@@ -115,7 +109,7 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula, Hypergrapha
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#numberOfConstraints()
      */
     @Override
@@ -125,7 +119,7 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula, Hypergrapha
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#variables()
      */
     @Override
@@ -135,7 +129,7 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula, Hypergrapha
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.hypergraph.Hypergraphable#isActive(int)
      */
     @Override
@@ -145,7 +139,7 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula, Hypergrapha
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * fr.univartois.cril.pbd4.hypergraph.Hypergraphable#numberOfConstraintsContaining(
      * int)
@@ -157,7 +151,7 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula, Hypergrapha
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.hypergraph.Hypergraphable#constraintsContaining(int)
      */
     @Override
@@ -167,7 +161,7 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula, Hypergrapha
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#score()
      */
     @Override
@@ -177,78 +171,55 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula, Hypergrapha
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#assume(int)
      */
     @Override
     public PseudoBooleanFormula assume(int literal) {
         return SubPseudoBooleanFormulaBuilder.of(decorated)
-                .initialAssumptions(assumptions)
-                .satisfiedLiterals((BitSet) satisfiedLiterals.clone())
-                .inactiveConstraints((BitSet) inactiveConstraints.clone())
-                .possibleVariable(variables)
-                .decision(literal)
-                .build();
+            .initialAssumptions(assumptions)
+            .satisfiedLiterals((BitSet) satisfiedLiterals.clone())
+            .inactiveConstraints((BitSet) inactiveConstraints.clone())
+            .possibleVariables(variables)
+            .decision(literal)
+            .build();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#assume(IVecInt)
      */
     @Override
     public PseudoBooleanFormula assume(IVecInt literals) {
         return SubPseudoBooleanFormulaBuilder.of(decorated)
-                .initialAssumptions(assumptions)
-                .satisfiedLiterals((BitSet) satisfiedLiterals.clone())
-                .inactiveConstraints((BitSet) inactiveConstraints.clone())
-                .possibleVariable(variables)
-                .newAssumptions(literals)
-                .build();
-    }
-
-    /* 
-     * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#requirePartitioning()
-     */
-    @Override
-    public boolean requirePartitioning() {
-        // A partition is recomputed when more than 10% of the variables have been assigned.
-        return (10 * latestRemovedVariables) >= (latestRemovedVariables + numberOfVariables());
+            .initialAssumptions(assumptions)
+            .satisfiedLiterals((BitSet) satisfiedLiterals.clone())
+            .inactiveConstraints((BitSet) inactiveConstraints.clone())
+            .possibleVariables(variables)
+            .newAssumptions(literals)
+            .build();
     }
 
     /*
      * (non-Javadoc)
-     * 
-     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#cutset()
-     */
-    @Override
-    public IVecInt cutset() {
-        var cutset = hypergraph().cutset();
-        cutset.sort((x, y) -> Double.compare(score(x), score(y)));
-        return cutset;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#connectedComponents()
      */
     @Override
     public Collection<PseudoBooleanFormula> connectedComponents() {
         var rawComponents = hypergraph().connectedComponents();
         var components = new ArrayList<PseudoBooleanFormula>(rawComponents.size());
-        
+
         // Computing the actual sub-formulae.
         for (var it = rawComponents.iterator(); it.hasNext();) {
             var component = it.next();
             components.add(computeSubFormula(component));
         }
-        
+
         return components;
     }
-    
+
     /**
      * Computes the sub-formula containing only the given constraints.
      *
@@ -264,33 +235,33 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula, Hypergrapha
             var constr = it.next();
             subInactiveConstraints.set(constr, false);
         }
-        
+
         // Creating the sub-formula.
         return SubPseudoBooleanFormulaBuilder.of(decorated)
-                .initialAssumptions(assumptions)
-                .previousRemovedVariables(latestRemovedVariables)
-                .satisfiedLiterals((BitSet) satisfiedLiterals.clone())
-                .inactiveConstraints(subInactiveConstraints)
-                .possibleVariable(variables)
-                .build();
+            .initialAssumptions(assumptions)
+            .satisfiedLiterals((BitSet) satisfiedLiterals.clone())
+            .inactiveConstraints(subInactiveConstraints)
+            .possibleVariables(variables)
+            .build();
     }
 
-    /**
-     * Computes the dual hypergraph of this sub-formula (unless it has already been computed), and returns it.
+    /*
+     * (non-Javadoc)
      *
-     * @return The dual hypergraph of this sub-formula.
+     * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#hypergraph()
      */
-    private DualHypergraph hypergraph() {
+    @Override
+    public DualHypergraph hypergraph() {
         if (hypergraph == null) {
             hypergraph = DualHypergraph.of(this);
         }
-        
+
         return hypergraph;
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#propagate()
      */
     @Override
@@ -339,9 +310,9 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula, Hypergrapha
         return effectiveAssumptions;
     }
 
-    /* 
+    /*
      * (non-Javadoc)
-     * 
+     *
      * @see fr.univartois.cril.pbd4.pbc.PseudoBooleanFormula#onCaching()
      */
     @Override
@@ -349,5 +320,5 @@ final class SubPseudoBooleanFormula implements PseudoBooleanFormula, Hypergrapha
         // The hypergraph will not be reused, so we do not keep it.
         hypergraph = null;
     }
-    
+
 }
